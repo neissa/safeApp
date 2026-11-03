@@ -26,6 +26,9 @@ html,
 body {
   height: 100%;
   margin: 0;
+  /* Pas de rafraîchissement par glissement vers le bas (pull-to-refresh) */
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
 }
 
 body {
@@ -79,6 +82,7 @@ button:active {
   height: 100%;
   padding: 10px 14px;
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .screen.active {
