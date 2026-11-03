@@ -44,6 +44,8 @@ html,
 body {
   height: 100%;
   margin: 0;
+  /* Pas de zoom par pincement ni de zoom par double appui : seul le défilement reste possible */
+  touch-action: pan-x pan-y;
   /* Pas de rafraîchissement par glissement vers le bas (pull-to-refresh) */
   overscroll-behavior: none;
   overscroll-behavior-y: none;
@@ -594,6 +596,13 @@ button:active {
   resize: none;
 }
 
+/* Bloc-notes en capitales (bouton AA) */
+.paper-text.caps {
+  font-family: var(--font-digits);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 .paper-text:focus {
   outline: 3px solid #ffb300;
 }
@@ -1093,6 +1102,12 @@ audio {
   justify-content: space-between;
   font-size: 12px;
   opacity: 0.7;
+}
+
+/* Voix coupée : on cache les 🔊 des jeux (sans décaler la barre du haut) */
+html[data-voice="off"] .speak-btn {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 /* Statistiques du menu parent */

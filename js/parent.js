@@ -405,6 +405,7 @@
     });
     voiceBtn.addEventListener("click", () => {
       KA.settings.set("voice", !KA.settings.get("voice", true));
+      KA.applyVoiceUI();
       refreshToggles();
     });
     document.getElementById("parent-voice-select").addEventListener("change", (e) => {

@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="color-scheme" content="light">
-  <meta name="app-version" content="b56895a9cf03">
+  <meta name="app-version" content="259d862415f1">
   <meta name="app-built" content="2026-11-03">
   <title>Mon coin magique</title>
   <meta name="theme-color" content="#bfe9ff">
@@ -12,7 +12,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=982c60cb58">
+  <link rel="stylesheet" href="css/style.css?v=fc38eb6182">
 </head>
 <body>
 <div id="app">
@@ -95,6 +95,7 @@
     </header>
     <textarea id="note-text" class="paper-text" placeholder="✏️ Écris ici..." spellcheck="false"></textarea>
     <div class="row">
+      <button class="btn" id="note-caps" aria-label="Changer l'écriture">AA</button>
       <button class="btn alt" id="note-clear">🗑️ Effacer</button>
     </div>
   </section>
@@ -104,7 +105,7 @@
     <header class="bar">
       <button class="chip" data-back aria-label="Accueil">🏠</button>
       <h2>🧮 Nombre</h2>
-      <button class="chip" id="calc-read" aria-label="Lire le résultat">🔊</button>
+      <button class="chip speak-btn" id="calc-read" aria-label="Lire le résultat">🔊</button>
     </header>
     <div class="row">
       <button class="btn" id="calc-mode">🎮 Jouer</button>
@@ -295,7 +296,7 @@
     <header class="bar">
       <button class="chip" data-back aria-label="Accueil">🏠</button>
       <h2>🔶 Formes</h2>
-      <button class="chip" id="shapes-say" aria-label="Répéter la consigne">🔊</button>
+      <button class="chip speak-btn" id="shapes-say" aria-label="Répéter la consigne">🔊</button>
     </header>
     <p id="shapes-help" class="game-help">Touche la forme demandée</p>
     <div id="shapes-choices" class="shape-choices"></div>
@@ -307,7 +308,7 @@
     <header class="bar">
       <button class="chip" data-back aria-label="Accueil">🏠</button>
       <h2>🔍 L'intrus</h2>
-      <button class="chip" id="intrus-say" aria-label="Répéter la consigne">🔊</button>
+      <button class="chip speak-btn" id="intrus-say" aria-label="Répéter la consigne">🔊</button>
     </header>
     <p class="game-help">Trouve celui qui n'a rien à faire là</p>
     <div id="intrus-grid" class="intrus-grid"></div>
@@ -478,17 +479,17 @@
 
 </div>
 
-<script src="js/core.js?v=392660af8e"></script>
+<script src="js/core.js?v=553009934e"></script>
 <script src="js/ui.js?v=3d63d19598"></script>
 <script src="js/draw.js?v=57783c48c5"></script>
-<script src="js/notes.js?v=c40e79ee86"></script>
+<script src="js/notes.js?v=0b82255267"></script>
 <script src="js/calc.js?v=76aec6d76e"></script>
 <script src="js/gallery.js?v=ef63a40877"></script>
 <script src="js/music.js?v=7e8b9510e0"></script>
 <script src="js/recorder.js?v=7c25dc92e5"></script>
 <script src="js/clock.js?v=7b4f1fee15"></script>
 <script src="js/spotify.js?v=d6ebba8e7c"></script>
-<script src="js/parent.js?v=bca662e590"></script>
+<script src="js/parent.js?v=9e08bc1925"></script>
 <script src="js/stats.js?v=d8bd7df3de"></script>
 <script src="js/pin.js?v=3879420e83"></script>
 <script src="js/home.js?v=d6063d6cae"></script>

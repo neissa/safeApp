@@ -203,6 +203,12 @@
   if (darkQuery && darkQuery.addEventListener) darkQuery.addEventListener("change", () => KA.applyTheme());
   KA.applyTheme();
 
+  // Voix coupée : les boutons 🔊 des jeux disparaissent (le bloc-notes garde le sien)
+  KA.applyVoiceUI = function () {
+    document.documentElement.dataset.voice = KA.settings.get("voice", true) ? "on" : "off";
+  };
+  KA.applyVoiceUI();
+
   // Vrai pendant un enregistrement : ni bruitage ni voix, le micro les capterait
   KA.quiet = false;
 
