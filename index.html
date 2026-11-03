@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light">
-  <meta name="app-version" content="25fa46299c1f">
+  <meta name="app-version" content="35f8d67aad14">
   <meta name="app-built" content="2026-11-03">
   <title>Mon coin magique</title>
   <meta name="theme-color" content="#bfe9ff">
@@ -12,7 +12,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=6492fdedfb">
+  <link rel="stylesheet" href="css/style.css?v=e6e0ef2856">
 </head>
 <body>
 <div id="app">
@@ -37,6 +37,7 @@
       <button class="tile t-timer" data-open="timer" data-say="Minuteur" aria-label="Minuteur"><span class="tile-ico">⏱️</span><span class="tile-label">Minuteur</span></button>
       <button class="tile t-shapes" data-open="shapes" data-say="Formes" aria-label="Formes"><span class="tile-ico">🔶</span><span class="tile-label">Formes</span></button>
       <button class="tile t-intrus" data-open="intrus" data-say="L'intrus" aria-label="L'intrus"><span class="tile-ico">🔍</span><span class="tile-label">L'intrus</span></button>
+      <button class="tile t-snake" data-open="snake" data-say="Snake" data-lang="en-US" aria-label="Snake"><span class="tile-ico">🐍</span><span class="tile-label">Snake</span></button>
       <button class="tile t-clock" data-open="clock" data-say="Date et heure" aria-label="Date et heure"><span class="tile-ico">🕐</span><span class="tile-label">Date et heure</span></button>
     </nav>
     <div class="home-foot">
@@ -248,6 +249,30 @@
     <p id="memory-msg" class="hint"></p>
   </section>
 
+  <!-- SNAKE -->
+  <section id="screen-snake" class="screen">
+    <header class="bar">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>🐍 Snake</h2>
+      <span></span>
+    </header>
+    <div class="snake-info">
+      <span id="snake-score" class="snake-score">Pommes : 0</span>
+      <span id="snake-best" class="hint"></span>
+    </div>
+    <canvas id="snake-canvas" class="snake-canvas" width="336" height="336" aria-label="Terrain du serpent"></canvas>
+    <div class="snake-pad">
+      <button class="snake-arrow" id="snake-up" aria-label="Haut">⬆️</button>
+      <button class="snake-arrow" id="snake-left" aria-label="Gauche">⬅️</button>
+      <button class="snake-arrow" id="snake-down" aria-label="Bas">⬇️</button>
+      <button class="snake-arrow" id="snake-right" aria-label="Droite">➡️</button>
+    </div>
+    <div class="row">
+      <button class="btn" id="snake-start">▶️ Jouer</button>
+    </div>
+    <p id="snake-msg" class="hint"></p>
+  </section>
+
   <!-- FORMES -->
   <section id="screen-shapes" class="screen">
     <header class="bar">
@@ -255,7 +280,7 @@
       <h2>🔶 Formes</h2>
       <button class="chip" id="shapes-say" aria-label="Répéter la consigne">🔊</button>
     </header>
-    <p class="game-help">Touche la forme demandée</p>
+    <p id="shapes-help" class="game-help">Touche la forme demandée</p>
     <div id="shapes-choices" class="shape-choices"></div>
     <p id="shapes-stars" class="game-stars"></p>
   </section>
@@ -336,6 +361,20 @@
   </div>
 </div>
 
+<!-- Code à 4 chiffres du menu parent -->
+<div id="pin" class="overlay" hidden>
+  <div class="overlay-card pin-card">
+    <p id="pin-title" class="pin-title">Entre le code</p>
+    <div id="pin-dots" class="pin-dots"><span></span><span></span><span></span><span></span></div>
+    <p id="pin-msg" class="hint"></p>
+    <div id="pin-pad" class="pin-pad"></div>
+    <div class="row">
+      <button class="btn alt" id="pin-recover">Code oublié ?</button>
+      <button class="btn" id="pin-cancel">Annuler</button>
+    </div>
+  </div>
+</div>
+
 <!-- Menu parent : titre, sons, sauvegarde -->
 <div id="parent" class="overlay" hidden>
   <div class="overlay-card parent-card">
@@ -353,6 +392,14 @@
       <h3>🧩 Tuiles de l'accueil</h3>
       <p class="hint">Décoche une tuile pour la cacher</p>
       <div id="parent-tiles" class="parent-tiles"></div>
+    </section>
+
+    <section class="parent-section">
+      <h3>📊 Statistiques</h3>
+      <div id="stats-table" class="stats-table"></div>
+      <h3 class="stats-sub">Répartition d'aujourd'hui</h3>
+      <div id="stats-pie" class="stats-pie"></div>
+      <button class="btn alt" id="stats-reset">🗑️ Réinitialiser les statistiques</button>
     </section>
 
     <section class="parent-section">
@@ -401,6 +448,12 @@
       <button class="btn" id="parent-update">🔄 Vérifier et mettre à jour</button>
     </section>
 
+    <section class="parent-section">
+      <h3>🔐 Sécurité</h3>
+      <button class="btn" id="parent-pin">🔐 Changer le code</button>
+      <p id="parent-pin-msg" class="hint"></p>
+    </section>
+
     <p id="parent-msg" class="hint"></p>
     <button class="btn" id="parent-close">Fermer</button>
   </div>
@@ -408,7 +461,7 @@
 
 </div>
 
-<script src="js/core.js?v=32dc19fe90"></script>
+<script src="js/core.js?v=392660af8e"></script>
 <script src="js/ui.js?v=3d63d19598"></script>
 <script src="js/draw.js?v=57783c48c5"></script>
 <script src="js/notes.js?v=c40e79ee86"></script>
@@ -418,14 +471,17 @@
 <script src="js/recorder.js?v=7c25dc92e5"></script>
 <script src="js/clock.js?v=7b4f1fee15"></script>
 <script src="js/spotify.js?v=473b9b2ed4"></script>
-<script src="js/parent.js?v=6056ae62d2"></script>
-<script src="js/home.js?v=e1672b3c6c"></script>
+<script src="js/parent.js?v=bca662e590"></script>
+<script src="js/stats.js?v=d8bd7df3de"></script>
+<script src="js/pin.js?v=3879420e83"></script>
+<script src="js/home.js?v=d6063d6cae"></script>
 <script src="js/raptor.js?v=1ecf6d4917"></script>
 <script src="js/piano.js?v=2f144c1b63"></script>
 <script src="js/memory.js?v=4792d1a37a"></script>
 <script src="js/timer.js?v=a2eca99d52"></script>
-<script src="js/games.js?v=7aa974e1cd"></script>
-<script src="js/main.js?v=70f5d3943d"></script>
+<script src="js/games.js?v=fa71f6a408"></script>
+<script src="js/snake.js?v=df99f1a5a0"></script>
+<script src="js/main.js?v=15ea266cbf"></script>
 <script>
   // Hors ligne : le service worker garde l'appli en cache (ignoré si le navigateur ne le gère pas)
   if ("serviceWorker" in navigator) {

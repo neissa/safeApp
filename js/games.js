@@ -67,6 +67,8 @@
     shapes.busy = false;
     const pick = shuffle(SHAPES.slice()).slice(0, 3);
     shapes.target = pick[Math.floor(Math.random() * pick.length)];
+    // Le nom de la forme demandée s'écrit aussi à l'écran
+    shapesRoot.querySelector("#shapes-help").textContent = "Touche " + shapes.target.name;
     const box = shapesRoot.querySelector("#shapes-choices");
     box.innerHTML = "";
     pick.forEach((s) => {

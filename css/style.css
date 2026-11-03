@@ -293,12 +293,68 @@ button:active {
 .t-timer { background: #ef6c00; }
 .t-shapes { background: #7cb342; }
 .t-intrus { background: #8d6e63; }
+.t-snake { background: #2e7d32; }
+
+/* Snake */
+.snake-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.snake-score {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.snake-canvas {
+  display: block;
+  width: min(90vw, 340px, calc(100dvh - 440px));
+  aspect-ratio: 1;
+  margin: 0 auto;
+  border-radius: 18px;
+  box-shadow: 0 5px 0 var(--shadow);
+  touch-action: none;
+}
+
+.snake-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 62px);
+  grid-template-rows: repeat(2, 56px);
+  gap: 8px;
+  width: max-content;
+  margin: 0 auto;
+}
+
+.snake-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  border: none;
+  border-radius: 18px;
+  background: var(--paper);
+  font-size: 26px;
+  box-shadow: 0 4px 0 var(--shadow);
+}
+
+#snake-up { grid-column: 2; grid-row: 1; }
+#snake-left { grid-column: 1; grid-row: 2; }
+#snake-down { grid-column: 2; grid-row: 2; }
+#snake-right { grid-column: 3; grid-row: 2; }
 
 /* Jeux Formes et L'intrus */
 .game-help {
   margin: 0;
   text-align: center;
   font-size: 18px;
+}
+
+#shapes-help {
+  font-size: 26px;
+  font-weight: bold;
 }
 
 .shape-choices {
@@ -952,6 +1008,128 @@ audio {
   border: 2px solid var(--line);
   border-radius: 12px;
   color: var(--ink);
+}
+
+/* Statistiques du menu parent */
+.stats-table {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  gap: 4px;
+  font-size: 14px;
+}
+
+.stats-cell {
+  padding: 4px 2px;
+  text-align: center;
+  border-bottom: 1px solid var(--line);
+}
+
+.stats-cell.name {
+  text-align: left;
+}
+
+.stats-cell.head {
+  font-weight: bold;
+  border-bottom-width: 2px;
+}
+
+.stats-sub {
+  margin-top: 8px;
+  font-size: 16px;
+}
+
+.stats-pie {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.pie-svg {
+  width: min(60vw, 200px);
+  height: auto;
+}
+
+.pie-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+  width: 100%;
+}
+
+.pie-legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+}
+
+.pie-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+/* Code à 4 chiffres */
+.pin-card {
+  align-items: center;
+  max-width: 340px;
+}
+
+.pin-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.pin-dots {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  padding: 6px 0;
+}
+
+.pin-dots span {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 3px solid #90a4ae;
+  box-sizing: border-box;
+}
+
+.pin-dots span.on {
+  background: #42a5f5;
+  border-color: #42a5f5;
+}
+
+.pin-dots.shake {
+  animation: shake 0.4s;
+}
+
+.pin-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 72px);
+  gap: 10px;
+  justify-content: center;
+}
+
+.pin-key {
+  height: 60px;
+  border: none;
+  border-radius: 18px;
+  background: var(--paper);
+  font-family: var(--font-digits);
+  font-size: 24px;
+  font-weight: bold;
+  box-shadow: 0 4px 0 var(--shadow);
+}
+
+.pin-key.blank {
+  box-shadow: none;
+  background: transparent;
 }
 
 /* Menu parent : police normale, sections séparées */

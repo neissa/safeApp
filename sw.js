@@ -2,7 +2,7 @@
    Réseau d'abord (les mises à jour arrivent tout de suite), cache en secours.
    Spotify, la météo et les fichiers du téléphone ne sont jamais mis en cache.
    La version et la liste des fichiers sont mises à jour par tools/update-cache.js. */
-const CACHE = "mon-coin-magique-25fa46299c1f";
+const CACHE = "mon-coin-magique-35f8d67aad14";
 
 // BEGIN SHELL (généré par tools/update-cache.js)
 const SHELL = [
@@ -24,9 +24,12 @@ const SHELL = [
   "./js/notes.js",
   "./js/parent.js",
   "./js/piano.js",
+  "./js/pin.js",
   "./js/raptor.js",
   "./js/recorder.js",
+  "./js/snake.js",
   "./js/spotify.js",
+  "./js/stats.js",
   "./js/timer.js",
   "./js/ui.js",
   "./manifest.json",

@@ -7,6 +7,7 @@
 
   function show(name) {
     if (name === current) return;
+    if (name !== "home" && KA.stats) KA.stats.count(name);
     const prev = current;
     current = name;
     document.querySelectorAll(".screen").forEach((s) => {
@@ -36,7 +37,7 @@
 
     document.querySelectorAll("[data-open]").forEach((btn) => {
       btn.addEventListener("click", () => {
-        KA.speak(btn.dataset.say);
+        KA.speak(btn.dataset.say, { lang: btn.dataset.lang });
         show(btn.dataset.open);
       });
     });

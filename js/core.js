@@ -118,9 +118,11 @@
       if (!KA.settings.get("voice", true) && !(opts && opts.force)) return;
       window.speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(text);
-      u.lang = "fr-FR";
+      // Langue demandée (français par défaut, anglais pour « Snake ») ; la voix choisie ne sert que pour le français
+      const lang = (opts && opts.lang) || "fr-FR";
+      u.lang = lang;
       u.rate = 0.9;
-      const v = chosenVoice();
+      const v = lang.indexOf("fr") === 0 ? chosenVoice() : null;
       if (v) u.voice = v;
       window.speechSynthesis.speak(u);
     } catch (e) {

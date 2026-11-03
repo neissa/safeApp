@@ -51,6 +51,89 @@
       : "⚠️ Stockage non protégé : pense à faire une sauvegarde";
   }
 
+  // ---------- Statistiques ----------
+  function pieSvg(slices) {
+    const shown = slices.filter((s) => s.value > 0);
+    const total = shown.reduce((a, s) => a + s.value, 0);
+    if (!total) return null;
+    const cx = 100;
+    const cy = 100;
+    const r = 90;
+    let angle = -Math.PI / 2;
+    let body = "";
+    if (shown.length === 1) {
+      body = '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + shown[0].color + '"/>';
+    } else {
+      shown.forEach((s) => {
+        const a = (s.value / total) * 2 * Math.PI;
+        const x1 = cx + r * Math.cos(angle);
+        const y1 = cy + r * Math.sin(angle);
+        angle += a;
+        const x2 = cx + r * Math.cos(angle);
+        const y2 = cy + r * Math.sin(angle);
+        const large = a > Math.PI ? 1 : 0;
+        body +=
+          '<path d="M' + cx + " " + cy + " L" + x1.toFixed(2) + " " + y1.toFixed(2) +
+          " A" + r + " " + r + " 0 " + large + " 1 " + x2.toFixed(2) + " " + y2.toFixed(2) +
+          ' Z" fill="' + s.color + '"/>';
+      });
+    }
+    return '<svg viewBox="0 0 200 200" class="pie-svg" role="img" aria-label="Répartition des lancements d\'aujourd\'hui">' + body + "</svg>";
+  }
+
+  function refreshStats() {
+    const table = document.getElementById("stats-table");
+    const pie = document.getElementById("stats-pie");
+    if (!table || !KA.stats) return;
+    const tiles = [...document.querySelectorAll(".tile[data-open]")].map((t) => ({
+      name: t.dataset.open,
+      label: t.querySelector(".tile-label").textContent,
+      color: getComputedStyle(t).backgroundColor,
+    }));
+    const total = KA.stats.total();
+    const today = KA.stats.today();
+    const week = KA.stats.week();
+
+    table.innerHTML = "";
+    ["Tuile", "Depuis toujours", "Aujourd'hui", "7 jours"].forEach((h) => {
+      const c = document.createElement("span");
+      c.className = "stats-cell head";
+      c.textContent = h;
+      table.appendChild(c);
+    });
+    tiles.forEach((t) => {
+      [t.label, total[t.name] || 0, today[t.name] || 0, week[t.name] || 0].forEach((v, i) => {
+        const c = document.createElement("span");
+        c.className = "stats-cell" + (i === 0 ? " name" : "");
+        c.textContent = v;
+        table.appendChild(c);
+      });
+    });
+
+    pie.innerHTML = "";
+    const slices = tiles.map((t) => ({ value: today[t.name] || 0, color: t.color, label: t.label }));
+    const svg = pieSvg(slices);
+    if (!svg) {
+      pie.textContent = "Aucune ouverture aujourd'hui";
+      return;
+    }
+    pie.innerHTML = svg;
+    const totalToday = slices.reduce((a, s) => a + s.value, 0);
+    const legend = document.createElement("ul");
+    legend.className = "pie-legend";
+    slices
+      .filter((s) => s.value > 0)
+      .forEach((s) => {
+        const li = document.createElement("li");
+        const dot = document.createElement("span");
+        dot.className = "pie-dot";
+        dot.style.background = s.color;
+        li.append(dot, s.label + " : " + s.value + " (" + Math.round((s.value / totalToday) * 100) + " %)");
+        legend.appendChild(li);
+      });
+    pie.appendChild(legend);
+  }
+
   // ---------- Thème ----------
   function refreshTheme() {
     const current = KA.settings.get("theme", "light");
@@ -199,6 +282,7 @@
     refreshVoices();
     refreshTheme();
     refreshTiles();
+    refreshStats();
     refreshSpotify();
     refreshStorage();
     showUpdateState();
@@ -337,6 +421,16 @@
       })
     );
 
+    const statsReset = document.getElementById("stats-reset");
+    if (statsReset) {
+      statsReset.addEventListener("click", () =>
+        KA.armed(statsReset, () => {
+          KA.stats.reset();
+          refreshStats();
+        })
+      );
+    }
+
     spLogin.addEventListener("click", loginSpotify);
     spLogout.addEventListener("click", logoutSpotify);
     spPick.addEventListener("click", showPlaylists);
@@ -347,7 +441,20 @@
       if (fileInput.files[0]) importBackup(fileInput.files[0]);
     });
     document.getElementById("parent-update").addEventListener("click", updateApp);
+    document.getElementById("parent-pin").addEventListener("click", () => {
+      KA.askPin({
+        create: true,
+        onOk: () => {
+          document.getElementById("parent-pin-msg").textContent = "Nouveau code enregistré";
+        },
+      });
+    });
     document.getElementById("parent-close").addEventListener("click", close);
+    // Un appui (doigt ou souris) sur le fond sombre, en dehors de la fenêtre, ferme le menu.
+    // Un appui qui commence dans la fenêtre ne le ferme pas.
+    box.addEventListener("pointerdown", (e) => {
+      if (e.target === box) close();
+    });
 
     // Vérification en arrière-plan : au démarrage, toutes les 15 minutes, et au retour sur l'appli
     showUpdateState();

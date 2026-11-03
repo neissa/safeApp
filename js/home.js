@@ -37,7 +37,7 @@
     KA.applyTiles();
 
     iconEl.addEventListener("click", () => nextIcon(iconEl));
-    if (parentBtn) parentBtn.addEventListener("click", () => KA.challenge(() => KA.parent.open()));
+    if (parentBtn) parentBtn.addEventListener("click", () => KA.askPin({ onOk: () => KA.parent.open() }));
   }
 
   document.addEventListener("DOMContentLoaded", init);
