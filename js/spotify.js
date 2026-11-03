@@ -275,6 +275,16 @@
     if (player) player.pause();
   }
 
+  // État du lecteur (position, durée, piste en cours) ; null si le lecteur n'est pas actif
+  function getState() {
+    return player ? player.getCurrentState() : Promise.resolve(null);
+  }
+
+  // Place la lecture à « ms » millisecondes
+  function seek(ms) {
+    if (player) player.seek(ms);
+  }
+
   KA.spotify = {
     isConnected,
     login,
@@ -289,6 +299,8 @@
     pause,
     pickImage,
     userPlaylists,
+    getState,
+    seek,
     // pour les tests
     _challengeOf: challengeOf,
   };

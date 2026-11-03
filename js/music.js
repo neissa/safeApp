@@ -18,6 +18,8 @@
   let spConnected, spNow, spToggle, spList, spMsg, spCover;
   let miniPlayer, miniTitle, miniToggle, miniFill, miniBar, miniCur, miniDur;
   let seeking = false;
+  let miniMode = "local"; // "local" (chansons du téléphone) ou "spotify"
+  let spPoll = null;
   let tracks = [];
   let index = -1;
   let currentUrl = null;
@@ -64,6 +66,54 @@
     } else {
       refreshSpotifyView();
       if (KA.spotify.isConnected()) openConnected();
+    }
+    setMiniMode(local ? "local" : "spotify");
+  }
+
+  // ---------- Mini-lecteur Spotify (lecteur complet, compte connecté) ----------
+  let spState = null; // dernier état reçu du lecteur Spotify
+
+  function stopSpPoll() {
+    clearInterval(spPoll);
+    spPoll = null;
+  }
+
+  function startSpPoll() {
+    stopSpPoll();
+    const tick = () => {
+      KA.spotify.getState().then(updateMiniSpotify).catch(() => updateMiniSpotify(null));
+    };
+    tick();
+    spPoll = setInterval(tick, 500);
+  }
+
+  function updateMiniSpotify(st) {
+    if (miniMode !== "spotify" || !miniPlayer) return;
+    spState = st;
+    if (!st || !st.track_window || !st.track_window.current_track) {
+      miniPlayer.hidden = true;
+      return;
+    }
+    const t = st.track_window.current_track;
+    miniPlayer.hidden = false;
+    miniTitle.textContent = t.name + " — " + t.artists.map((a) => a.name).join(", ");
+    miniToggle.textContent = st.paused ? "▶️" : "⏸️";
+    const d = st.duration || 0;
+    const ratio = d > 0 ? Math.min(1, st.position / d) : 0;
+    miniFill.style.width = ratio * 100 + "%";
+    miniCur.textContent = fmt(st.position / 1000);
+    miniDur.textContent = fmt(d / 1000);
+  }
+
+  // Le mini-lecteur suit le lecteur du moment : chansons du téléphone, ou Spotify (connecté)
+  function setMiniMode(mode) {
+    miniMode = mode;
+    stopSpPoll();
+    if (mode === "spotify") {
+      if (KA.spotify.isConnected()) startSpPoll();
+      else miniPlayer.hidden = true; // le lecteur intégré ne peut pas être commandé
+    } else {
+      updateMini();
     }
   }
 
@@ -207,7 +257,7 @@
   }
 
   function updateMini() {
-    if (!miniPlayer) return;
+    if (!miniPlayer || miniMode !== "local") return;
     const t = index >= 0 ? tracks[index] : null;
     miniPlayer.hidden = !t || !player.src;
     if (!t || miniPlayer.hidden) return;
@@ -223,10 +273,17 @@
 
   // Un appui ou un glissement sur la barre place la lecture au bon endroit
   function seekFromEvent(e) {
-    const d = player.duration;
-    if (!isFinite(d) || d <= 0) return;
     const r = miniBar.getBoundingClientRect();
     const ratio = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+    if (miniMode === "spotify") {
+      if (spState && spState.duration > 0) {
+        KA.spotify.seek(ratio * spState.duration);
+        updateMiniSpotify({ ...spState, position: ratio * spState.duration });
+      }
+      return;
+    }
+    const d = player.duration;
+    if (!isFinite(d) || d <= 0) return;
     player.currentTime = ratio * d;
     updateMini();
   }
@@ -276,12 +333,17 @@
       miniBar = root.querySelector("#mini-bar");
       miniCur = root.querySelector("#mini-cur");
       miniDur = root.querySelector("#mini-dur");
-      miniToggle.addEventListener("click", () => (player.paused ? player.play() : player.pause()));
+      miniToggle.addEventListener("click", () => {
+        if (miniMode === "spotify") KA.spotify.toggle();
+        else (player.paused ? player.play() : player.pause());
+      });
       root.querySelector("#mini-prev").addEventListener("click", () => {
-        if (tracks.length) playAt(Math.max(0, index - 1));
+        if (miniMode === "spotify") KA.spotify.previous();
+        else if (tracks.length) playAt(Math.max(0, index - 1));
       });
       root.querySelector("#mini-next").addEventListener("click", () => {
-        if (tracks.length) playAt(index + 1 < tracks.length ? index + 1 : 0);
+        if (miniMode === "spotify") KA.spotify.next();
+        else if (tracks.length) playAt(index + 1 < tracks.length ? index + 1 : 0);
       });
       miniBar.addEventListener("pointerdown", (e) => {
         seeking = true;
@@ -310,6 +372,7 @@
       player.pause();
       frame.src = "about:blank";
       KA.spotify.pause();
+      stopSpPoll();
     },
   };
 })();
