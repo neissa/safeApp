@@ -7,7 +7,8 @@
 
   KA.config = {
     // Identifiant de la playlist Spotify affichée (dans l'URL open.spotify.com/playlist/<ID>)
-    spotifyPlaylistId: "6qQlOLI05pL8Lg0VH2spLi",
+    // Aucune playlist par défaut : elle se choisit avec 5 appuis rapides sur l'onglet Spotify
+    spotifyPlaylistId: "",
     // Identifiant client de l'appli Spotify (public, pas de secret). L'adresse de retour
     // (http://127.0.0.1:5500/index.html par exemple) doit être enregistrée sur le tableau de bord Spotify.
     spotifyClientId: "c8d31a70661e4f679d9eef30b1aa91c3",

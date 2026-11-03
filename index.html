@@ -157,9 +157,9 @@
           <button class="chip" id="sp-toggle" aria-label="Lecture ou pause">▶️</button>
           <button class="chip" id="sp-next" aria-label="Suivante">⏭️</button>
         </div>
+        <img id="sp-cover" class="cover-big" alt="" hidden>
         <p id="sp-now" class="hint">Choisis une chanson</p>
         <ul id="sp-list" class="list"></ul>
-        <button class="btn alt" id="sp-logout">Se déconnecter</button>
       </div>
       <p id="sp-msg" class="hint"></p>
       <div id="spotify-set" class="set-box" hidden>
@@ -170,6 +170,7 @@
           <button class="btn" id="spotify-save">✅ Enregistrer</button>
           <button class="btn alt" id="spotify-cancel">Annuler</button>
         </div>
+        <button class="btn alt" id="spotify-logout" hidden>🔓 Se déconnecter de Spotify</button>
       </div>
       <iframe id="spotify-frame" class="spotify" src="about:blank" title="Playlist Spotify"
               allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"

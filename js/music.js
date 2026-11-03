@@ -11,7 +11,7 @@
   const PLAYLIST_KEY = "mcm.spotifyPlaylist";
 
   let root, player, list, empty, fileInput, frame, setBox, setInput, setMsg;
-  let spLogin, spConnected, spNow, spToggle, spList, spMsg;
+  let spLogin, spConnected, spNow, spToggle, spList, spMsg, spCover;
   let tracks = [];
   let index = -1;
   let currentUrl = null;
@@ -35,6 +35,8 @@
       "https://open.spotify.com/embed/playlist/" + encodeURIComponent(playlistId) + "?utm_source=generator";
   }
 
+  const NO_PLAYLIST_TEXT = "Aucune playlist choisie : fais 5 appuis rapides sur Spotify pour en ajouter une";
+
   function setSpMsg(text) {
     spMsg.textContent = text;
   }
@@ -45,7 +47,20 @@
     spLogin.hidden = connected;
     spConnected.hidden = !connected;
     frame.hidden = connected;
+    if (!playlistId) {
+      frame.src = "about:blank";
+      setSpMsg(NO_PLAYLIST_TEXT);
+      return;
+    }
     if (!connected && (!frame.src || frame.src === "about:blank")) loadSpotify();
+  }
+
+  // Après un changement de playlist : le lecteur intégré et la liste connectée suivent la nouvelle
+  function applyPlaylistChange() {
+    frame.src = "about:blank";
+    setSpMsg("");
+    refreshSpotifyView();
+    if (KA.spotify.isConnected()) openConnected();
   }
 
   function setTab(which) {
@@ -83,11 +98,20 @@
     if (!state || !state.track_window || !state.track_window.current_track) return;
     const t = state.track_window.current_track;
     spNow.textContent = "🎵 " + t.name + " — " + t.artists.map((a) => a.name).join(", ");
+    const cover = KA.spotify.pickImage(t.album && t.album.images, 300);
+    spCover.hidden = !cover;
+    if (cover) spCover.src = cover;
     spToggle.textContent = state.paused ? "▶️" : "⏸️";
   }
 
   async function openConnected() {
     setSpMsg("");
+    if (!playlistId) {
+      spTracks = [];
+      renderSpList();
+      setSpMsg(NO_PLAYLIST_TEXT);
+      return;
+    }
     try {
       await KA.spotify.connectPlayer({
         onReady: () => setSpMsg(""),
@@ -115,6 +139,10 @@
 
   async function playSpTrack(i) {
     setSpMsg("");
+    if (!playlistId) {
+      setSpMsg(NO_PLAYLIST_TEXT);
+      return;
+    }
     try {
       await KA.spotify.playAt(playlistId, i);
     } catch (e) {
@@ -134,10 +162,17 @@
       playBtn.textContent = "▶️";
       playBtn.setAttribute("aria-label", "Écouter");
       playBtn.addEventListener("click", () => playSpTrack(i));
+      const cover = document.createElement("img");
+      cover.className = "cover";
+      cover.alt = "";
+      cover.loading = "lazy";
+      if (t.cover) cover.src = t.cover;
+      else cover.hidden = true;
+
       const name = document.createElement("span");
       name.className = "row-name";
       name.textContent = t.name + (t.artists ? " · " + t.artists : "");
-      li.append(playBtn, name);
+      li.append(playBtn, cover, name);
       spList.appendChild(li);
     });
   }
@@ -157,8 +192,20 @@
   function openSetter() {
     setInput.value = playlistId ? "https://open.spotify.com/playlist/" + playlistId : "";
     setMsg.textContent = "";
+    root.querySelector("#spotify-logout").hidden = !KA.spotify.isConnected();
     setBox.hidden = false;
     setInput.focus();
+  }
+
+  function logoutFromSetter() {
+    KA.spotify.logout();
+    closeSetter();
+    spTracks = [];
+    renderSpList();
+    spNow.textContent = "Choisis une chanson";
+    spCover.hidden = true;
+    refreshSpotifyView();
+    setSpMsg("Tu es déconnecté de Spotify");
   }
 
   function closeSetter() {
@@ -175,9 +222,7 @@
     KA.ls.set(PLAYLIST_KEY, id);
     playlistId = id;
     closeSetter();
-    frame.src = "about:blank";
-    loadSpotify();
-    if (KA.spotify.isConnected()) openConnected();
+    applyPlaylistChange();
   }
 
   // ---------- Chansons du téléphone ----------
@@ -266,6 +311,7 @@
       spToggle = root.querySelector("#sp-toggle");
       spList = root.querySelector("#sp-list");
       spMsg = root.querySelector("#sp-msg");
+      spCover = root.querySelector("#sp-cover");
 
       playlistId = parsePlaylistId(KA.ls.get(PLAYLIST_KEY, "")) || KA.config.spotifyPlaylistId;
 
@@ -286,11 +332,7 @@
       root.querySelector("#sp-toggle").addEventListener("click", () => KA.spotify.toggle());
       root.querySelector("#sp-next").addEventListener("click", () => KA.spotify.next());
       root.querySelector("#sp-prev").addEventListener("click", () => KA.spotify.previous());
-      root.querySelector("#sp-logout").addEventListener("click", () => {
-        KA.spotify.logout();
-        setSpMsg("");
-        refreshSpotifyView();
-      });
+      root.querySelector("#spotify-logout").addEventListener("click", logoutFromSetter);
 
       root.querySelector("#music-add").addEventListener("click", () => fileInput.click());
       fileInput.addEventListener("change", () => addFiles(fileInput.files));

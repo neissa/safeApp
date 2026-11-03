@@ -165,6 +165,14 @@
     return res.json();
   }
 
+  // Choisit l'image de pochette la plus proche de la taille demandée (en pixels)
+  function pickImage(images, size) {
+    if (!images || !images.length) return null;
+    const sorted = images.slice().sort((a, b) => (a.width || 0) - (b.width || 0));
+    const bigEnough = sorted.find((img) => (img.width || 0) >= size);
+    return (bigEnough || sorted[sorted.length - 1]).url;
+  }
+
   // Liste des chansons de la playlist (Spotify ne la donne que pour les playlists du compte ou en collaboration)
   async function playlistTracks(playlistId) {
     const tracks = [];
@@ -174,7 +182,12 @@
       (data.items || []).forEach((it) => {
         const t = it.item || it.track;
         if (t && t.uri) {
-          tracks.push({ uri: t.uri, name: t.name, artists: (t.artists || []).map((a) => a.name).join(", ") });
+          tracks.push({
+            uri: t.uri,
+            name: t.name,
+            artists: (t.artists || []).map((a) => a.name).join(", "),
+            cover: pickImage(t.album && t.album.images, 96),
+          });
         }
       });
       path = data.next ? data.next.replace(API, "") : null;
@@ -260,6 +273,7 @@
     next,
     previous,
     pause,
+    pickImage,
     // pour les tests
     _challengeOf: challengeOf,
   };
