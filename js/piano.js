@@ -1,11 +1,12 @@
-/* Panneau Piano : un clavier avec huit touches blanches et cinq touches noires (une octave).
-   Piano libre, ou jeu Simon : l'appli joue une suite de notes en éclairant les touches blanches,
-   l'enfant la répète. Chaque suite réussie ajoute une note. */
+/* Panneau Piano, en deux claviers :
+   - en haut, le piano libre : huit touches blanches et cinq touches noires (une octave), pour s'amuser ;
+   - en dessous, le piano de couleur : une couleur par note. C'est là qu'on joue à Simon :
+     l'appli joue une suite de notes en éclairant les touches, l'enfant la répète. Chaque suite réussie ajoute une note. */
 (function () {
   "use strict";
 
   const KA = window.KA;
-  // Touches blanches : do, ré, mi, fa, sol, la, si, do
+  // Touches : do, ré, mi, fa, sol, la, si, do
   const WHITE = [
     { name: "Do", freq: 261.63 },
     { name: "Ré", freq: 293.66 },
@@ -16,6 +17,8 @@
     { name: "Si", freq: 493.88 },
     { name: "Do", freq: 523.25 },
   ];
+  // Une couleur par note du piano de couleur
+  const COLORS = ["#e53935", "#fb8c00", "#fdd835", "#7cb342", "#26a69a", "#42a5f5", "#5c6bc0", "#ab47bc"];
   // Touches noires : placées après la touche blanche d'indice « after »
   const BLACK = [
     { after: 0, freq: 277.18 },
@@ -34,10 +37,15 @@
     phase: "idle", // idle | show | input | wait
     timers: [],
   };
-  let whiteEls = [];
+  let simonEls = []; // touches du piano de couleur, utilisées par Simon
   let statusEl = null;
   let bestEl = null;
   let simonBtn = null;
+
+  // Les messages de Simon sont des bruitages du jeu : ils se taisent quand les bruitages sont coupés
+  function say(text) {
+    if (KA.settings.get("sounds", true)) KA.speak(text);
+  }
 
   function play(btn, freq) {
     KA.tone(freq, 0.9, "triangle", 0.35);
@@ -55,7 +63,7 @@
   }
 
   function light(i, ms) {
-    const el = whiteEls[i];
+    const el = simonEls[i];
     el.classList.add("lit");
     KA.tone(WHITE[i].freq, 0.45, "triangle", 0.3);
     later(() => el.classList.remove("lit"), ms || LIGHT_MS);
@@ -103,7 +111,7 @@
     statusEl.textContent = msg || "";
   }
 
-  // Une touche blanche pendant le jeu
+  // Une touche de couleur pendant le jeu
   function answer(i) {
     light(i, 250);
     if (i === sim.seq[sim.pos]) {
@@ -113,12 +121,12 @@
         recordBest(done);
         sim.phase = "wait";
         statusEl.textContent = "Bravo ! " + done + " note" + (done > 1 ? "s" : "") + " !";
-        KA.speak("Bravo !");
+        say("Bravo !");
         later(newRound, 1100);
       }
     } else {
       const score = sim.seq.length - 1;
-      KA.speak("Oups !");
+      say("Oups !");
       stopGame(
         "Tu as réussi " + score + " note" + (score > 1 ? "s" : "") + ". Rejoue pour battre ton record !"
       );
@@ -127,31 +135,26 @@
 
   KA.panels.piano = {
     init(root) {
-      const wrap = root.querySelector("#piano-keys");
+      const freeWrap = root.querySelector("#piano-keys");
+      const simonWrap = root.querySelector("#piano-simon");
       statusEl = root.querySelector("#simon-status");
       bestEl = root.querySelector("#simon-best");
       simonBtn = root.querySelector("#simon-btn");
       showBest();
 
+      // Piano libre (en haut) : toujours joué, même pendant Simon
       const board = document.createElement("div");
       board.className = "keyboard";
       const area = document.createElement("div");
       area.className = "keys-area";
 
-      WHITE.forEach((n, i) => {
+      WHITE.forEach((n) => {
         const b = document.createElement("button");
         b.className = "white-key";
         b.textContent = n.name;
         b.dataset.silent = "";
         b.setAttribute("aria-label", n.name);
-        b.addEventListener("click", () => {
-          if (sim.on) {
-            if (sim.phase === "input") answer(i);
-            return; // pendant Simon, pas de piano libre
-          }
-          play(b, n.freq);
-        });
-        whiteEls.push(b);
+        b.addEventListener("click", () => play(b, n.freq));
         area.appendChild(b);
       });
 
@@ -163,14 +166,40 @@
         b.style.left = (n.after + 1) * step - step * 0.28 + "%";
         b.dataset.silent = "";
         b.setAttribute("aria-label", "Touche noire");
-        b.addEventListener("click", () => {
-          if (!sim.on) play(b, n.freq);
-        });
+        b.addEventListener("click", () => play(b, n.freq));
         area.appendChild(b);
       });
 
       board.appendChild(area);
-      wrap.appendChild(board);
+      freeWrap.appendChild(board);
+
+      // Piano de couleur (en dessous) : une couleur par note, c'est lui qui sert à Simon
+      const colorBoard = document.createElement("div");
+      colorBoard.className = "keyboard";
+      const colorArea = document.createElement("div");
+      colorArea.className = "color-area";
+
+      WHITE.forEach((n, i) => {
+        const b = document.createElement("button");
+        b.className = "color-key";
+        b.style.background = COLORS[i];
+        b.textContent = n.name;
+        b.dataset.silent = "";
+        b.setAttribute("aria-label", n.name + " (couleur)");
+        b.addEventListener("click", () => {
+          if (!sim.on) {
+            play(b, n.freq);
+            return;
+          }
+          // Pendant Simon, seule la réponse compte (pas de son libre)
+          if (sim.phase === "input") answer(i);
+        });
+        simonEls.push(b);
+        colorArea.appendChild(b);
+      });
+
+      colorBoard.appendChild(colorArea);
+      simonWrap.appendChild(colorBoard);
 
       simonBtn.addEventListener("click", () => (sim.on ? stopGame("") : startGame()));
     },

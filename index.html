@@ -4,15 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="color-scheme" content="light">
-  <meta name="app-version" content="0dc8ab30525c">
-  <meta name="app-built" content="2026-11-03 18:26">
+  <meta name="app-version" content="b1e5755c1b71">
+  <meta name="app-built" content="2026-11-03 18:52">
   <title>Mon coin magique</title>
   <meta name="theme-color" content="#bfe9ff">
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=10206a1241">
+  <link rel="stylesheet" href="css/style.css?v=fdf7341d18">
 </head>
 <body>
 <div id="app">
@@ -44,6 +44,7 @@
       <button class="tile t-snake" data-open="snake" data-say="Snake" data-lang="en-US" aria-label="Snake"><span class="tile-ico">🐍</span><span class="tile-label">Snake</span></button>
       <button class="tile t-clock" data-open="clock" data-say="Date et heure" aria-label="Date et heure"><span class="tile-ico">🕐</span><span class="tile-label">Date et heure</span></button>
       <button class="tile t-farts" data-open="farts" data-say="Bruits de pet" aria-label="Bruits de pet"><span class="tile-ico">💨</span><span class="tile-label">Bruits de pet</span></button>
+      <button class="tile t-mega" data-open="megaphone" data-say="Mégaphone" aria-label="Mégaphone"><span class="tile-ico">📢</span><span class="tile-label">Mégaphone</span></button>
     </nav>
   </section>
 
@@ -265,12 +266,14 @@
       <h2>🎹 Piano</h2>
       <span></span>
     </header>
+    <p class="hint piano-label">🎹 Piano libre : joue comme tu veux</p>
+    <div id="piano-keys" class="piano-keys"></div>
     <div class="simon-bar">
       <button class="btn" id="simon-btn">🎲 Jouer à Simon</button>
       <span id="simon-best" class="hint"></span>
     </div>
     <p id="simon-status" class="hint"></p>
-    <div id="piano-keys" class="piano-keys"></div>
+    <div id="piano-simon" class="piano-keys piano-simon"></div>
   </section>
 
   <!-- MEMORY -->
@@ -294,23 +297,21 @@
     <header class="bar">
       <button class="chip" data-back aria-label="Accueil">🏠</button>
       <h2>🐍 Snake</h2>
-      <span></span>
+      <button class="chip" id="snake-start" aria-label="Jouer">▶️</button>
     </header>
     <div class="snake-info">
       <span id="snake-score" class="snake-score">Pommes : 0</span>
       <span id="snake-best" class="hint"></span>
     </div>
-    <canvas id="snake-canvas" class="snake-canvas" width="336" height="336" aria-label="Terrain du serpent"></canvas>
+    <div class="snake-board">
+      <canvas id="snake-canvas" class="snake-canvas" width="336" height="336" aria-label="Terrain du serpent"></canvas>
+    </div>
     <div class="snake-pad">
       <button class="snake-arrow" id="snake-up" aria-label="Haut">⬆️</button>
       <button class="snake-arrow" id="snake-left" aria-label="Gauche">⬅️</button>
       <button class="snake-arrow" id="snake-down" aria-label="Bas">⬇️</button>
       <button class="snake-arrow" id="snake-right" aria-label="Droite">➡️</button>
     </div>
-    <div class="row">
-      <button class="btn" id="snake-start">▶️ Jouer</button>
-    </div>
-    <p id="snake-msg" class="hint"></p>
   </section>
 
   <!-- FORMES -->
@@ -348,6 +349,22 @@
     <div id="farts-grid" class="farts-grid"></div>
     <p id="farts-msg" class="game-help" role="status"></p>
     <button id="farts-random" class="farts-random" data-silent>🎲 Au hasard</button>
+  </section>
+
+  <!-- MÉGAPHONE -->
+  <section id="screen-megaphone" class="screen">
+    <header class="bar">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>📢 Mégaphone</h2>
+      <span></span>
+    </header>
+    <p class="game-help">Parle, puis écoute ta voix changée</p>
+    <div class="mega-zone">
+      <button id="mega-btn" class="rec-btn" aria-label="Parler" data-silent><span></span></button>
+      <p id="mega-state" class="hint"></p>
+    </div>
+    <p class="hint">Choisis ta voix</p>
+    <div id="mega-effects" class="mega-grid"></div>
   </section>
 
   <!-- MINUTEUR -->
@@ -529,12 +546,13 @@
 <script src="js/pin.js?v=3879420e83"></script>
 <script src="js/home.js?v=d6063d6cae"></script>
 <script src="js/raptor.js?v=1ecf6d4917"></script>
-<script src="js/piano.js?v=2f144c1b63"></script>
+<script src="js/piano.js?v=a69096e17c"></script>
 <script src="js/memory.js?v=4792d1a37a"></script>
 <script src="js/timer.js?v=a2eca99d52"></script>
 <script src="js/games.js?v=fa71f6a408"></script>
-<script src="js/snake.js?v=b90a35cee1"></script>
+<script src="js/snake.js?v=9d54ce7140"></script>
 <script src="js/farts.js?v=59cf93fe89"></script>
+<script src="js/megaphone.js?v=7cfa22a2d8"></script>
 <script src="js/main.js?v=15ea266cbf"></script>
 <script>
   // Hors ligne : le service worker garde l'appli en cache (ignoré si le navigateur ne le gère pas)
