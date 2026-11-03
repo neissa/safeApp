@@ -35,7 +35,10 @@ const files = listFiles(root, []).filter((f) => !GENERATED.has(f)).sort();
 const global = crypto.createHash("sha256");
 files.forEach((f) => global.update(f).update(contentOf(f)));
 const version = global.digest("hex").slice(0, 12);
-const built = new Date().toISOString().slice(0, 10);
+// Date et heure locales de la mise à jour : « AAAA-MM-JJ HH:MM »
+const now = new Date();
+const pad = (n) => String(n).padStart(2, "0");
+const built = now.getFullYear() + "-" + pad(now.getMonth() + 1) + "-" + pad(now.getDate()) + " " + pad(now.getHours()) + ":" + pad(now.getMinutes());
 
 fs.writeFileSync(path.join(root, "version.json"), JSON.stringify({ version, built }, null, 2) + "\n");
 

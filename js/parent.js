@@ -219,10 +219,12 @@
     return m && m.content ? m.content : "inconnue";
   }
 
-  // Date de fabrication au format JJ/MM/AAAA
+  // Date et heure de fabrication, au format « JJ/MM/AAAA à HH:MM » (meta app-built : « AAAA-MM-JJ HH:MM »)
   function appBuilt() {
     const m = document.querySelector('meta[name="app-built"]');
-    return m && m.content ? m.content.split("-").reverse().join("/") : "";
+    if (!m || !m.content) return "";
+    const [day, time] = m.content.split(" ");
+    return day.split("-").reverse().join("/") + (time ? " à " + time : "");
   }
 
   function showUpdateState() {
@@ -232,8 +234,8 @@
     if (status) status.textContent = latestVersion ? "🆕 Une nouvelle version est disponible" : "✅ L'appli est à jour";
     const btn = document.getElementById("parent-update");
     if (btn) btn.textContent = latestVersion ? "🔄 Installer la mise à jour" : "🔄 Vérifier et mettre à jour";
-    const badge = document.getElementById("update-badge");
-    if (badge) badge.hidden = !latestVersion;
+    const homeBtn = document.getElementById("home-update");
+    if (homeBtn) homeBtn.hidden = !latestVersion;
   }
 
   // Vérifie en arrière-plan si une version plus récente est en ligne (silencieux hors ligne)
@@ -442,6 +444,7 @@
       if (fileInput.files[0]) importBackup(fileInput.files[0]);
     });
     document.getElementById("parent-update").addEventListener("click", updateApp);
+    document.getElementById("home-update").addEventListener("click", updateApp);
     document.getElementById("parent-pin").addEventListener("click", () => {
       KA.askPin({
         create: true,
