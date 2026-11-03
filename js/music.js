@@ -16,6 +16,8 @@
 
   let root, player, list, empty, fileInput, frame;
   let spConnected, spNow, spToggle, spList, spMsg, spCover;
+  let miniPlayer, miniTitle, miniToggle, miniFill, miniBar, miniCur, miniDur;
+  let seeking = false;
   let tracks = [];
   let index = -1;
   let currentUrl = null;
@@ -147,6 +149,7 @@
     player.src = currentUrl;
     player.play().catch(() => {});
     render();
+    updateMini();
   }
 
   async function removeTrack(id) {
@@ -161,6 +164,7 @@
     }
     await KA.db.del(id);
     render();
+    updateMini();
   }
 
   async function addFiles(files) {
@@ -193,6 +197,38 @@
         })
       );
     });
+  }
+
+  // ---------- Mini-lecteur (chansons du téléphone) ----------
+  function fmt(sec) {
+    if (!isFinite(sec) || sec < 0) return "0:00";
+    const s = Math.floor(sec);
+    return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+  }
+
+  function updateMini() {
+    if (!miniPlayer) return;
+    const t = index >= 0 ? tracks[index] : null;
+    miniPlayer.hidden = !t || !player.src;
+    if (!t || miniPlayer.hidden) return;
+    miniTitle.textContent = t.name.replace(/\.[^.]+$/, "");
+    miniToggle.textContent = player.paused ? "▶️" : "⏸️";
+    const d = player.duration;
+    const known = isFinite(d) && d > 0;
+    const ratio = known ? Math.min(1, player.currentTime / d) : 0;
+    miniFill.style.width = ratio * 100 + "%";
+    miniCur.textContent = fmt(player.currentTime);
+    miniDur.textContent = known ? fmt(d) : "0:00";
+  }
+
+  // Un appui ou un glissement sur la barre place la lecture au bon endroit
+  function seekFromEvent(e) {
+    const d = player.duration;
+    if (!isFinite(d) || d <= 0) return;
+    const r = miniBar.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+    player.currentTime = ratio * d;
+    updateMini();
   }
 
   KA.panels.music = {
@@ -231,6 +267,40 @@
       });
       player.addEventListener("play", render);
       player.addEventListener("pause", render);
+
+      // Mini-lecteur collé en bas
+      miniPlayer = root.querySelector("#mini-player");
+      miniTitle = root.querySelector("#mini-title");
+      miniToggle = root.querySelector("#mini-toggle");
+      miniFill = root.querySelector("#mini-fill");
+      miniBar = root.querySelector("#mini-bar");
+      miniCur = root.querySelector("#mini-cur");
+      miniDur = root.querySelector("#mini-dur");
+      miniToggle.addEventListener("click", () => (player.paused ? player.play() : player.pause()));
+      root.querySelector("#mini-prev").addEventListener("click", () => {
+        if (tracks.length) playAt(Math.max(0, index - 1));
+      });
+      root.querySelector("#mini-next").addEventListener("click", () => {
+        if (tracks.length) playAt(index + 1 < tracks.length ? index + 1 : 0);
+      });
+      miniBar.addEventListener("pointerdown", (e) => {
+        seeking = true;
+        seekFromEvent(e);
+        try {
+          miniBar.setPointerCapture(e.pointerId);
+        } catch (err) {
+          /* pointeur non capturable : le glissement sera simplement moins suivi */
+        }
+      });
+      miniBar.addEventListener("pointermove", (e) => {
+        if (seeking) seekFromEvent(e);
+      });
+      const stopSeek = () => {
+        seeking = false;
+      };
+      miniBar.addEventListener("pointerup", stopSeek);
+      miniBar.addEventListener("pointercancel", stopSeek);
+      ["timeupdate", "loadedmetadata", "play", "pause", "ended"].forEach((ev) => player.addEventListener(ev, updateMini));
     },
     enter() {
       setTab("spotify"); // Spotify par défaut ; l'onglet Téléphone reste accessible

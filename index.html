@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light">
-  <meta name="app-version" content="35f8d67aad14">
+  <meta name="app-version" content="de27e18b95ed">
   <meta name="app-built" content="2026-11-03">
   <title>Mon coin magique</title>
   <meta name="theme-color" content="#bfe9ff">
@@ -12,7 +12,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=e6e0ef2856">
+  <link rel="stylesheet" href="css/style.css?v=83166efbb3">
 </head>
 <body>
 <div id="app">
@@ -198,6 +198,20 @@
       <iframe id="spotify-frame" class="spotify" src="about:blank" title="Playlist Spotify"
               allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
               loading="lazy"></iframe>
+    </div>
+
+    <!-- Mini-lecteur collé en bas : apparaît quand une chanson du téléphone est lancée -->
+    <div id="mini-player" class="mini-player" hidden>
+      <span id="mini-title" class="mini-title"></span>
+      <div class="mini-controls">
+        <button class="chip" id="mini-prev" aria-label="Précédente">⏮️</button>
+        <button class="chip" id="mini-toggle" aria-label="Lecture ou pause">▶️</button>
+        <button class="chip" id="mini-next" aria-label="Suivante">⏭️</button>
+      </div>
+      <div id="mini-bar" class="mini-progress" aria-label="Progression">
+        <div id="mini-fill" class="mini-fill"></div>
+      </div>
+      <div class="mini-times"><span id="mini-cur">0:00</span><span id="mini-dur">0:00</span></div>
     </div>
   </section>
 
@@ -467,7 +481,7 @@
 <script src="js/notes.js?v=c40e79ee86"></script>
 <script src="js/calc.js?v=76aec6d76e"></script>
 <script src="js/gallery.js?v=ef63a40877"></script>
-<script src="js/music.js?v=11800880eb"></script>
+<script src="js/music.js?v=5450278f7a"></script>
 <script src="js/recorder.js?v=7c25dc92e5"></script>
 <script src="js/clock.js?v=7b4f1fee15"></script>
 <script src="js/spotify.js?v=473b9b2ed4"></script>

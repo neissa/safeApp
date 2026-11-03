@@ -1010,6 +1010,58 @@ audio {
   color: var(--ink);
 }
 
+/* Mini-lecteur collé en bas de la musique */
+.mini-player {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  margin: auto -14px -10px;
+  padding: 10px 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-radius: 18px 18px 0 0;
+  background: var(--paper);
+  box-shadow: 0 -4px 12px var(--shadow);
+}
+
+.mini-title {
+  font-size: 16px;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mini-controls {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.mini-progress {
+  position: relative;
+  height: 12px;
+  border-radius: 6px;
+  background: #e0e0e0;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.mini-fill {
+  height: 100%;
+  width: 0;
+  border-radius: 6px;
+  background: #42a5f5;
+}
+
+.mini-times {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
 /* Statistiques du menu parent */
 .stats-table {
   display: grid;
