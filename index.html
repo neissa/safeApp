@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="color-scheme" content="light">
-  <meta name="app-version" content="259d862415f1">
+  <meta name="app-version" content="f1fdced75193">
   <meta name="app-built" content="2026-11-03">
   <title>Mon coin magique</title>
   <meta name="theme-color" content="#bfe9ff">
@@ -12,7 +12,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=fc38eb6182">
+  <link rel="stylesheet" href="css/style.css?v=3b3f30f940">
 </head>
 <body>
 <div id="app">
@@ -43,6 +43,7 @@
       <button class="tile t-intrus" data-open="intrus" data-say="L'intrus" aria-label="L'intrus"><span class="tile-ico">🔍</span><span class="tile-label">L'intrus</span></button>
       <button class="tile t-snake" data-open="snake" data-say="Snake" data-lang="en-US" aria-label="Snake"><span class="tile-ico">🐍</span><span class="tile-label">Snake</span></button>
       <button class="tile t-clock" data-open="clock" data-say="Date et heure" aria-label="Date et heure"><span class="tile-ico">🕐</span><span class="tile-label">Date et heure</span></button>
+      <button class="tile t-farts" data-open="farts" data-say="Bruits de pet" aria-label="Bruits de pet"><span class="tile-ico">💨</span><span class="tile-label">Bruits de pet</span></button>
     </nav>
   </section>
 
@@ -71,7 +72,6 @@
             <div class="dd-grid" id="draw-colors"></div>
           </div>
         </div>
-        <div class="sizes" id="draw-sizes"></div>
         <button class="chip tool" id="tool-pen" aria-label="Crayon">✏️</button>
         <button class="chip tool" id="tool-eraser" aria-label="Gomme">🧽</button>
         <button class="chip tool" id="tool-bucket" aria-label="Pot de peinture">🪣</button>
@@ -79,6 +79,28 @@
           <button class="chip dd-btn" id="stamp-btn" aria-label="Choisir un tampon"><span id="stamp-current">⭐</span></button>
           <div class="dd-menu dd-tools" id="stamp-menu" hidden>
             <div class="dd-grid" id="draw-stamps"></div>
+            <label class="brush-range">
+              <span>Taille</span>
+              <input type="range" id="stamp-size-range" min="16" max="96" step="2" value="44" aria-label="Taille du tampon">
+            </label>
+            <div class="brush-preview-wrap">
+              <canvas id="stamp-preview" width="100" height="100" aria-label="Aperçu du tampon"></canvas>
+              <span id="stamp-size-label" class="hint"></span>
+            </div>
+          </div>
+        </div>
+        <div class="dropdown">
+          <button class="chip dd-btn" id="brush-btn" aria-label="Forme et taille du pinceau"><span id="brush-current">●</span></button>
+          <div class="dd-menu dd-tools" id="brush-menu" hidden>
+            <div class="dd-grid" id="brush-shapes"></div>
+            <label class="brush-range">
+              <span>Taille</span>
+              <input type="range" id="draw-size-range" min="4" max="60" step="1" value="14" aria-label="Taille du pinceau">
+            </label>
+            <div class="brush-preview-wrap">
+              <canvas id="brush-preview" width="100" height="100" aria-label="Aperçu du pinceau"></canvas>
+              <span id="brush-size-label" class="hint"></span>
+            </div>
           </div>
         </div>
       </div>
@@ -315,6 +337,19 @@
     <p id="intrus-stars" class="game-stars"></p>
   </section>
 
+  <!-- BRUITS DE PET -->
+  <section id="screen-farts" class="screen">
+    <header class="bar">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>💨 Bruits de pet</h2>
+      <span></span>
+    </header>
+    <p class="game-help">Touche une case pour entendre un pet</p>
+    <div id="farts-grid" class="farts-grid"></div>
+    <p id="farts-msg" class="game-help" role="status"></p>
+    <button id="farts-random" class="farts-random" data-silent>🎲 Au hasard</button>
+  </section>
+
   <!-- MINUTEUR -->
   <section id="screen-timer" class="screen">
     <header class="bar">
@@ -481,7 +516,7 @@
 
 <script src="js/core.js?v=553009934e"></script>
 <script src="js/ui.js?v=3d63d19598"></script>
-<script src="js/draw.js?v=57783c48c5"></script>
+<script src="js/draw.js?v=c23b640ee3"></script>
 <script src="js/notes.js?v=0b82255267"></script>
 <script src="js/calc.js?v=76aec6d76e"></script>
 <script src="js/gallery.js?v=ef63a40877"></script>
@@ -498,7 +533,8 @@
 <script src="js/memory.js?v=4792d1a37a"></script>
 <script src="js/timer.js?v=a2eca99d52"></script>
 <script src="js/games.js?v=fa71f6a408"></script>
-<script src="js/snake.js?v=df99f1a5a0"></script>
+<script src="js/snake.js?v=b90a35cee1"></script>
+<script src="js/farts.js?v=59cf93fe89"></script>
 <script src="js/main.js?v=15ea266cbf"></script>
 <script>
   // Hors ligne : le service worker garde l'appli en cache (ignoré si le navigateur ne le gère pas)

@@ -18,7 +18,16 @@
   const SIZES = [6, 14, 28]; // diamètre du trait en pixels CSS
   const STAMPS = ["⭐", "❤️", "☀️", "🌸", "🐶", "🚗", "🌈", "🎈"];
 
-  const state = { color: COLORS[4].hex, size: SIZES[1], tool: "pen", stamp: STAMPS[0] };
+  const state = { color: COLORS[4].hex, size: SIZES[1], stampSize: 44, tool: "pen", stamp: STAMPS[0], brush: "round" };
+  // Formes du pinceau (le trait est dessiné avec cette forme au lieu d'un rond)
+  const BRUSHES = [
+    { id: "round", icon: "●", name: "Cercle" },
+    { id: "square", icon: "■", name: "Carré" },
+    { id: "triangle", icon: "▲", name: "Triangle" },
+    { id: "star", icon: "★", name: "Étoile" },
+    { id: "heart", icon: "♥", name: "Cœur" },
+    { id: "diamond", icon: "◆", name: "Losange" },
+  ];
   let canvas = null;
   let ctx = null;
   let scale = 1; // pixels du canvas par pixel CSS
@@ -31,6 +40,10 @@
   let thumbUrls = [];
   let root = null;
   let undoBtn = null;
+  let preview = null; // aperçu du pinceau (taille, forme, couleur)
+  let previewCtx = null;
+  let stampPreview = null; // aperçu du tampon (taille)
+  let stampPreviewCtx = null;
   const history = []; // images précédentes, pour annuler
   const HISTORY_MAX = 10;
 
@@ -145,12 +158,65 @@
 
   function stamp(x, y) {
     ctx.save();
-    ctx.font = Math.round(44 * scale) + "px sans-serif";
+    ctx.font = Math.round(state.stampSize * scale) + "px sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(state.stamp, x, y);
     ctx.restore();
     scheduleSave();
+  }
+
+  // Vrai si le pinceau n'est pas un rond (crayon avec une autre forme)
+  function usesShape() {
+    return state.tool === "pen" && state.brush !== "round";
+  }
+
+  // Dessine la forme du pinceau centrée en (cx, cy), de rayon r
+  function brushPath(kind, cx, cy, r) {
+    ctx.beginPath();
+    if (kind === "square") {
+      ctx.rect(cx - r, cy - r, 2 * r, 2 * r);
+    } else if (kind === "triangle") {
+      ctx.moveTo(cx, cy - r);
+      ctx.lineTo(cx + r, cy + r);
+      ctx.lineTo(cx - r, cy + r);
+      ctx.closePath();
+    } else if (kind === "diamond") {
+      ctx.moveTo(cx, cy - r);
+      ctx.lineTo(cx + r, cy);
+      ctx.lineTo(cx, cy + r);
+      ctx.lineTo(cx - r, cy);
+      ctx.closePath();
+    } else if (kind === "star") {
+      for (let i = 0; i < 10; i++) {
+        const rr = i % 2 === 0 ? r : r * 0.45;
+        const a = -Math.PI / 2 + (i * Math.PI) / 5;
+        const px = cx + rr * Math.cos(a);
+        const py = cy + rr * Math.sin(a);
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+    } else if (kind === "heart") {
+      ctx.moveTo(cx, cy + r * 0.9);
+      ctx.bezierCurveTo(cx - r * 1.3, cy + r * 0.1, cx - r * 0.6, cy - r * 1.0, cx, cy - r * 0.35);
+      ctx.bezierCurveTo(cx + r * 0.6, cy - r * 1.0, cx + r * 1.3, cy + r * 0.1, cx, cy + r * 0.9);
+      ctx.closePath();
+    } else {
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    }
+    ctx.fill();
+  }
+
+  // Le trait avec une forme : on pose la forme tout le long du mouvement
+  function stampBrush(x0, y0, x1, y1) {
+    const r = ctx.lineWidth / 2;
+    const dist = Math.hypot(x1 - x0, y1 - y0);
+    const n = Math.max(1, Math.ceil(dist / Math.max(1, r * 0.5)));
+    for (let i = 1; i <= n; i++) {
+      const t = i / n;
+      brushPath(state.brush, x0 + (x1 - x0) * t, y0 + (y1 - y0) * t, r);
+    }
   }
 
   function down(e) {
@@ -168,21 +234,33 @@
       return;
     }
     drawing = true;
-    canvas.setPointerCapture(e.pointerId);
+    try {
+      canvas.setPointerCapture(e.pointerId);
+    } catch (err) {
+      /* pointeur non capturable : le trait suit quand même le doigt sur le canevas */
+    }
     lastX = x;
     lastY = y;
-    ctx.beginPath();
-    ctx.arc(lastX, lastY, ctx.lineWidth / 2, 0, Math.PI * 2);
-    ctx.fill();
+    if (usesShape()) {
+      brushPath(state.brush, lastX, lastY, ctx.lineWidth / 2);
+    } else {
+      ctx.beginPath();
+      ctx.arc(lastX, lastY, ctx.lineWidth / 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
 
   function move(e) {
     if (!drawing) return;
     const [x, y] = pos(e);
-    ctx.beginPath();
-    ctx.moveTo(lastX, lastY);
-    ctx.lineTo(x, y);
-    ctx.stroke();
+    if (usesShape()) {
+      stampBrush(lastX, lastY, x, y);
+    } else {
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    }
     lastX = x;
     lastY = y;
   }
@@ -294,11 +372,57 @@
     applyBrush();
   }
 
+  // Aperçu : la forme choisie, à la taille réglée, dans la couleur du pinceau
+  function drawBrushPreview() {
+    if (!previewCtx) return;
+    const w = preview.width;
+    const h = preview.height;
+    previewCtx.clearRect(0, 0, w, h);
+    previewCtx.fillStyle = state.tool === "eraser" ? "#90a4ae" : state.color;
+    previewCtx.strokeStyle = previewCtx.fillStyle;
+    // brushPath dessine sur le contexte courant : on le remplace le temps de l'aperçu
+    const saved = ctx;
+    ctx = previewCtx;
+    try {
+      brushPath(state.brush, w / 2, h / 2, state.size / 2);
+    } finally {
+      ctx = saved;
+    }
+    root.querySelector("#brush-size-label").textContent = state.size + " px";
+  }
+
+  // Aperçu du tampon : l'emoji choisi, à la taille réglée
+  function drawStampPreview() {
+    if (!stampPreviewCtx) return;
+    const w = stampPreview.width;
+    const h = stampPreview.height;
+    stampPreviewCtx.clearRect(0, 0, w, h);
+    stampPreviewCtx.font = Math.round(state.stampSize) + "px sans-serif";
+    stampPreviewCtx.textAlign = "center";
+    stampPreviewCtx.textBaseline = "middle";
+    stampPreviewCtx.fillText(state.stamp, w / 2, h / 2);
+    root.querySelector("#stamp-size-label").textContent = state.stampSize + " px";
+  }
+
+  // Affiche la forme choisie sur le bouton du pinceau
+  function refreshBrush() {
+    const b = BRUSHES.find((x) => x.id === state.brush) || BRUSHES[0];
+    root.querySelector("#brush-current").textContent = b.icon;
+    root.querySelectorAll(".brush-btn").forEach((btn) => btn.classList.toggle("selected", btn.dataset.brush === state.brush));
+    drawBrushPreview();
+  }
+
   function refreshColors() {
     root.querySelectorAll(".swatch").forEach((b) => {
       b.classList.toggle("selected", state.tool !== "eraser" && b.dataset.hex === state.color);
     });
     root.querySelectorAll(".size").forEach((b) => b.classList.toggle("selected", Number(b.dataset.size) === state.size));
+    const range = root.querySelector("#draw-size-range");
+    if (range) range.value = state.size;
+    drawBrushPreview();
+    const stampRange = root.querySelector("#stamp-size-range");
+    if (stampRange) stampRange.value = state.stampSize;
+    drawStampPreview();
     root.querySelector("#color-current").style.background = state.color;
   }
 
@@ -322,6 +446,10 @@
     root.querySelector("#stamp-btn").addEventListener("click", (e) => {
       e.stopPropagation();
       toggleMenu("#stamp-menu");
+    });
+    root.querySelector("#brush-btn").addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleMenu("#brush-menu");
     });
     root.querySelector("#drawings-btn").addEventListener("click", (e) => {
       e.stopPropagation();
@@ -358,23 +486,22 @@
       palette.appendChild(b);
     });
 
-    const sizes = root.querySelector("#draw-sizes");
-    SIZES.forEach((s) => {
-      const b = document.createElement("button");
-      b.className = "size";
-      b.dataset.size = s;
-      b.setAttribute("aria-label", "Épaisseur " + s);
-      const dot = document.createElement("span");
-      dot.style.width = dot.style.height = s + "px";
-      b.appendChild(dot);
-      b.addEventListener("click", () => {
-        state.size = s;
-        if (state.tool === "bucket" || state.tool === "stamp") setTool("pen");
-        refreshColors();
-        applyBrush();
+    // Formes du pinceau : un appui choisit la forme et repasse au crayon
+    const brushBox = root.querySelector("#brush-shapes");
+    BRUSHES.forEach((b) => {
+      const btn = document.createElement("button");
+      btn.className = "brush-btn";
+      btn.dataset.brush = b.id;
+      btn.textContent = b.icon;
+      btn.setAttribute("aria-label", b.name);
+      btn.addEventListener("click", () => {
+        state.brush = b.id;
+        setTool("pen");
+        refreshBrush();
       });
-      sizes.appendChild(b);
+      brushBox.appendChild(btn);
     });
+
 
     root.querySelector("#tool-pen").dataset.tool = "pen";
     root.querySelector("#tool-eraser").dataset.tool = "eraser";
@@ -402,11 +529,27 @@
     });
 
     undoBtn.addEventListener("click", undo);
+    // Curseur : taille libre du pinceau, pour toutes les formes
+    const range = root.querySelector("#draw-size-range");
+    range.addEventListener("input", () => {
+      state.size = Number(range.value);
+      refreshColors();
+      applyBrush();
+    });
+
+    // Curseur : taille du tampon (emoji)
+    const stampRange = root.querySelector("#stamp-size-range");
+    stampRange.addEventListener("input", () => {
+      state.stampSize = Number(stampRange.value);
+      drawStampPreview();
+    });
+
     root.querySelector("#draw-new").addEventListener("click", newDrawing);
     root.querySelector("#draw-delete").addEventListener("click", (e) => deleteCurrent(e.currentTarget));
     setTool("pen");
     refreshColors();
     setupMenus();
+    refreshBrush();
   }
 
   KA.panels.draw = {
@@ -415,6 +558,10 @@
       canvas = root.querySelector("#draw-canvas");
       ctx = canvas.getContext("2d");
       undoBtn = root.querySelector("#draw-undo");
+      preview = root.querySelector("#brush-preview");
+      previewCtx = preview.getContext("2d");
+      stampPreview = root.querySelector("#stamp-preview");
+      stampPreviewCtx = stampPreview.getContext("2d");
       updateUndo();
       buildTools();
       canvas.addEventListener("pointerdown", down);

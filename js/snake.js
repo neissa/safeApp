@@ -173,6 +173,12 @@
     if (st.queue.length < 2) st.queue.push(d);
   }
 
+  // Une flèche lance la partie si elle n'est pas en cours (ou reprend après une pause)
+  function steer(name) {
+    if (!st.running) start();
+    turn(name);
+  }
+
   KA.panels.snake = {
     init(r) {
       root = r;
@@ -190,7 +196,7 @@
         else start();
       });
       ["up", "down", "left", "right"].forEach((name) => {
-        root.querySelector("#snake-" + name).addEventListener("click", () => turn(name));
+        root.querySelector("#snake-" + name).addEventListener("click", () => steer(name));
       });
 
       // Glisser le doigt sur le terrain
@@ -206,8 +212,8 @@
         const dy = t.clientY - touch.y;
         touch = null;
         if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return;
-        if (Math.abs(dx) > Math.abs(dy)) turn(dx > 0 ? "right" : "left");
-        else turn(dy > 0 ? "down" : "up");
+        if (Math.abs(dx) > Math.abs(dy)) steer(dx > 0 ? "right" : "left");
+        else steer(dy > 0 ? "down" : "up");
       });
     },
     leave() {
@@ -219,10 +225,17 @@
   document.addEventListener("keydown", (e) => {
     const screen = document.getElementById("screen-snake");
     if (!screen || !screen.classList.contains("active")) return;
+    // Barre d'espace : pause ou reprise
+    if (e.key === " ") {
+      e.preventDefault();
+      if (st.running) pause();
+      else start();
+      return;
+    }
     const map = { ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right" };
     if (map[e.key]) {
       e.preventDefault();
-      turn(map[e.key]);
+      steer(map[e.key]);
     }
   });
 })();
