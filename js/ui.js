@@ -97,6 +97,31 @@
     return li;
   };
 
+  // Une note synthétisée (piano, memory…). Respecte le réglage des bruitages et l'arrêt pendant un enregistrement.
+  let toneCtx = null;
+  KA.tone = function (freq, dur, type, vol) {
+    try {
+      if (KA.quiet || !KA.settings.get("sounds", true)) return;
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      toneCtx = toneCtx || new AC();
+      const t = toneCtx.currentTime;
+      const o = toneCtx.createOscillator();
+      const g = toneCtx.createGain();
+      o.type = type || "sine";
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol || 0.3, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g);
+      g.connect(toneCtx.destination);
+      o.start(t);
+      o.stop(t + dur + 0.05);
+    } catch (e) {
+      /* audio indisponible */
+    }
+  };
+
   // Blob -> texte base64 (pour la sauvegarde en fichier)
   KA.blobToDataUrl = function (blob) {
     return new Promise((resolve, reject) => {

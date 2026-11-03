@@ -1,8 +1,9 @@
 // Met à jour le projet avant chaque mise en ligne :
-// - la version du cache (sw.js), calculée à partir du contenu de tous les fichiers ;
-// - la liste des fichiers gardés hors ligne (sw.js) ;
-// - un numéro de version sur chaque script et feuille de style de index.html (?v=…),
-//   pour que la page et les fichiers chargés soient toujours la même version.
+// - un numéro de version calculé à partir du contenu de tous les fichiers ;
+// - version.json (lu par l'appli pour savoir si une mise à jour existe) ;
+// - la version et la date dans index.html (affichées dans le menu parent) ;
+// - la version du cache, la liste des fichiers hors ligne (sw.js) ;
+// - un numéro de version sur chaque script et feuille de style de index.html (?v=…).
 // Usage : bun tools/update-cache.js   (ou node tools/update-cache.js)
 const fs = require("fs");
 const path = require("path");
@@ -10,7 +11,9 @@ const crypto = require("crypto");
 
 const root = path.join(__dirname, "..");
 const SKIP = new Set(["sw.js", "node_modules", ".git", "tools"]);
+const GENERATED = new Set(["version.json"]); // écrit par ce script, donc exclu du calcul
 const EXT = [".html", ".js", ".css", ".json", ".ttf", ".png", ".mp3", ".ogg"];
+const META = /[ \t]*<meta name="app-(?:version|built)"[^>]*>\n?/g; // lignes de version dans index.html
 
 function listFiles(dir, out) {
   for (const name of fs.readdirSync(dir)) {
@@ -22,25 +25,38 @@ function listFiles(dir, out) {
   return out;
 }
 
-const files = listFiles(root, []).sort();
-const readHash = (f) => crypto.createHash("sha256").update(fs.readFileSync(path.join(root, f))).digest("hex");
+// Contenu d'un fichier pour le calcul de version (sans les lignes de version de index.html)
+function contentOf(f) {
+  const buf = fs.readFileSync(path.join(root, f));
+  return f === "index.html" ? buf.toString("utf8").replace(META, "") : buf;
+}
 
-// Version globale du cache
+const files = listFiles(root, []).filter((f) => !GENERATED.has(f)).sort();
 const global = crypto.createHash("sha256");
-files.forEach((f) => global.update(f).update(fs.readFileSync(path.join(root, f))));
-const version = "mon-coin-magique-" + global.digest("hex").slice(0, 12);
+files.forEach((f) => global.update(f).update(contentOf(f)));
+const version = global.digest("hex").slice(0, 12);
+const built = new Date().toISOString().slice(0, 10);
 
-// Numéro de version de chaque script et feuille de style, dans index.html
+fs.writeFileSync(path.join(root, "version.json"), JSON.stringify({ version, built }, null, 2) + "\n");
+
+// index.html : version affichée, numéro de chaque script et feuille de style
+const readHash = (f) => crypto.createHash("sha256").update(fs.readFileSync(path.join(root, f))).digest("hex");
 const indexPath = path.join(root, "index.html");
-const html = fs
-  .readFileSync(indexPath, "utf8")
-  .replace(/(src|href)="((?:js|css)\/[^"?]+)(\?v=[0-9a-f]+)?"/g, (m, attr, file) => attr + '="' + file + "?v=" + readHash(file).slice(0, 10) + '"');
+let html = fs.readFileSync(indexPath, "utf8").replace(META, "");
+html = html.replace(
+  /(src|href)="((?:js|css)\/[^"?]+)(\?v=[0-9a-f]+)?"/g,
+  (m, attr, file) => attr + '="' + file + "?v=" + readHash(file).slice(0, 10) + '"'
+);
+html = html.replace(
+  '<meta name="color-scheme" content="light">',
+  '<meta name="color-scheme" content="light">\n  <meta name="app-version" content="' + version + '">\n  <meta name="app-built" content="' + built + '">'
+);
 fs.writeFileSync(indexPath, html);
 
 // sw.js : version du cache et liste des fichiers
 const swPath = path.join(root, "sw.js");
 let sw = fs.readFileSync(swPath, "utf8");
-sw = sw.replace(/const CACHE = "[^"]*";/, 'const CACHE = "' + version + '";');
+sw = sw.replace(/const CACHE = "[^"]*";/, 'const CACHE = "mon-coin-magique-' + version + '";');
 const shell = ["./", ...files.filter((f) => f !== "index.html").map((f) => "./" + f), "./index.html"];
 const block =
   "// BEGIN SHELL (généré par tools/update-cache.js)\nconst SHELL = [\n" +
@@ -49,4 +65,4 @@ const block =
 sw = sw.replace(/\/\/ BEGIN SHELL[\s\S]*?\/\/ END SHELL/, block);
 fs.writeFileSync(swPath, sw);
 
-console.log("cache " + version + " — " + files.length + " fichiers");
+console.log("version " + version + " (" + built + ") — " + files.length + " fichiers");

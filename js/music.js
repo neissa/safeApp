@@ -1,64 +1,53 @@
 /* Panneau musique : chansons du téléphone, et Spotify.
-   - Sans connexion : la playlist s'affiche avec le lecteur intégré de Spotify.
-   - Avec connexion Spotify : lecture complète et boutons (Premium requis pour la lecture).
-   Réglage caché : 5 appuis rapides sur l'onglet Spotify permettent de changer la playlist. */
+   - Sans connexion : la playlist choisie dans le menu parent s'affiche avec le lecteur intégré.
+   - Avec connexion Spotify : lecture complète de la playlist (Premium requis pour la lecture). */
 (function () {
   "use strict";
 
   const KA = window.KA;
-  const SECRET_TAPS = 5;
   const PLAYLIST_KEY = "mcm.spotifyPlaylist";
 
-  let root, player, list, empty, fileInput, frame, setBox, setInput, setMsg;
-  let spLogin, spConnected, spNow, spToggle, spList, spMsg, spCover;
+  const PLAYER_ERRORS = {
+    account_error: "La lecture complète demande un compte Spotify Premium",
+    authentication_error: "Reconnecte-toi à Spotify depuis le menu parent",
+    initialization_error: "Le lecteur ne peut pas démarrer sur cet appareil",
+    playback_error: "Lecture impossible pour le moment",
+  };
+
+  let root, player, list, empty, fileInput, frame;
+  let spConnected, spNow, spToggle, spList, spMsg, spCover;
   let tracks = [];
   let index = -1;
   let currentUrl = null;
-  let playlistId = KA.config.spotifyPlaylistId;
   let spTracks = [];
-  let pendingSpotifyTab = false;
 
-  // Accepte l'adresse complète (open.spotify.com/playlist/ID, avec ou sans paramètres),
-  // l'URI spotify:playlist:ID, ou l'identifiant seul
-  function parsePlaylistId(text) {
-    const t = (text || "").trim();
-    const m = t.match(/playlist[\/:]([A-Za-z0-9]{22})/);
-    if (m) return m[1];
-    if (/^[A-Za-z0-9]{22}$/.test(t)) return t;
-    return null;
+  // Playlist choisie dans le menu parent (ou celle de la configuration)
+  function currentPlaylist() {
+    return KA.ls.get(PLAYLIST_KEY, "") || KA.config.spotifyPlaylistId || "";
   }
-
-  function loadSpotify() {
-    frame.src =
-      "https://open.spotify.com/embed/playlist/" + encodeURIComponent(playlistId) + "?utm_source=generator";
-  }
-
-  const NO_PLAYLIST_TEXT = "Aucune playlist choisie : fais 5 appuis rapides sur Spotify pour en ajouter une";
 
   function setSpMsg(text) {
     spMsg.textContent = text;
   }
 
-  // Affiche soit la connexion et le lecteur intégré, soit le lecteur complet
-  function refreshSpotifyView() {
-    const connected = KA.spotify.isConnected();
-    spLogin.hidden = connected;
-    spConnected.hidden = !connected;
-    frame.hidden = connected;
-    if (!playlistId) {
-      frame.src = "about:blank";
-      setSpMsg(NO_PLAYLIST_TEXT);
-      return;
-    }
-    if (!connected && (!frame.src || frame.src === "about:blank")) loadSpotify();
+  function loadEmbed(id) {
+    frame.src = "https://open.spotify.com/embed/playlist/" + encodeURIComponent(id) + "?utm_source=generator";
   }
 
-  // Après un changement de playlist : le lecteur intégré et la liste connectée suivent la nouvelle
-  function applyPlaylistChange() {
-    frame.src = "about:blank";
-    setSpMsg("");
-    refreshSpotifyView();
-    if (KA.spotify.isConnected()) openConnected();
+  // Affiche soit le lecteur complet (connecté), soit le lecteur intégré, soit un message
+  function refreshSpotifyView() {
+    const id = currentPlaylist();
+    const connected = KA.spotify.isConnected();
+    spConnected.hidden = !connected;
+    frame.hidden = connected || !id;
+    if (connected) return;
+    if (id) {
+      if (!frame.src || frame.src === "about:blank" || frame.src.indexOf(encodeURIComponent(id)) < 0) loadEmbed(id);
+      setSpMsg("");
+    } else {
+      frame.src = "about:blank";
+      setSpMsg("Aucune playlist choisie : ouvre le menu parent 🔧 pour en choisir une");
+    }
   }
 
   function setTab(which) {
@@ -77,19 +66,9 @@
   }
 
   // ---------- Spotify connecté ----------
-  const PLAYER_ERRORS = {
-    account_error: "La lecture complète demande un compte Spotify Premium",
-    authentication_error: "Reconnecte-toi à Spotify",
-    initialization_error: "Le lecteur ne peut pas démarrer sur cet appareil",
-    playback_error: "Lecture impossible pour le moment",
-  };
-
   function showPlayerError(ev, message) {
     setSpMsg("⚠️ " + (PLAYER_ERRORS[ev] || message));
-    if (ev === "authentication_error") {
-      KA.spotify.logout();
-      refreshSpotifyView();
-    }
+    if (ev === "authentication_error") refreshSpotifyView();
   }
 
   function updateNow(state) {
@@ -104,10 +83,11 @@
 
   async function openConnected() {
     setSpMsg("");
-    if (!playlistId) {
+    const id = currentPlaylist();
+    if (!id) {
       spTracks = [];
       renderSpList();
-      setSpMsg(NO_PLAYLIST_TEXT);
+      setSpMsg("Aucune playlist choisie : ouvre le menu parent 🔧 pour en choisir une");
       return;
     }
     try {
@@ -120,14 +100,13 @@
       setSpMsg("⚠️ Le lecteur Spotify ne se charge pas");
     }
     try {
-      spTracks = await KA.spotify.playlistTracks(playlistId);
+      spTracks = await KA.spotify.playlistTracks(id);
       renderSpList();
     } catch (e) {
       spTracks = [];
       renderSpList();
-      if (e.message === "not-connected") {
-        refreshSpotifyView();
-      } else if (e.status === 403) {
+      if (e.message === "not-connected") refreshSpotifyView();
+      else if (e.status === 403) {
         setSpMsg("La liste n'est pas disponible pour cette playlist. Tu peux quand même utiliser ⏮️ ▶️ ⏭️.");
       } else {
         setSpMsg("Impossible de charger la liste des chansons");
@@ -137,12 +116,8 @@
 
   async function playSpTrack(i) {
     setSpMsg("");
-    if (!playlistId) {
-      setSpMsg(NO_PLAYLIST_TEXT);
-      return;
-    }
     try {
-      await KA.spotify.playAt(playlistId, i);
+      await KA.spotify.playAt(currentPlaylist(), i);
     } catch (e) {
       if (e.message === "player-not-ready") setSpMsg("Le lecteur se prépare, réessaie dans un instant");
       else if (e.status === 403) setSpMsg("La lecture complète demande un compte Spotify Premium");
@@ -160,89 +135,6 @@
         })
       );
     });
-  }
-
-  // ---------- Playlist Spotify : réglage caché ----------
-  function openSetter() {
-    const connected = KA.spotify.isConnected();
-    setInput.value = playlistId ? "https://open.spotify.com/playlist/" + playlistId : "";
-    setMsg.textContent = "";
-    root.querySelector("#spotify-logout").hidden = !connected;
-    root.querySelector("#spotify-pick").hidden = !connected;
-    root.querySelector("#spotify-pick-list").hidden = true;
-    root.querySelector("#spotify-pick-list").innerHTML = "";
-    setBox.hidden = false;
-    setInput.focus();
-  }
-
-  // Liste les playlists du compte connecté ; un appui en choisit une
-  async function showPlaylistChoices() {
-    const pickList = root.querySelector("#spotify-pick-list");
-    pickList.hidden = true;
-    pickList.innerHTML = "";
-    setMsg.textContent = "Chargement de tes playlists…";
-    try {
-      const lists = await KA.spotify.userPlaylists();
-      if (!lists.length) {
-        setMsg.textContent = "Aucune playlist trouvée sur ce compte";
-        return;
-      }
-      lists.forEach((p) => {
-        pickList.appendChild(
-          KA.listItem({
-            leading: [KA.cover(p.cover)],
-            label: p.name,
-            trailing: [KA.chip("✅", "Choisir " + p.name, () => choosePlaylist(p.id))],
-          })
-        );
-      });
-      pickList.hidden = false;
-      setMsg.textContent = "Touche la playlist à écouter";
-    } catch (e) {
-      if (e.message === "not-connected") {
-        closeSetter();
-        refreshSpotifyView();
-      } else {
-        setMsg.textContent = e.status === 403
-          ? "Spotify refuse la liste de tes playlists"
-          : "Impossible de charger tes playlists";
-      }
-    }
-  }
-
-  function choosePlaylist(id) {
-    KA.ls.set(PLAYLIST_KEY, id);
-    playlistId = id;
-    closeSetter();
-    applyPlaylistChange();
-  }
-
-  function logoutFromSetter() {
-    KA.spotify.logout();
-    closeSetter();
-    spTracks = [];
-    renderSpList();
-    spNow.textContent = "Choisis une chanson";
-    spCover.hidden = true;
-    refreshSpotifyView();
-    setSpMsg("Tu es déconnecté de Spotify");
-  }
-
-  function closeSetter() {
-    setBox.hidden = true;
-    setMsg.textContent = "";
-  }
-
-  function saveSetter() {
-    const id = parsePlaylistId(setInput.value);
-    if (!id) {
-      setMsg.textContent = "Adresse non reconnue : colle le lien de la playlist Spotify";
-      return;
-    }
-    KA.ls.set(PLAYLIST_KEY, id);
-    playlistId = id;
-    closeSetter();
-    applyPlaylistChange();
   }
 
   // ---------- Chansons du téléphone ----------
@@ -292,7 +184,6 @@
         }
       });
       const delBtn = KA.chip("🗑️", "Supprimer", () => KA.armed(delBtn, () => removeTrack(t.id)));
-
       list.appendChild(
         KA.listItem({
           leading: [playBtn],
@@ -312,10 +203,6 @@
       empty = root.querySelector("#music-empty");
       fileInput = root.querySelector("#music-file");
       frame = root.querySelector("#spotify-frame");
-      setBox = root.querySelector("#spotify-set");
-      setInput = root.querySelector("#spotify-url");
-      setMsg = root.querySelector("#spotify-msg");
-      spLogin = root.querySelector("#sp-login-box");
       spConnected = root.querySelector("#sp-connected");
       spNow = root.querySelector("#sp-now");
       spToggle = root.querySelector("#sp-toggle");
@@ -323,26 +210,11 @@
       spMsg = root.querySelector("#sp-msg");
       spCover = root.querySelector("#sp-cover");
 
-      playlistId = parsePlaylistId(KA.ls.get(PLAYLIST_KEY, "")) || KA.config.spotifyPlaylistId;
-
       root.querySelector("#tab-local").addEventListener("click", () => setTab("local"));
-      // Cinq appuis rapides sur l'onglet Spotify, puis une question de contrôle, ouvrent les réglages
-      KA.tap(root.querySelector("#tab-spotify"), SECRET_TAPS, () => KA.challenge(openSetter));
       root.querySelector("#tab-spotify").addEventListener("click", () => setTab("spotify"));
-      root.querySelector("#spotify-save").addEventListener("click", saveSetter);
-      root.querySelector("#spotify-cancel").addEventListener("click", closeSetter);
-      setInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") saveSetter();
-      });
-
-      root.querySelector("#sp-login").addEventListener("click", () => {
-        KA.spotify.login().catch(() => setSpMsg("Connexion Spotify impossible"));
-      });
       root.querySelector("#sp-toggle").addEventListener("click", () => KA.spotify.toggle());
       root.querySelector("#sp-next").addEventListener("click", () => KA.spotify.next());
       root.querySelector("#sp-prev").addEventListener("click", () => KA.spotify.previous());
-      root.querySelector("#spotify-logout").addEventListener("click", logoutFromSetter);
-      root.querySelector("#spotify-pick").addEventListener("click", showPlaylistChoices);
 
       root.querySelector("#music-add").addEventListener("click", () => fileInput.click());
       fileInput.addEventListener("change", () => addFiles(fileInput.files));
@@ -359,31 +231,15 @@
       });
       player.addEventListener("play", render);
       player.addEventListener("pause", render);
-
-      // Retour de la connexion Spotify : on ouvre directement l'onglet Spotify
-      KA.spotify
-        .finishLoginIfNeeded()
-        .then((done) => {
-          if (!done) return;
-          pendingSpotifyTab = true;
-          KA.showPanel("music");
-        })
-        .catch((e) => {
-          KA.showPanel("music");
-          pendingSpotifyTab = true;
-          setTimeout(() => setSpMsg("⚠️ " + e.message), 0);
-        });
     },
     enter() {
       setTab("spotify"); // Spotify par défaut ; l'onglet Téléphone reste accessible
-      pendingSpotifyTab = false;
       render();
     },
     leave() {
       player.pause();
       frame.src = "about:blank";
       KA.spotify.pause();
-      closeSetter();
     },
   };
 })();

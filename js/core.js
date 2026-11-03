@@ -191,6 +191,16 @@
     },
   };
 
+  // ---------- Thème : clair, sombre, ou suit le thème de l'appareil ----------
+  const darkQuery = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+  KA.applyTheme = function () {
+    const pref = KA.settings.get("theme", "light");
+    const dark = pref === "dark" || (pref === "auto" && !!(darkQuery && darkQuery.matches));
+    document.documentElement.dataset.theme = dark ? "dark" : "light";
+  };
+  if (darkQuery && darkQuery.addEventListener) darkQuery.addEventListener("change", () => KA.applyTheme());
+  KA.applyTheme();
+
   // Vrai pendant un enregistrement : ni bruitage ni voix, le micro les capterait
   KA.quiet = false;
 

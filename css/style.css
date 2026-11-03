@@ -15,7 +15,25 @@
   --ink: #2b2b2b;
   --paper: #ffffff;
   --shadow: rgba(0, 0, 0, 0.15);
+  --bg1: #bfe9ff;
+  --bg2: #fff6d1;
+  --soft: #f5f5f5;
+  --line: #dddddd;
+  --seg-bg: rgba(255, 255, 255, 0.6);
   color-scheme: light;
+}
+
+/* Thème sombre (réglé dans le menu parent : clair, sombre ou suit l'appareil) */
+:root[data-theme="dark"] {
+  --ink: #f1f1f1;
+  --paper: #262a33;
+  --shadow: rgba(0, 0, 0, 0.5);
+  --bg1: #1b2430;
+  --bg2: #2a2433;
+  --soft: #343a46;
+  --line: #4a505c;
+  --seg-bg: rgba(0, 0, 0, 0.25);
+  color-scheme: dark;
 }
 
 * {
@@ -35,7 +53,7 @@ body {
   font-family: var(--font-script);
   font-size: 16px;
   color: var(--ink);
-  background: linear-gradient(180deg, #bfe9ff 0%, #fff6d1 100%);
+  background: linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior: none;
   -webkit-user-select: none;
@@ -189,7 +207,7 @@ button:active {
 
 .tiles {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   padding: 6px 0;
   align-content: center;
@@ -197,7 +215,7 @@ button:active {
 }
 
 .tile {
-  aspect-ratio: 1.45;
+  aspect-ratio: 1.9;
   padding: 0;
   border: none;
   border-radius: 24px;
@@ -209,20 +227,205 @@ button:active {
   box-shadow: 0 6px 0 rgba(0, 0, 0, 0.18);
 }
 
-/* L'icône est centrée à la fois horizontalement et verticalement */
-.tile span {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  line-height: 1;
+/* Icône au-dessus, nom en dessous, le tout centré dans la tuile */
+.tile {
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+}
+
+.tile-ico {
+  display: block;
+  font-size: 38px;
+  line-height: 1.2;
+}
+
+.tile-label {
+  display: block;
+  max-width: 100%;
+  font-family: var(--font-script);
+  font-size: 17px;
+  white-space: nowrap;
+  font-weight: bold;
+  line-height: 1.1;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.t-notes .tile-label {
+  color: var(--ink);
+  text-shadow: none;
 }
 
 .tile.wide {
   grid-column: span 2;
   aspect-ratio: auto;
-  height: 110px;
+  height: 78px;
 }
+
+/* Accès au menu parent, tout en bas de l'accueil */
+.home-foot {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding: 32px 0 6px;
+}
+
+/* Bulle affichée au-dessus du menu parent quand une mise à jour existe */
+.update-badge {
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 3px 10px;
+  border-radius: 14px;
+  background: #e53935;
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  white-space: nowrap;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+
+.t-piano { background: #5c6bc0; }
+.t-memory { background: #26c6da; }
+.t-timer { background: #ef6c00; }
+.t-shapes { background: #7cb342; }
+.t-intrus { background: #8d6e63; }
+
+/* Jeux Formes et L'intrus */
+.game-help {
+  margin: 0;
+  text-align: center;
+  font-size: 18px;
+}
+
+.shape-choices {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-content: center;
+  gap: 12px;
+}
+
+.shape-btn {
+  aspect-ratio: 1;
+  border: none;
+  border-radius: 22px;
+  background: var(--paper);
+  box-shadow: 0 5px 0 var(--shadow);
+  padding: 12px;
+}
+
+.shape-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.shape-btn.right {
+  background: #c5e1a5;
+}
+
+.shape-btn.shake,
+.intrus-item.shake {
+  animation: shake 0.4s;
+}
+
+.intrus-grid {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: center;
+  gap: 14px;
+}
+
+.intrus-item {
+  aspect-ratio: 1;
+  border: none;
+  border-radius: 22px;
+  background: var(--paper);
+  box-shadow: 0 5px 0 var(--shadow);
+  font-size: clamp(44px, 16vw, 72px);
+  line-height: 1;
+}
+
+.intrus-item.right {
+  background: #c5e1a5;
+}
+
+/* Minuteur : durées rapides, affichage et barre de progression */
+.timer-presets {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.timer-preset {
+  min-height: 52px;
+  border: none;
+  border-radius: 16px;
+  background: var(--paper);
+  font-family: var(--font-digits);
+  font-size: 18px;
+  font-weight: bold;
+  box-shadow: 0 3px 0 var(--shadow);
+}
+
+.timer-preset.on {
+  background: #ffe082;
+  outline: 3px solid #ffb300;
+  outline-offset: 2px;
+}
+
+/* Anneau circulaire : il se vide au fil du temps, le temps restant est au centre */
+.timer-ring {
+  position: relative;
+  width: min(72vw, 280px);
+  aspect-ratio: 1;
+  margin: 8px auto;
+}
+
+.ring-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.ring-bg {
+  fill: var(--paper);
+  stroke: #e0e0e0;
+  stroke-width: 10;
+}
+
+.ring-arc {
+  fill: none;
+  stroke: #66bb6a;
+  stroke-width: 10;
+  stroke-linecap: round;
+  stroke-dasharray: 326.73;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.25s linear, stroke 0.3s;
+}
+
+.timer-display {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-digits);
+  font-size: clamp(36px, 11vw, 52px);
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+}
+
+.timer-display.ring {
+  animation: wiggle 0.3s infinite alternate;
+  color: #e53935;
+}
+
 
 .t-draw { background: #ff7043; }
 .t-notes { background: #ffca28; }
@@ -292,7 +495,7 @@ button:active {
   min-height: 200px;
   width: 100%;
   display: block;
-  background: var(--paper);
+  background: #ffffff; /* le dessin reste sur fond blanc, même en thème sombre */
   border-radius: 20px;
   box-shadow: 0 5px 0 var(--shadow);
   touch-action: none;
@@ -464,7 +667,7 @@ button:active {
   gap: 6px;
   padding: 5px;
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--seg-bg);
 }
 
 .seg-btn {
@@ -509,7 +712,7 @@ audio {
   font: inherit;
   font-size: 16px;
   padding: 10px;
-  border: 2px solid #ddd;
+  border: 2px solid var(--line);
   border-radius: 12px;
   color: var(--ink);
 }
@@ -550,7 +753,141 @@ audio {
   height: 40px;
   font-size: 18px;
   box-shadow: none;
-  background: #f5f5f5;
+  background: var(--soft);
+}
+
+/* Piano : huit touches de couleur */
+/* Piano : clavier avec touches blanches et noires */
+.piano-keys {
+  flex: 1 1 auto;
+  display: flex;
+  min-height: 0;
+}
+
+.keyboard {
+  flex: 1;
+  display: flex;
+  padding: 8px 6px 0;
+  border-radius: 16px 16px 0 0;
+  background: #222;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.2);
+  min-height: 240px;
+  box-sizing: border-box;
+}
+
+.keys-area {
+  position: relative;
+  flex: 1;
+  display: flex;
+}
+
+.white-key {
+  flex: 1;
+  margin: 0 1px;
+  border: none;
+  border-radius: 0 0 10px 10px;
+  background: linear-gradient(#ffffff, #f2f2f2);
+  box-shadow: inset 0 -6px 0 #d6d6d6;
+  font-family: var(--font-digits);
+  font-size: 16px;
+  font-weight: bold;
+  color: #555;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 12px;
+}
+
+.black-key {
+  position: absolute;
+  top: 0;
+  z-index: 2;
+  width: 7%;
+  height: 60%;
+  border: none;
+  border-radius: 0 0 6px 6px;
+  background: linear-gradient(#3a3a3a, #000);
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.35);
+}
+
+/* Simon : touche éclairée, et barre de commande */
+.simon-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.white-key.lit {
+  background: #ffe082;
+  box-shadow: inset 0 -6px 0 #d6b24a;
+}
+
+.white-key.pressed,
+.black-key.pressed {
+  background: #ffe082;
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
+/* Memory : grille de cartes */
+.memory-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.memory-moves {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.memory-levels {
+  margin: 0;
+}
+
+/* Grille toujours carrée, et assez petite pour tenir en entier à l'écran */
+.memory-board {
+  --cols: 4;
+  --rows: 4;
+  width: min(100%, calc((100dvh - 260px) * var(--cols) / var(--rows)));
+  aspect-ratio: var(--cols) / var(--rows);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--rows), minmax(0, 1fr));
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.card {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: none;
+  border-radius: 12px;
+  background: #81d4fa;
+  font-size: calc(min(100vw - 40px, 100dvh - 260px) / max(var(--cols), var(--rows)) * 0.5);
+  line-height: 1;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.15);
+}
+
+/* Case vide des grilles impaires (3×3, 5×5) */
+.card-gap {
+  width: 100%;
+  height: 100%;
+}
+
+.card.up {
+  background: var(--paper);
+}
+
+.card.matched {
+  background: #c5e1a5;
+  opacity: 0.85;
 }
 
 /* Dinosaure de l'effet « Raptorize » (voir js/raptor.js) : il traverse l'écran */
@@ -612,16 +949,64 @@ audio {
   font: inherit;
   font-size: 18px;
   padding: 10px;
-  border: 2px solid #ddd;
+  border: 2px solid var(--line);
   border-radius: 12px;
   color: var(--ink);
+}
+
+/* Menu parent : police normale, sections séparées */
+.parent-card {
+  font-family: var(--font-digits);
+  font-size: 16px;
+  gap: 14px;
+}
+
+.parent-card h3 {
+  margin: 0 0 4px;
+  font-size: 18px;
+}
+
+.parent-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 2px solid var(--line);
+}
+
+/* Menu parent : cases des tuiles */
+.parent-tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.parent-tiles label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+}
+
+.parent-tiles input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  flex: 0 0 auto;
+}
+
+.parent-label {
+  font-size: 14px;
+  opacity: 0.75;
 }
 
 .voice-select {
   font: inherit;
   font-size: 16px;
   padding: 10px;
-  border: 2px solid #ddd;
+  border: 2px solid var(--line);
   border-radius: 12px;
   background: var(--paper);
   color: var(--ink);
@@ -741,7 +1126,7 @@ audio {
   height: 40px;
   font-size: 20px;
   box-shadow: none;
-  background: #f5f5f5;
+  background: var(--soft);
 }
 
 .dd-grid .swatch {
@@ -901,7 +1286,7 @@ audio {
   flex: 0 0 auto;
   border-radius: 10px;
   object-fit: cover;
-  background: #eee;
+  background: var(--soft);
 }
 
 .cover-big {

@@ -4,13 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light">
+  <meta name="app-version" content="25fa46299c1f">
+  <meta name="app-built" content="2026-11-03">
   <title>Mon coin magique</title>
   <meta name="theme-color" content="#bfe9ff">
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=96756e96cf">
+  <link rel="stylesheet" href="css/style.css?v=6492fdedfb">
 </head>
 <body>
 <div id="app">
@@ -24,14 +26,23 @@
       </h1>
     </header>
     <nav class="tiles">
-      <button class="tile t-draw" data-open="draw" data-say="Dessin" aria-label="Dessin"><span>🎨</span></button>
-      <button class="tile t-notes" data-open="notes" data-say="Bloc notes" aria-label="Bloc notes"><span>📝</span></button>
-      <button class="tile t-calc" data-open="calc" data-say="Nombre" aria-label="Nombre"><span>🧮</span></button>
-      <button class="tile t-gallery" data-open="gallery" data-say="Galerie photos" aria-label="Galerie photos"><span>🖼️</span></button>
-      <button class="tile t-music" data-open="music" data-say="Musique" aria-label="Musique"><span>🎵</span></button>
-      <button class="tile t-rec" data-open="recorder" data-say="Micro" aria-label="Micro"><span>🎙️</span></button>
-      <button class="tile t-clock wide" data-open="clock" data-say="Heure" aria-label="Heure et météo"><span>🕐</span></button>
+      <button class="tile t-draw" data-open="draw" data-say="Dessin" aria-label="Dessin"><span class="tile-ico">🎨</span><span class="tile-label">Dessin</span></button>
+      <button class="tile t-notes" data-open="notes" data-say="Bloc notes" aria-label="Bloc notes"><span class="tile-ico">📝</span><span class="tile-label">Bloc notes</span></button>
+      <button class="tile t-calc" data-open="calc" data-say="Nombre" aria-label="Nombre"><span class="tile-ico">🧮</span><span class="tile-label">Nombre</span></button>
+      <button class="tile t-gallery" data-open="gallery" data-say="Galerie photos" aria-label="Galerie photos"><span class="tile-ico">🖼️</span><span class="tile-label">Galerie</span></button>
+      <button class="tile t-music" data-open="music" data-say="Musique" aria-label="Musique"><span class="tile-ico">🎵</span><span class="tile-label">Musique</span></button>
+      <button class="tile t-rec" data-open="recorder" data-say="Enregistrement" aria-label="Enregistrement"><span class="tile-ico">🎙️</span><span class="tile-label">Enregistrement</span></button>
+      <button class="tile t-piano" data-open="piano" data-say="Piano" aria-label="Piano"><span class="tile-ico">🎹</span><span class="tile-label">Piano</span></button>
+      <button class="tile t-memory" data-open="memory" data-say="Memory" aria-label="Memory"><span class="tile-ico">🃏</span><span class="tile-label">Memory</span></button>
+      <button class="tile t-timer" data-open="timer" data-say="Minuteur" aria-label="Minuteur"><span class="tile-ico">⏱️</span><span class="tile-label">Minuteur</span></button>
+      <button class="tile t-shapes" data-open="shapes" data-say="Formes" aria-label="Formes"><span class="tile-ico">🔶</span><span class="tile-label">Formes</span></button>
+      <button class="tile t-intrus" data-open="intrus" data-say="L'intrus" aria-label="L'intrus"><span class="tile-ico">🔍</span><span class="tile-label">L'intrus</span></button>
+      <button class="tile t-clock" data-open="clock" data-say="Date et heure" aria-label="Date et heure"><span class="tile-ico">🕐</span><span class="tile-label">Date et heure</span></button>
     </nav>
+    <div class="home-foot">
+      <button class="btn alt" id="open-parent">🔧 Menu parent</button>
+      <span id="update-badge" class="update-badge" hidden>🆕 Mise à jour</span>
+    </div>
   </section>
 
   <!-- DESSIN -->
@@ -172,10 +183,6 @@
     </div>
 
     <div id="music-spotify" class="pane" hidden>
-      <div id="sp-login-box" class="set-box">
-        <p class="hint">Connecte-toi à Spotify pour écouter la playlist entière</p>
-        <button class="btn" id="sp-login">🔑 Se connecter à Spotify</button>
-      </div>
       <div id="sp-connected" class="pane" hidden>
         <div class="row">
           <button class="chip" id="sp-prev" aria-label="Précédente">⏮️</button>
@@ -187,18 +194,6 @@
         <ul id="sp-list" class="list"></ul>
       </div>
       <p id="sp-msg" class="hint"></p>
-      <div id="spotify-set" class="set-box" hidden>
-        <p class="hint">Colle le lien de la playlist Spotify</p>
-        <input id="spotify-url" type="text" placeholder="https://open.spotify.com/playlist/..." autocomplete="off" spellcheck="false">
-        <p id="spotify-msg" class="hint"></p>
-        <div class="row">
-          <button class="btn" id="spotify-save">✅ Enregistrer</button>
-          <button class="btn alt" id="spotify-cancel">Annuler</button>
-        </div>
-        <button class="btn" id="spotify-pick" hidden>📋 Choisir une de mes playlists</button>
-        <ul id="spotify-pick-list" class="list" hidden></ul>
-        <button class="btn alt" id="spotify-logout" hidden>🔓 Se déconnecter de Spotify</button>
-      </div>
       <iframe id="spotify-frame" class="spotify" src="about:blank" title="Playlist Spotify"
               allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
               loading="lazy"></iframe>
@@ -209,7 +204,7 @@
   <section id="screen-recorder" class="screen">
     <header class="bar">
       <button class="chip" data-back aria-label="Accueil">🏠</button>
-      <h2>🎙️ Micro</h2>
+      <h2>🎙️ Enregistrement</h2>
       <span></span>
     </header>
     <div class="rec-zone">
@@ -222,11 +217,88 @@
     <p id="rec-empty" class="hint">🎧 Pas encore d'enregistrements</p>
   </section>
 
+  <!-- PIANO -->
+  <section id="screen-piano" class="screen">
+    <header class="bar">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>🎹 Piano</h2>
+      <span></span>
+    </header>
+    <div class="simon-bar">
+      <button class="btn" id="simon-btn">🎲 Jouer à Simon</button>
+      <span id="simon-best" class="hint"></span>
+    </div>
+    <p id="simon-status" class="hint"></p>
+    <div id="piano-keys" class="piano-keys"></div>
+  </section>
+
+  <!-- MEMORY -->
+  <section id="screen-memory" class="screen">
+    <header class="bar">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>🃏 Memory</h2>
+      <span></span>
+    </header>
+    <div id="memory-levels" class="seg memory-levels"></div>
+    <div class="memory-bar">
+      <span id="memory-moves" class="memory-moves">Coups : 0</span>
+      <button class="btn" id="memory-new">🔀 Nouvelle partie</button>
+    </div>
+    <div id="memory-grid" class="memory-board"></div>
+    <p id="memory-msg" class="hint"></p>
+  </section>
+
+  <!-- FORMES -->
+  <section id="screen-shapes" class="screen">
+    <header class="bar">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>🔶 Formes</h2>
+      <button class="chip" id="shapes-say" aria-label="Répéter la consigne">🔊</button>
+    </header>
+    <p class="game-help">Touche la forme demandée</p>
+    <div id="shapes-choices" class="shape-choices"></div>
+    <p id="shapes-stars" class="game-stars"></p>
+  </section>
+
+  <!-- L'INTRUS -->
+  <section id="screen-intrus" class="screen">
+    <header class="bar">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>🔍 L'intrus</h2>
+      <button class="chip" id="intrus-say" aria-label="Répéter la consigne">🔊</button>
+    </header>
+    <p class="game-help">Trouve celui qui n'a rien à faire là</p>
+    <div id="intrus-grid" class="intrus-grid"></div>
+    <p id="intrus-stars" class="game-stars"></p>
+  </section>
+
+  <!-- MINUTEUR -->
+  <section id="screen-timer" class="screen">
+    <header class="bar">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>⏱️ Minuteur</h2>
+      <span></span>
+    </header>
+    <div id="timer-presets" class="timer-presets"></div>
+    <div class="timer-ring">
+      <svg viewBox="0 0 120 120" class="ring-svg" aria-hidden="true">
+        <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
+        <circle id="timer-arc" class="ring-arc" cx="60" cy="60" r="52"></circle>
+      </svg>
+      <div id="timer-display" class="timer-display">05:00</div>
+    </div>
+    <div class="row">
+      <button class="btn" id="timer-toggle">▶️ Démarrer</button>
+      <button class="chip" id="timer-reset" aria-label="Remettre à zéro">🔄</button>
+    </div>
+    <p id="timer-msg" class="hint"></p>
+  </section>
+
   <!-- HEURE, SAISON, MÉTÉO -->
   <section id="screen-clock" class="screen">
     <header class="bar">
       <button class="chip" data-back aria-label="Accueil">🏠</button>
-      <h2>🕐 Heure</h2>
+      <h2>🕐 Date et heure</h2>
       <span></span>
     </header>
     <div class="clock-wrap">
@@ -266,50 +338,93 @@
 
 <!-- Menu parent : titre, sons, sauvegarde -->
 <div id="parent" class="overlay" hidden>
-  <div class="overlay-card">
+  <div class="overlay-card parent-card">
     <h2>🔧 Menu parent</h2>
-    <p class="hint">Titre de l'accueil</p>
-    <input id="parent-title" type="text" maxlength="30" autocomplete="off" spellcheck="false">
-    <div class="row">
+    <p id="parent-version" class="hint"></p>
+
+    <section class="parent-section">
+      <h3>🏠 Accueil</h3>
+      <label class="parent-label" for="parent-title">Titre de l'accueil</label>
+      <input id="parent-title" type="text" maxlength="30" autocomplete="off" spellcheck="false">
       <button class="btn" id="parent-title-save">✅ Enregistrer le titre</button>
-    </div>
-    <div class="row">
-      <button class="btn" id="parent-sound">🔊 Bruitages</button>
-      <button class="btn" id="parent-voice">🗣️ Voix</button>
-    </div>
-    <p class="hint">Voix utilisée pour les annonces</p>
-    <select id="parent-voice-select" class="voice-select"></select>
-    <p id="parent-storage" class="hint"></p>
-    <div class="row">
-      <button class="btn alt" id="parent-export">💾 Sauvegarder</button>
-      <button class="btn alt" id="parent-import">📂 Restaurer</button>
-    </div>
-    <input id="parent-file" type="file" accept="application/json,.json" hidden>
-    <div class="row">
-      <button class="btn" id="parent-update">🔄 Mettre à jour l'appli</button>
-    </div>
+    </section>
+
+    <section class="parent-section">
+      <h3>🧩 Tuiles de l'accueil</h3>
+      <p class="hint">Décoche une tuile pour la cacher</p>
+      <div id="parent-tiles" class="parent-tiles"></div>
+    </section>
+
+    <section class="parent-section">
+      <h3>🔊 Sons</h3>
+      <div class="row">
+        <button class="btn" id="parent-sound">🔊 Bruitages</button>
+        <button class="btn" id="parent-voice">🗣️ Voix</button>
+      </div>
+      <label class="parent-label" for="parent-voice-select">Voix utilisée pour les annonces</label>
+      <select id="parent-voice-select" class="voice-select"></select>
+    </section>
+
+    <section class="parent-section">
+      <h3>🌓 Thème</h3>
+      <div id="parent-theme" class="seg">
+        <button class="seg-btn" data-theme="light">☀️ Clair</button>
+        <button class="seg-btn" data-theme="dark">🌙 Sombre</button>
+        <button class="seg-btn" data-theme="auto">📱 Comme l'appareil</button>
+      </div>
+    </section>
+
+    <section class="parent-section">
+      <h3>🎵 Spotify</h3>
+      <p id="parent-sp-status" class="hint"></p>
+      <div class="row">
+        <button class="btn" id="parent-sp-login">🔑 Se connecter</button>
+        <button class="btn alt" id="parent-sp-logout">🔓 Se déconnecter</button>
+      </div>
+      <button class="btn" id="parent-sp-pick">📋 Choisir la playlist</button>
+      <ul id="parent-sp-list" class="list" hidden></ul>
+    </section>
+
+    <section class="parent-section">
+      <h3>💾 Sauvegarde</h3>
+      <p id="parent-storage" class="hint"></p>
+      <div class="row">
+        <button class="btn alt" id="parent-export">💾 Sauvegarder</button>
+        <button class="btn alt" id="parent-import">📂 Restaurer</button>
+      </div>
+      <input id="parent-file" type="file" accept="application/json,.json" hidden>
+    </section>
+
+    <section class="parent-section">
+      <h3>🔄 Application</h3>
+      <p id="parent-update-status" class="hint"></p>
+      <button class="btn" id="parent-update">🔄 Vérifier et mettre à jour</button>
+    </section>
+
     <p id="parent-msg" class="hint"></p>
-    <div class="row">
-      <button class="btn" id="parent-close">Fermer</button>
-    </div>
+    <button class="btn" id="parent-close">Fermer</button>
   </div>
 </div>
 
 </div>
 
-<script src="js/core.js?v=d7f78ca0ee"></script>
-<script src="js/ui.js?v=0efefcd9eb"></script>
+<script src="js/core.js?v=32dc19fe90"></script>
+<script src="js/ui.js?v=3d63d19598"></script>
 <script src="js/draw.js?v=57783c48c5"></script>
 <script src="js/notes.js?v=c40e79ee86"></script>
 <script src="js/calc.js?v=76aec6d76e"></script>
 <script src="js/gallery.js?v=ef63a40877"></script>
-<script src="js/music.js?v=019b777ba9"></script>
+<script src="js/music.js?v=11800880eb"></script>
 <script src="js/recorder.js?v=7c25dc92e5"></script>
 <script src="js/clock.js?v=7b4f1fee15"></script>
 <script src="js/spotify.js?v=473b9b2ed4"></script>
-<script src="js/parent.js?v=9b2e4928c9"></script>
-<script src="js/home.js?v=3dda66935d"></script>
+<script src="js/parent.js?v=6056ae62d2"></script>
+<script src="js/home.js?v=e1672b3c6c"></script>
 <script src="js/raptor.js?v=1ecf6d4917"></script>
+<script src="js/piano.js?v=2f144c1b63"></script>
+<script src="js/memory.js?v=4792d1a37a"></script>
+<script src="js/timer.js?v=a2eca99d52"></script>
+<script src="js/games.js?v=7aa974e1cd"></script>
 <script src="js/main.js?v=70f5d3943d"></script>
 <script>
   // Hors ligne : le service worker garde l'appli en cache (ignoré si le navigateur ne le gère pas)
