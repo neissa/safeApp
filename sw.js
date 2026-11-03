@@ -1,0 +1,64 @@
+/* Service worker : l'appli fonctionne hors ligne une fois chargée.
+   Réseau d'abord (les mises à jour arrivent tout de suite), cache en secours.
+   Spotify, la météo et les fichiers du téléphone ne sont jamais mis en cache. */
+const CACHE = "mon-coin-magique-v1";
+const SHELL = [
+  "./",
+  "./index.html",
+  "./manifest.json",
+  "./css/style.css",
+  "./css/fonts/PlaywriteFRTrad-Regular.ttf",
+  "./icons/icon-192.png",
+  "./icons/icon-512.png",
+  "./js/core.js",
+  "./js/draw.js",
+  "./js/notes.js",
+  "./js/calc.js",
+  "./js/gallery.js",
+  "./js/music.js",
+  "./js/recorder.js",
+  "./js/clock.js",
+  "./js/spotify.js",
+  "./js/home.js",
+  "./js/main.js",
+];
+
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches
+      .open(CACHE)
+      .then((cache) => cache.addAll(SHELL))
+      .then(() => self.skipWaiting())
+  );
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches
+      .keys()
+      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener("fetch", (event) => {
+  const req = event.request;
+  if (req.method !== "GET") return;
+  const url = new URL(req.url);
+  // Seulement les fichiers de l'appli, pas les services externes
+  if (url.origin !== self.location.origin) return;
+  // Retour de connexion Spotify : toujours depuis le réseau
+  if (url.searchParams.has("code")) return;
+
+  event.respondWith(
+    fetch(req)
+      .then((res) => {
+        if (res.ok) {
+          const copy = res.clone();
+          caches.open(CACHE).then((cache) => cache.put(req, copy));
+        }
+        return res;
+      })
+      .catch(() => caches.match(req).then((hit) => hit || caches.match("./index.html")))
+  );
+});

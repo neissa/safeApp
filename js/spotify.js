@@ -25,9 +25,10 @@
   let deviceId = null;
   let ui = {}; // callbacks vers l'écran : onReady, onState, onError
 
-  // Adresse de retour : doit être identique à celle enregistrée dans le tableau de bord Spotify
+  // Adresse de retour : doit être identique à celle enregistrée dans le tableau de bord Spotify.
+  // Toujours « index.html » dans le même dossier, que l'on ouvre le dossier ou le fichier.
   function redirectUri() {
-    return location.origin + location.pathname;
+    return location.origin + location.pathname.replace(/[^\/]*$/, "") + "index.html";
   }
 
   // ---------- PKCE ----------
