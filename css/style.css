@@ -617,6 +617,16 @@ audio {
   color: var(--ink);
 }
 
+.voice-select {
+  font: inherit;
+  font-size: 16px;
+  padding: 10px;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  background: var(--paper);
+  color: var(--ink);
+}
+
 .challenge-q {
   margin: 0;
   text-align: center;

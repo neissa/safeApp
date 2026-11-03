@@ -99,14 +99,29 @@
   };
 
   // ---------- Voix : lit un texte à voix haute (pour les enfants qui ne lisent pas) ----------
-  KA.speak = function (text) {
+  // Voix françaises disponibles sur l'appareil
+  KA.voices = function () {
+    if (!("speechSynthesis" in window)) return [];
+    return window.speechSynthesis.getVoices().filter((v) => /^fr/i.test(v.lang));
+  };
+
+  // Voix choisie dans le menu parent (ou null = voix par défaut)
+  function chosenVoice() {
+    const name = KA.settings.get("voiceName", "");
+    if (!name) return null;
+    return KA.voices().find((v) => v.name === name) || null;
+  }
+
+  KA.speak = function (text, opts) {
     try {
       if (!("speechSynthesis" in window) || !text || KA.quiet) return;
-      if (!KA.settings.get("voice", true)) return;
+      if (!KA.settings.get("voice", true) && !(opts && opts.force)) return;
       window.speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(text);
       u.lang = "fr-FR";
       u.rate = 0.9;
+      const v = chosenVoice();
+      if (v) u.voice = v;
       window.speechSynthesis.speak(u);
     } catch (e) {
       /* synthèse vocale indisponible */

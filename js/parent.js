@@ -17,6 +17,25 @@
     voiceBtn.textContent = voice ? "🗣️ Voix : oui" : "🤐 Voix : non";
   }
 
+  // Liste des voix françaises du téléphone, avec la voix choisie
+  function refreshVoices() {
+    const select = document.getElementById("parent-voice-select");
+    if (!select) return;
+    const current = KA.settings.get("voiceName", "");
+    const voices = KA.voices();
+    select.innerHTML = "";
+    const add = (value, text) => {
+      const o = document.createElement("option");
+      o.value = value;
+      o.textContent = text;
+      select.appendChild(o);
+    };
+    add("", "Voix par défaut");
+    voices.forEach((v) => add(v.name, v.name.replace(/^Microsoft /, "").replace(/ - .*$/, "")));
+    select.value = voices.some((v) => v.name === current) ? current : "";
+    if (!voices.length) msg.textContent = "Aucune voix française trouvée sur cet appareil";
+  }
+
   async function refreshStorage() {
     let persisted = false;
     try {
@@ -33,6 +52,7 @@
     titleInput.value = KA.ls.get(TITLE_KEY, "Mon coin magique");
     msg.textContent = "";
     refreshToggles();
+    refreshVoices();
     refreshStorage();
     box.hidden = false;
   }
@@ -155,6 +175,12 @@
       if (fileInput.files[0]) importBackup(fileInput.files[0]);
     });
     document.getElementById("parent-close").addEventListener("click", close);
+    // Les voix arrivent parfois après le chargement de la page
+    if ("speechSynthesis" in window) speechSynthesis.addEventListener("voiceschanged", refreshVoices);
+    document.getElementById("parent-voice-select").addEventListener("change", (e) => {
+      KA.settings.set("voiceName", e.target.value);
+      KA.speak("Bonjour, c'est ma nouvelle voix !", { force: true });
+    });
     document.getElementById("parent-update").addEventListener("click", updateApp);
   });
 })();
