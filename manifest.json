@@ -1,7 +1,7 @@
 {
   "name": "Mon coin magique",
   "short_name": "Mon coin",
-  "description": "Un coin magique pour les petits : dessin, calcul, galerie, musique, micro et heure.",
+  "description": "Un coin magique pour les petits : dessin, nombre, galerie, musique, micro et heure.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

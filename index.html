@@ -22,20 +22,11 @@
         <span id="home-icon" class="home-icon" role="button" tabindex="0" aria-label="Changer d'icône">🌈</span>
         <span id="home-title" class="home-title">Mon coin magique</span>
       </h1>
-      <div id="title-set" class="set-box" hidden>
-        <p class="hint">Nouveau titre de l'accueil</p>
-        <input id="title-input" type="text" maxlength="30" autocomplete="off" spellcheck="false">
-        <p id="title-msg" class="hint"></p>
-        <div class="row">
-          <button class="btn" id="title-save">✅ Enregistrer</button>
-          <button class="btn alt" id="title-cancel">Annuler</button>
-        </div>
-      </div>
     </header>
     <nav class="tiles">
       <button class="tile t-draw" data-open="draw" data-say="Dessin" aria-label="Dessin"><span>🎨</span></button>
       <button class="tile t-notes" data-open="notes" data-say="Bloc notes" aria-label="Bloc notes"><span>📝</span></button>
-      <button class="tile t-calc" data-open="calc" data-say="Calculatrice" aria-label="Calculatrice"><span>🧮</span></button>
+      <button class="tile t-calc" data-open="calc" data-say="Nombre" aria-label="Nombre"><span>🧮</span></button>
       <button class="tile t-gallery" data-open="gallery" data-say="Galerie photos" aria-label="Galerie photos"><span>🖼️</span></button>
       <button class="tile t-music" data-open="music" data-say="Musique" aria-label="Musique"><span>🎵</span></button>
       <button class="tile t-rec" data-open="recorder" data-say="Micro" aria-label="Micro"><span>🎙️</span></button>
@@ -51,13 +42,30 @@
       <span></span>
     </header>
     <div class="tools">
-      <div class="row" id="draw-colors"></div>
-      <div class="row">
+      <div class="row tool-row">
+        <div class="dropdown">
+          <button class="chip dd-btn" id="color-btn" aria-label="Choisir une couleur"><span id="color-current" class="color-current"></span></button>
+          <div class="dd-menu" id="color-menu" hidden>
+            <div class="dd-grid" id="draw-colors"></div>
+          </div>
+        </div>
         <div class="sizes" id="draw-sizes"></div>
-        <button class="chip" id="draw-eraser" aria-label="Gomme">🧽</button>
-        <button class="chip" id="draw-clear" aria-label="Tout effacer">🗑️</button>
+        <button class="chip tool" id="tool-pen" aria-label="Crayon">✏️</button>
+        <button class="chip tool" id="tool-eraser" aria-label="Gomme">🧽</button>
+        <button class="chip tool" id="tool-bucket" aria-label="Pot de peinture">🪣</button>
+        <div class="dropdown">
+          <button class="chip dd-btn" id="stamp-btn" aria-label="Choisir un tampon"><span id="stamp-current">⭐</span></button>
+          <div class="dd-menu dd-tools" id="stamp-menu" hidden>
+            <div class="dd-grid" id="draw-stamps"></div>
+          </div>
+        </div>
       </div>
     </div>
+    <div class="row">
+      <button class="btn" id="draw-new">➕ Nouveau dessin</button>
+      <button class="chip" id="draw-delete" aria-label="Supprimer ce dessin">🗑️</button>
+    </div>
+    <div class="draw-list" id="draw-list"></div>
     <canvas id="draw-canvas" class="paper"></canvas>
   </section>
 
@@ -78,11 +86,23 @@
   <section id="screen-calc" class="screen">
     <header class="bar">
       <button class="chip" data-back aria-label="Accueil">🏠</button>
-      <h2>🧮 Calcul</h2>
+      <h2>🧮 Nombre</h2>
       <button class="chip" id="calc-read" aria-label="Lire le résultat">🔊</button>
     </header>
+    <div class="row">
+      <button class="btn" id="calc-mode">🎮 Jouer</button>
+    </div>
     <div id="calc-display" class="display">0</div>
     <div id="calc-keys" class="keys"></div>
+    <div id="calc-game" class="game" hidden>
+      <div class="row game-kinds">
+        <button class="btn" id="game-count">🔢 Compter</button>
+        <button class="btn" id="game-add">➕ Calculer</button>
+      </div>
+      <div id="game-scene" class="game-scene"></div>
+      <div id="game-choices" class="game-choices"></div>
+      <p id="game-stars" class="game-stars"></p>
+    </div>
   </section>
 
   <!-- GALERIE -->
@@ -190,7 +210,7 @@
     <div class="rec-zone">
       <div id="rec-time" class="digits">0:00</div>
       <canvas id="rec-live" class="live-wave" width="320" height="80" aria-label="Niveau du son"></canvas>
-      <button id="rec-btn" class="rec-btn" aria-label="Enregistrer"><span></span></button>
+      <button id="rec-btn" class="rec-btn" aria-label="Enregistrer" data-silent><span></span></button>
       <p id="rec-state" class="hint">Appuie pour parler 🎤</p>
     </div>
     <ul id="rec-list" class="list"></ul>
@@ -226,7 +246,49 @@
 
 </div>
 
+<!-- Question de contrôle pour les adultes -->
+<div id="challenge" class="overlay" hidden>
+  <div class="overlay-card">
+    <p id="challenge-q" class="challenge-q"></p>
+    <input id="challenge-a" type="number" inputmode="numeric" autocomplete="off">
+    <p id="challenge-msg" class="hint"></p>
+    <div class="row">
+      <button class="btn" id="challenge-ok">✅ Valider</button>
+      <button class="btn alt" id="challenge-no">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<!-- Menu parent : titre, sons, sauvegarde -->
+<div id="parent" class="overlay" hidden>
+  <div class="overlay-card">
+    <h2>🔧 Menu parent</h2>
+    <p class="hint">Titre de l'accueil</p>
+    <input id="parent-title" type="text" maxlength="30" autocomplete="off" spellcheck="false">
+    <div class="row">
+      <button class="btn" id="parent-title-save">✅ Enregistrer le titre</button>
+    </div>
+    <div class="row">
+      <button class="btn" id="parent-sound">🔊 Bruitages</button>
+      <button class="btn" id="parent-voice">🗣️ Voix</button>
+    </div>
+    <p id="parent-storage" class="hint"></p>
+    <div class="row">
+      <button class="btn alt" id="parent-export">💾 Sauvegarder</button>
+      <button class="btn alt" id="parent-import">📂 Restaurer</button>
+    </div>
+    <input id="parent-file" type="file" accept="application/json,.json" hidden>
+    <p id="parent-msg" class="hint"></p>
+    <div class="row">
+      <button class="btn" id="parent-close">Fermer</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
 <script src="js/core.js"></script>
+<script src="js/ui.js"></script>
 <script src="js/draw.js"></script>
 <script src="js/notes.js"></script>
 <script src="js/calc.js"></script>
@@ -235,6 +297,7 @@
 <script src="js/recorder.js"></script>
 <script src="js/clock.js"></script>
 <script src="js/spotify.js"></script>
+<script src="js/parent.js"></script>
 <script src="js/home.js"></script>
 <script src="js/main.js"></script>
 <script>

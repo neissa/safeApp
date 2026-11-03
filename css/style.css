@@ -549,6 +549,271 @@ audio {
   background: #f5f5f5;
 }
 
+/* Fenêtres par-dessus l'appli : question de contrôle et menu parent */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.overlay-card {
+  width: 100%;
+  max-width: 400px;
+  max-height: 92vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--paper);
+  box-shadow: 0 6px 0 var(--shadow);
+}
+
+.overlay-card h2 {
+  margin: 0;
+  text-align: center;
+  font-size: 24px;
+}
+
+.overlay-card input {
+  font: inherit;
+  font-size: 18px;
+  padding: 10px;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  color: var(--ink);
+}
+
+.challenge-q {
+  margin: 0;
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* Dessin : menus déroulants pour les couleurs et les outils */
+.tool-row {
+  position: relative;
+  z-index: 15;
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dd-btn {
+  width: 46px;
+  height: 46px;
+  font-size: 22px;
+}
+
+.color-current {
+  display: block;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 3px solid var(--paper);
+  box-shadow: 0 1px 4px var(--shadow);
+  background: #1e88e5;
+}
+
+.dd-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: 0 6px 0 var(--shadow);
+}
+
+.dd-tools {
+  left: auto;
+  right: 0;
+}
+
+/* Outils visibles en ligne, à côté des tailles */
+.tool-row .chip.tool {
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+}
+
+.dd-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 40px);
+  gap: 8px;
+  justify-content: center;
+}
+
+.dd-grid .chip {
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  box-shadow: none;
+  background: #f5f5f5;
+}
+
+.dd-grid .swatch {
+  width: 40px;
+  height: 40px;
+}
+
+.dd-grid .stamp {
+  width: 40px;
+  height: 40px;
+  font-size: 22px;
+}
+
+/* Dessin : outils, tampons et liste des dessins */
+.tool.selected,
+.stamp.selected {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.stamp {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 10px;
+  background: var(--paper);
+  font-size: 20px;
+  line-height: 1;
+  box-shadow: 0 2px 0 var(--shadow);
+}
+
+.draw-list {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px;
+}
+
+.thumb {
+  flex: 0 0 auto;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 3px solid var(--paper);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--paper);
+  box-shadow: 0 2px 0 var(--shadow);
+}
+
+.thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumb.selected {
+  border-color: #ffb300;
+}
+
+/* Calculatrice : mode jeu */
+.game {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+.game-scene {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 120px;
+  padding: 12px;
+  border-radius: 20px;
+  background: var(--paper);
+  box-shadow: 0 5px 0 var(--shadow);
+}
+
+.game-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: center;
+  max-width: 45%;
+}
+
+/* Choix du jeu : compter ou calculer */
+.game-kinds .btn {
+  flex: 1 1 0;
+  opacity: 0.55;
+}
+
+.game-kinds .btn.on {
+  opacity: 1;
+  outline: 3px solid #ffb300;
+  outline-offset: 2px;
+}
+
+.game-obj {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.game-sign {
+  font-family: var(--font-digits);
+  font-size: 36px;
+  font-weight: bold;
+}
+
+.game-choices {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.game-choice {
+  min-height: 72px;
+  border: none;
+  border-radius: 20px;
+  background: #81d4fa;
+  font-family: var(--font-digits);
+  font-size: 36px;
+  font-weight: bold;
+  box-shadow: 0 4px 0 var(--shadow);
+}
+
+.game-choice.right {
+  background: #66bb6a;
+  color: #fff;
+}
+
+.game-choice.shake {
+  animation: shake 0.4s;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+.game-stars {
+  margin: 0;
+  text-align: center;
+  font-size: 22px;
+}
+
 /* Pochettes des chansons Spotify */
 .cover {
   width: 48px;

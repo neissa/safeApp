@@ -70,6 +70,9 @@
     del(id) {
       return run("readwrite", (s) => s.delete(id));
     },
+    all() {
+      return run("readonly", (s) => s.getAll());
+    },
     async list(kind) {
       const items = await run("readonly", (s) => s.index("kind").getAll(kind));
       return (items || []).sort((a, b) => a.createdAt - b.createdAt);
@@ -98,7 +101,8 @@
   // ---------- Voix : lit un texte à voix haute (pour les enfants qui ne lisent pas) ----------
   KA.speak = function (text) {
     try {
-      if (!("speechSynthesis" in window) || !text) return;
+      if (!("speechSynthesis" in window) || !text || KA.quiet) return;
+      if (!KA.settings.get("voice", true)) return;
       window.speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(text);
       u.lang = "fr-FR";
@@ -161,6 +165,60 @@
     }
     return under1000000(n);
   };
+
+  // ---------- Réglages parent (bruitages, voix), mémorisés sur l'appareil ----------
+  KA.settings = {
+    get(name, fallback) {
+      return KA.ls.get("mcm.set." + name, fallback);
+    },
+    set(name, value) {
+      KA.ls.set("mcm.set." + name, value);
+    },
+  };
+
+  // Vrai pendant un enregistrement : ni bruitage ni voix, le micro les capterait
+  KA.quiet = false;
+
+  // ---------- Bruitage bref à chaque appui sur un bouton ----------
+  let tickCtx = null;
+  KA.tick = function () {
+    try {
+      if (KA.quiet || !KA.settings.get("sounds", true)) return;
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      tickCtx = tickCtx || new AC();
+      const o = tickCtx.createOscillator();
+      const g = tickCtx.createGain();
+      o.type = "sine";
+      o.frequency.value = 880;
+      g.gain.setValueAtTime(0.08, tickCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0001, tickCtx.currentTime + 0.08);
+      o.connect(g);
+      g.connect(tickCtx.destination);
+      o.start();
+      o.stop(tickCtx.currentTime + 0.08);
+    } catch (e) {
+      /* audio indisponible */
+    }
+  };
+
+  document.addEventListener(
+    "click",
+    (e) => {
+      const b = e.target && e.target.closest ? e.target.closest("button") : null;
+      if (b && !b.hasAttribute("data-silent")) KA.tick();
+    },
+    true
+  );
+
+  // Demande au navigateur de ne pas effacer le stockage de l'appli (photos, dessins, enregistrements)
+  document.addEventListener("DOMContentLoaded", () => {
+    try {
+      if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
+    } catch (e) {
+      /* non disponible */
+    }
+  });
 
   // ---------- Double appui de sécurité : évite d'effacer quelque chose par erreur ----------
   KA.armed = function (btn, onConfirm) {

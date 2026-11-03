@@ -226,6 +226,7 @@
     tick();
     btn.classList.add("recording");
     stateEl.textContent = "🔴 J'enregistre...";
+    KA.quiet = true; // pas de bruitage ni de voix pendant l'enregistrement
     startLive(stream);
   }
 
@@ -237,6 +238,7 @@
     clearInterval(timer);
     timer = null;
     stopLive();
+    KA.quiet = false;
     const duration = Date.now() - startedAt;
     const type = recorder.mimeType || "audio/webm";
     const blob = new Blob(chunks, { type });

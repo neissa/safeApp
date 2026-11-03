@@ -1,27 +1,33 @@
 /* Service worker : l'appli fonctionne hors ligne une fois chargée.
    Réseau d'abord (les mises à jour arrivent tout de suite), cache en secours.
-   Spotify, la météo et les fichiers du téléphone ne sont jamais mis en cache. */
-const CACHE = "mon-coin-magique-v1";
+   Spotify, la météo et les fichiers du téléphone ne sont jamais mis en cache.
+   La version et la liste des fichiers sont mises à jour par tools/update-cache.js. */
+const CACHE = "mon-coin-magique-ac50e9d8bab2";
+
+// BEGIN SHELL (généré par tools/update-cache.js)
 const SHELL = [
   "./",
-  "./index.html",
-  "./manifest.json",
-  "./css/style.css",
   "./css/fonts/PlaywriteFRTrad-Regular.ttf",
+  "./css/style.css",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
+  "./js/calc.js",
+  "./js/clock.js",
   "./js/core.js",
   "./js/draw.js",
-  "./js/notes.js",
-  "./js/calc.js",
   "./js/gallery.js",
-  "./js/music.js",
-  "./js/recorder.js",
-  "./js/clock.js",
-  "./js/spotify.js",
   "./js/home.js",
   "./js/main.js",
+  "./js/music.js",
+  "./js/notes.js",
+  "./js/parent.js",
+  "./js/recorder.js",
+  "./js/spotify.js",
+  "./js/ui.js",
+  "./manifest.json",
+  "./index.html",
 ];
+// END SHELL
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

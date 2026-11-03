@@ -7,7 +7,6 @@
 
   const KA = window.KA;
   const SECRET_TAPS = 5;
-  const TAP_WINDOW_MS = 4000;
   const PLAYLIST_KEY = "mcm.spotifyPlaylist";
 
   let root, player, list, empty, fileInput, frame, setBox, setInput, setMsg;
@@ -16,7 +15,6 @@
   let index = -1;
   let currentUrl = null;
   let playlistId = KA.config.spotifyPlaylistId;
-  let tapTimes = [];
   let spTracks = [];
   let pendingSpotifyTab = false;
 
@@ -155,40 +153,16 @@
   function renderSpList() {
     spList.innerHTML = "";
     spTracks.forEach((t, i) => {
-      const li = document.createElement("li");
-      li.className = "row-item";
-      const playBtn = document.createElement("button");
-      playBtn.className = "chip";
-      playBtn.textContent = "▶️";
-      playBtn.setAttribute("aria-label", "Écouter");
-      playBtn.addEventListener("click", () => playSpTrack(i));
-      const cover = document.createElement("img");
-      cover.className = "cover";
-      cover.alt = "";
-      cover.loading = "lazy";
-      if (t.cover) cover.src = t.cover;
-      else cover.hidden = true;
-
-      const name = document.createElement("span");
-      name.className = "row-name";
-      name.textContent = t.name + (t.artists ? " · " + t.artists : "");
-      li.append(playBtn, cover, name);
-      spList.appendChild(li);
+      spList.appendChild(
+        KA.listItem({
+          leading: [KA.chip("▶️", "Écouter", () => playSpTrack(i)), KA.cover(t.cover)],
+          label: t.name + (t.artists ? " · " + t.artists : ""),
+        })
+      );
     });
   }
 
   // ---------- Playlist Spotify : réglage caché ----------
-  // Cinq appuis rapides sur l'onglet Spotify ouvrent le champ d'adresse
-  function countSpotifyTap() {
-    const now = Date.now();
-    tapTimes = tapTimes.filter((t) => now - t < TAP_WINDOW_MS);
-    tapTimes.push(now);
-    if (tapTimes.length >= SECRET_TAPS) {
-      tapTimes = [];
-      openSetter();
-    }
-  }
-
   function openSetter() {
     const connected = KA.spotify.isConnected();
     setInput.value = playlistId ? "https://open.spotify.com/playlist/" + playlistId : "";
@@ -214,24 +188,13 @@
         return;
       }
       lists.forEach((p) => {
-        const li = document.createElement("li");
-        li.className = "row-item";
-        const cover = document.createElement("img");
-        cover.className = "cover";
-        cover.alt = "";
-        cover.loading = "lazy";
-        if (p.cover) cover.src = p.cover;
-        else cover.hidden = true;
-        const name = document.createElement("span");
-        name.className = "row-name";
-        name.textContent = p.name;
-        const choose = document.createElement("button");
-        choose.className = "chip";
-        choose.textContent = "✅";
-        choose.setAttribute("aria-label", "Choisir " + p.name);
-        choose.addEventListener("click", () => choosePlaylist(p.id));
-        li.append(cover, name, choose);
-        pickList.appendChild(li);
+        pickList.appendChild(
+          KA.listItem({
+            leading: [KA.cover(p.cover)],
+            label: p.name,
+            trailing: [KA.chip("✅", "Choisir " + p.name, () => choosePlaylist(p.id))],
+          })
+        );
       });
       pickList.hidden = false;
       setMsg.textContent = "Touche la playlist à écouter";
@@ -321,33 +284,23 @@
     list.innerHTML = "";
     empty.hidden = tracks.length > 0;
     tracks.forEach((t, i) => {
-      const li = document.createElement("li");
-      li.className = "row-item" + (i === index ? " playing" : "");
-
-      const playBtn = document.createElement("button");
-      playBtn.className = "chip";
-      playBtn.textContent = i === index && !player.paused ? "⏸️" : "▶️";
-      playBtn.setAttribute("aria-label", "Écouter");
-      playBtn.addEventListener("click", () => {
+      const playBtn = KA.chip(i === index && !player.paused ? "⏸️" : "▶️", "Écouter", () => {
         if (i === index) {
           player.paused ? player.play() : player.pause();
         } else {
           playAt(i);
         }
       });
+      const delBtn = KA.chip("🗑️", "Supprimer", () => KA.armed(delBtn, () => removeTrack(t.id)));
 
-      const name = document.createElement("span");
-      name.className = "row-name";
-      name.textContent = t.name.replace(/\.[^.]+$/, "");
-
-      const delBtn = document.createElement("button");
-      delBtn.className = "chip";
-      delBtn.textContent = "🗑️";
-      delBtn.setAttribute("aria-label", "Supprimer");
-      delBtn.addEventListener("click", () => KA.armed(delBtn, () => removeTrack(t.id)));
-
-      li.append(playBtn, name, delBtn);
-      list.appendChild(li);
+      list.appendChild(
+        KA.listItem({
+          leading: [playBtn],
+          label: t.name.replace(/\.[^.]+$/, ""),
+          trailing: [delBtn],
+          playing: i === index,
+        })
+      );
     });
   }
 
@@ -373,10 +326,9 @@
       playlistId = parsePlaylistId(KA.ls.get(PLAYLIST_KEY, "")) || KA.config.spotifyPlaylistId;
 
       root.querySelector("#tab-local").addEventListener("click", () => setTab("local"));
-      root.querySelector("#tab-spotify").addEventListener("click", () => {
-        countSpotifyTap();
-        setTab("spotify");
-      });
+      // Cinq appuis rapides sur l'onglet Spotify, puis une question de contrôle, ouvrent les réglages
+      KA.tap(root.querySelector("#tab-spotify"), SECRET_TAPS, () => KA.challenge(openSetter));
+      root.querySelector("#tab-spotify").addEventListener("click", () => setTab("spotify"));
       root.querySelector("#spotify-save").addEventListener("click", saveSetter);
       root.querySelector("#spotify-cancel").addEventListener("click", closeSetter);
       setInput.addEventListener("keydown", (e) => {
@@ -423,7 +375,7 @@
         });
     },
     enter() {
-      setTab(pendingSpotifyTab ? "spotify" : "local");
+      setTab("spotify"); // Spotify par défaut ; l'onglet Téléphone reste accessible
       pendingSpotifyTab = false;
       render();
     },
