@@ -39,10 +39,20 @@
     <header class="bar">
       <button class="chip" data-back aria-label="Accueil">🏠</button>
       <h2>🎨 Dessin</h2>
-      <span></span>
+      <button class="chip" id="draw-undo" aria-label="Annuler la dernière action" disabled>↶</button>
     </header>
     <div class="tools">
       <div class="row tool-row">
+        <div class="dropdown">
+          <button class="chip dd-btn" id="drawings-btn" aria-label="Mes dessins"><span>🗂️</span></button>
+          <div class="dd-menu dd-drawings" id="drawings-menu" hidden>
+            <div class="draw-list" id="draw-list"></div>
+            <div class="row">
+              <button class="btn" id="draw-new">➕ Nouveau</button>
+              <button class="chip" id="draw-delete" data-keep aria-label="Supprimer ce dessin">🗑️</button>
+            </div>
+          </div>
+        </div>
         <div class="dropdown">
           <button class="chip dd-btn" id="color-btn" aria-label="Choisir une couleur"><span id="color-current" class="color-current"></span></button>
           <div class="dd-menu" id="color-menu" hidden>
@@ -61,11 +71,6 @@
         </div>
       </div>
     </div>
-    <div class="row">
-      <button class="btn" id="draw-new">➕ Nouveau dessin</button>
-      <button class="chip" id="draw-delete" aria-label="Supprimer ce dessin">🗑️</button>
-    </div>
-    <div class="draw-list" id="draw-list"></div>
     <canvas id="draw-canvas" class="paper"></canvas>
   </section>
 

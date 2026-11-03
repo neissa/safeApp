@@ -30,6 +30,34 @@
   let saveTimer = null;
   let thumbUrls = [];
   let root = null;
+  let undoBtn = null;
+  const history = []; // images précédentes, pour annuler
+  const HISTORY_MAX = 10;
+
+  // ---------- Annuler ----------
+  function updateUndo() {
+    if (undoBtn) undoBtn.disabled = history.length === 0;
+  }
+
+  // Garde l'image actuelle avant une action (trait, pot de peinture, tampon)
+  function pushHistory() {
+    if (!ctx || !canvas.width) return;
+    history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+    if (history.length > HISTORY_MAX) history.shift();
+    updateUndo();
+  }
+
+  function clearHistory() {
+    history.length = 0;
+    updateUndo();
+  }
+
+  function undo() {
+    if (!history.length) return;
+    ctx.putImageData(history.pop(), 0, 0);
+    updateUndo();
+    scheduleSave();
+  }
 
   // ---------- Pinceau ----------
   function applyBrush() {
@@ -67,6 +95,7 @@
     if (canvas.width) snapshot.getContext("2d").drawImage(canvas, 0, 0);
     canvas.width = w;
     canvas.height = h;
+    clearHistory(); // les anciennes images n'ont plus la bonne taille
     fillWhite();
     if (snapshot.width) ctx.drawImage(snapshot, 0, 0);
     applyBrush();
@@ -128,6 +157,7 @@
     if (!ctx) return;
     applyBrush();
     const [x, y] = pos(e);
+    pushHistory();
     if (state.tool === "bucket") {
       floodFill(x, y);
       scheduleSave();
@@ -223,6 +253,7 @@
   // Ouvre un dessin existant. Le dessin précédent est enregistré avant, pour ne rien perdre.
   async function openDrawing(item) {
     await saveNow();
+    clearHistory();
     currentId = item.id;
     currentCreated = item.createdAt;
     loadBlob(item.blob);
@@ -232,6 +263,7 @@
   // Crée un dessin vide, enregistré tout de suite pour apparaître dans la liste
   async function newDrawing() {
     await saveNow();
+    clearHistory();
     currentId = KA.db.newId(KIND);
     currentCreated = Date.now();
     fillWhite();
@@ -291,10 +323,15 @@
       e.stopPropagation();
       toggleMenu("#stamp-menu");
     });
+    root.querySelector("#drawings-btn").addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleMenu("#drawings-menu");
+    });
     // Un choix dans un menu le referme
     root.querySelectorAll(".dd-menu").forEach((m) =>
       m.addEventListener("click", (e) => {
-        if (e.target.closest("button")) closeMenus();
+        // Un choix referme le menu, sauf le bouton Supprimer qui doit rester visible pour la confirmation
+        if (e.target.closest("button") && !e.target.closest("[data-keep]")) closeMenus();
       })
     );
     // Un appui ailleurs referme les menus
@@ -364,6 +401,7 @@
       stamps.appendChild(b);
     });
 
+    undoBtn.addEventListener("click", undo);
     root.querySelector("#draw-new").addEventListener("click", newDrawing);
     root.querySelector("#draw-delete").addEventListener("click", (e) => deleteCurrent(e.currentTarget));
     setTool("pen");
@@ -376,6 +414,8 @@
       root = r;
       canvas = root.querySelector("#draw-canvas");
       ctx = canvas.getContext("2d");
+      undoBtn = root.querySelector("#draw-undo");
+      updateUndo();
       buildTools();
       canvas.addEventListener("pointerdown", down);
       canvas.addEventListener("pointermove", move);

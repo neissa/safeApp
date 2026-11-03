@@ -665,11 +665,54 @@ audio {
   right: 0;
 }
 
-/* Outils visibles en ligne, à côté des tailles */
+/* Outils visibles en ligne, à côté des tailles : une seule rangée pour gagner de la hauteur */
+.tool-row {
+  gap: 6px;
+}
+
 .tool-row .chip.tool {
   width: 40px;
   height: 40px;
   font-size: 20px;
+}
+
+.tool-row .sizes {
+  gap: 4px;
+}
+
+.tool-row .size {
+  width: 34px;
+  height: 34px;
+}
+
+/* Menu des dessins : vignettes en grille, boutons en dessous */
+.dd-drawings {
+  left: 0;
+  right: auto;
+  width: 220px;
+}
+
+.dd-drawings .draw-list {
+  display: grid;
+  grid-template-columns: repeat(3, 56px);
+  justify-content: center;
+  gap: 6px;
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 2px;
+}
+
+.dd-drawings .row {
+  gap: 8px;
+}
+
+.dd-drawings .btn {
+  min-height: 40px;
+  font-size: 16px;
+}
+
+.chip:disabled {
+  opacity: 0.4;
 }
 
 .dd-grid {
