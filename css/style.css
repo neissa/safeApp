@@ -1031,12 +1031,25 @@ audio {
 }
 
 /* Mini-lecteur collé en bas de la musique */
+/* La liste de la musique défile au-dessus ; le mini-lecteur reste fixé en bas de l'écran Musique */
+#screen-music {
+  padding-bottom: 0;
+}
+
+.music-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 10px;
+}
+
 .mini-player {
-  position: sticky;
-  bottom: 0;
-  z-index: 5;
-  margin: auto -14px -10px;
-  padding: 10px 14px 12px;
+  flex: 0 0 auto;
+  margin: 0 -14px;
+  padding: 10px 14px 14px;
   display: flex;
   flex-direction: column;
   gap: 6px;
