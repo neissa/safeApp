@@ -190,11 +190,68 @@
   }
 
   function openSetter() {
+    const connected = KA.spotify.isConnected();
     setInput.value = playlistId ? "https://open.spotify.com/playlist/" + playlistId : "";
     setMsg.textContent = "";
-    root.querySelector("#spotify-logout").hidden = !KA.spotify.isConnected();
+    root.querySelector("#spotify-logout").hidden = !connected;
+    root.querySelector("#spotify-pick").hidden = !connected;
+    root.querySelector("#spotify-pick-list").hidden = true;
+    root.querySelector("#spotify-pick-list").innerHTML = "";
     setBox.hidden = false;
     setInput.focus();
+  }
+
+  // Liste les playlists du compte connecté ; un appui en choisit une
+  async function showPlaylistChoices() {
+    const pickList = root.querySelector("#spotify-pick-list");
+    pickList.hidden = true;
+    pickList.innerHTML = "";
+    setMsg.textContent = "Chargement de tes playlists…";
+    try {
+      const lists = await KA.spotify.userPlaylists();
+      if (!lists.length) {
+        setMsg.textContent = "Aucune playlist trouvée sur ce compte";
+        return;
+      }
+      lists.forEach((p) => {
+        const li = document.createElement("li");
+        li.className = "row-item";
+        const cover = document.createElement("img");
+        cover.className = "cover";
+        cover.alt = "";
+        cover.loading = "lazy";
+        if (p.cover) cover.src = p.cover;
+        else cover.hidden = true;
+        const name = document.createElement("span");
+        name.className = "row-name";
+        name.textContent = p.name;
+        const choose = document.createElement("button");
+        choose.className = "chip";
+        choose.textContent = "✅";
+        choose.setAttribute("aria-label", "Choisir " + p.name);
+        choose.addEventListener("click", () => choosePlaylist(p.id));
+        li.append(cover, name, choose);
+        pickList.appendChild(li);
+      });
+      pickList.hidden = false;
+      setMsg.textContent = "Touche la playlist à écouter";
+    } catch (e) {
+      if (e.message === "not-connected") {
+        closeSetter();
+        refreshSpotifyView();
+      } else {
+        setMsg.textContent = e.status === 403
+          ? "Spotify refuse la liste de tes playlists"
+          : "Impossible de charger tes playlists";
+      }
+    }
+  }
+
+  function choosePlaylist(id) {
+    KA.ls.set(PLAYLIST_KEY, id);
+    playlistId = id;
+    closeSetter();
+    applyPlaylistChange();
   }
 
   function logoutFromSetter() {
@@ -333,6 +390,7 @@
       root.querySelector("#sp-next").addEventListener("click", () => KA.spotify.next());
       root.querySelector("#sp-prev").addEventListener("click", () => KA.spotify.previous());
       root.querySelector("#spotify-logout").addEventListener("click", logoutFromSetter);
+      root.querySelector("#spotify-pick").addEventListener("click", showPlaylistChoices);
 
       root.querySelector("#music-add").addEventListener("click", () => fileInput.click());
       fileInput.addEventListener("change", () => addFiles(fileInput.files));

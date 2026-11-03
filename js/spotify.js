@@ -195,6 +195,20 @@
     return tracks;
   }
 
+  // Playlists du compte connecté, pour en choisir une à écouter
+  async function userPlaylists() {
+    const out = [];
+    let path = "/me/playlists?limit=50";
+    for (let page = 0; path && page < 4; page++) {
+      const data = await api("GET", path);
+      (data.items || []).forEach((p) => {
+        if (p && p.id) out.push({ id: p.id, name: p.name || "Sans nom", cover: pickImage(p.images, 96) });
+      });
+      path = data.next ? data.next.replace(API, "") : null;
+    }
+    return out;
+  }
+
   // ---------- Lecteur (Web Playback SDK) ----------
   function loadSdk() {
     return new Promise((resolve, reject) => {
@@ -274,6 +288,7 @@
     previous,
     pause,
     pickImage,
+    userPlaylists,
     // pour les tests
     _challengeOf: challengeOf,
   };
