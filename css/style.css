@@ -264,17 +264,37 @@ button:active {
 }
 
 /* Accès au menu parent, tout en bas de l'accueil */
-.home-foot {
+/* Barre du haut de l'accueil : titre centré, menu parent à droite (pas de barre fixe en bas) */
+.home-head {
+  display: grid;
+  grid-template-columns: 1fr 46px;
+  align-items: center;
+  gap: 8px;
+}
+
+.home-head h1 {
+  grid-column: 1;
+  text-align: left;
+  padding-left: 4px;
+}
+
+.home-corner {
+  grid-column: 2;
   position: relative;
-  display: flex;
-  justify-content: center;
-  padding: 32px 0 6px;
+  justify-self: end;
+}
+
+.home-corner .update-badge {
+  top: 52px;
+  right: 0;
+  left: auto;
+  transform: none;
 }
 
 /* Bulle affichée au-dessus du menu parent quand une mise à jour existe */
 .update-badge {
   position: absolute;
-  top: 2px;
+  top: 4px;
   left: 50%;
   transform: translateX(-50%);
   padding: 3px 10px;

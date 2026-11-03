@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light">
-  <meta name="app-version" content="de27e18b95ed">
+  <meta name="app-version" content="7c78b15fc655">
   <meta name="app-built" content="2026-11-03">
   <title>Mon coin magique</title>
   <meta name="theme-color" content="#bfe9ff">
@@ -12,7 +12,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=83166efbb3">
+  <link rel="stylesheet" href="css/style.css?v=b7394a5180">
 </head>
 <body>
 <div id="app">
@@ -24,6 +24,10 @@
         <span id="home-icon" class="home-icon" role="button" tabindex="0" aria-label="Changer d'icône">🌈</span>
         <span id="home-title" class="home-title">Mon coin magique</span>
       </h1>
+      <div class="home-corner">
+        <button class="chip" id="open-parent" aria-label="Menu parent">🔧</button>
+        <span id="update-badge" class="update-badge" hidden>🆕 Mise à jour</span>
+      </div>
     </header>
     <nav class="tiles">
       <button class="tile t-draw" data-open="draw" data-say="Dessin" aria-label="Dessin"><span class="tile-ico">🎨</span><span class="tile-label">Dessin</span></button>
@@ -40,10 +44,6 @@
       <button class="tile t-snake" data-open="snake" data-say="Snake" data-lang="en-US" aria-label="Snake"><span class="tile-ico">🐍</span><span class="tile-label">Snake</span></button>
       <button class="tile t-clock" data-open="clock" data-say="Date et heure" aria-label="Date et heure"><span class="tile-ico">🕐</span><span class="tile-label">Date et heure</span></button>
     </nav>
-    <div class="home-foot">
-      <button class="btn alt" id="open-parent">🔧 Menu parent</button>
-      <span id="update-badge" class="update-badge" hidden>🆕 Mise à jour</span>
-    </div>
   </section>
 
   <!-- DESSIN -->
