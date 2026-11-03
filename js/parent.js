@@ -135,8 +135,11 @@
       if (navigator.serviceWorker) {
         const regs = await navigator.serviceWorker.getRegistrations();
         await Promise.all(regs.map((r) => r.update()));
+        // Laisse au nouveau service worker le temps de prendre la main
+        await new Promise((resolve) => setTimeout(resolve, 800));
       }
-      location.reload();
+      // Adresse unique : le navigateur ne peut pas réutiliser sa copie en cache
+      location.replace(location.pathname + "?maj=" + Date.now());
     } catch (e) {
       msg.textContent = "Mise à jour impossible : " + e.message;
     }
