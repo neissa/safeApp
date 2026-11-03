@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <title>Mon coin magique</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ACCUEIL -->
+  <section id="screen-home" class="screen active">
+    <header class="home-head">
+      <h1>
+        <span id="home-icon" class="home-icon" role="button" tabindex="0" aria-label="Changer d'icône">🌈</span>
+        <span id="home-title" class="home-title">Mon coin magique</span>
+      </h1>
+      <div id="title-set" class="set-box" hidden>
+        <p class="hint">Nouveau titre de l'accueil</p>
+        <input id="title-input" type="text" maxlength="30" autocomplete="off" spellcheck="false">
+        <p id="title-msg" class="hint"></p>
+        <div class="row">
+          <button class="btn" id="title-save">✅ Enregistrer</button>
+          <button class="btn alt" id="title-cancel">Annuler</button>
+        </div>
+      </div>
+    </header>
+    <nav class="tiles">
+      <button class="tile t-draw" data-open="draw" data-say="Dessin" aria-label="Dessin"><span>🎨</span></button>
+      <button class="tile t-notes" data-open="notes" data-say="Bloc notes" aria-label="Bloc notes"><span>📝</span></button>
+      <button class="tile t-calc" data-open="calc" data-say="Calculatrice" aria-label="Calculatrice"><span>🧮</span></button>
+      <button class="tile t-gallery" data-open="gallery" data-say="Galerie photos" aria-label="Galerie photos"><span>🖼️</span></button>
+      <button class="tile t-music" data-open="music" data-say="Musique" aria-label="Musique"><span>🎵</span></button>
+      <button class="tile t-rec" data-open="recorder" data-say="Micro" aria-label="Micro"><span>🎙️</span></button>
+      <button class="tile t-clock wide" data-open="clock" data-say="Heure" aria-label="Heure et météo"><span>🕐</span></button>
+    </nav>
+  </section>
+
+  <!-- DESSIN -->
+  <section id="screen-draw" class="screen">
+    <header class="bar">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>🎨 Dessin</h2>
+      <span></span>
+    </header>
+    <div class="tools">
+      <div class="row" id="draw-colors"></div>
+      <div class="row">
+        <div class="sizes" id="draw-sizes"></div>
+        <button class="chip" id="draw-eraser" aria-label="Gomme">🧽</button>
+        <button class="chip" id="draw-clear" aria-label="Tout effacer">🗑️</button>
+      </div>
+    </div>
+    <canvas id="draw-canvas" class="paper"></canvas>
+  </section>
+
+  <!-- BLOC NOTES -->
+  <section id="screen-notes" class="screen">
+    <header class="bar">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>📝 Bloc notes</h2>
+      <button class="chip" id="note-read" aria-label="Lire à voix haute">🔊</button>
+    </header>
+    <textarea id="note-text" class="paper-text" placeholder="✏️ Écris ici..." spellcheck="false"></textarea>
+    <div class="row">
+      <button class="btn alt" id="note-clear">🗑️ Effacer</button>
+    </div>
+  </section>
+
+  <!-- CALCULATRICE -->
+  <section id="screen-calc" class="screen">
+    <header class="bar">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>🧮 Calcul</h2>
+      <button class="chip" id="calc-read" aria-label="Lire le résultat">🔊</button>
+    </header>
+    <div id="calc-display" class="display">0</div>
+    <div id="calc-keys" class="keys"></div>
+  </section>
+
+  <!-- GALERIE -->
+  <section id="screen-gallery" class="screen">
+    <header class="bar">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>🖼️ Galerie</h2>
+      <span></span>
+    </header>
+    <div class="actions">
+      <button class="btn" id="cam-open">📷 Photo</button>
+      <button class="btn alt" id="photo-pick">🖼️ Téléphone</button>
+    </div>
+    <input id="photo-file" type="file" accept="image/*" multiple hidden>
+    <input id="camera-file" type="file" accept="image/*" capture="environment" hidden>
+
+    <div id="cam-box" class="cam" hidden>
+      <video id="cam-video" autoplay playsinline muted></video>
+      <div class="cam-bar">
+        <button class="chip" id="cam-close" aria-label="Fermer la caméra">✖️</button>
+        <button class="shutter" id="cam-shot" aria-label="Prendre la photo"></button>
+        <span class="spacer"></span>
+      </div>
+    </div>
+
+    <div id="gallery-grid" class="grid"></div>
+    <p id="gallery-empty" class="hint">🌅 Pas encore de photos</p>
+
+    <div id="viewer" class="viewer" hidden>
+      <img id="viewer-img" alt="">
+      <div class="viewer-bar">
+        <button class="chip" id="viewer-close" aria-label="Fermer">✖️</button>
+        <button class="chip" id="viewer-del" aria-label="Supprimer">🗑️</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- MUSIQUE -->
+  <section id="screen-music" class="screen">
+    <header class="bar">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>🎵 Musique</h2>
+      <span></span>
+    </header>
+    <div class="seg">
+      <button class="seg-btn active" id="tab-local">🎵 Téléphone</button>
+      <button class="seg-btn" id="tab-spotify">🟢 Spotify</button>
+    </div>
+
+    <div id="music-local" class="pane">
+      <div class="row">
+        <button class="btn" id="music-add">➕ Ajouter</button>
+      </div>
+      <input id="music-file" type="file" accept="audio/*" multiple hidden>
+      <audio id="player" controls></audio>
+      <div class="row">
+        <button class="chip" id="music-prev" aria-label="Précédente">⏮️</button>
+        <button class="chip" id="music-next" aria-label="Suivante">⏭️</button>
+      </div>
+      <ul id="music-list" class="list"></ul>
+      <p id="music-empty" class="hint">🎶 Ajoute des chansons de ton téléphone</p>
+    </div>
+
+    <div id="music-spotify" class="pane" hidden>
+      <div id="sp-login-box" class="set-box">
+        <p class="hint">Connecte-toi à Spotify pour écouter la playlist entière</p>
+        <button class="btn" id="sp-login">🔑 Se connecter à Spotify</button>
+      </div>
+      <div id="sp-connected" class="pane" hidden>
+        <div class="row">
+          <button class="chip" id="sp-prev" aria-label="Précédente">⏮️</button>
+          <button class="chip" id="sp-toggle" aria-label="Lecture ou pause">▶️</button>
+          <button class="chip" id="sp-next" aria-label="Suivante">⏭️</button>
+        </div>
+        <p id="sp-now" class="hint">Choisis une chanson</p>
+        <ul id="sp-list" class="list"></ul>
+        <button class="btn alt" id="sp-logout">Se déconnecter</button>
+      </div>
+      <p id="sp-msg" class="hint"></p>
+      <div id="spotify-set" class="set-box" hidden>
+        <p class="hint">Colle le lien de la playlist Spotify</p>
+        <input id="spotify-url" type="text" placeholder="https://open.spotify.com/playlist/..." autocomplete="off" spellcheck="false">
+        <p id="spotify-msg" class="hint"></p>
+        <div class="row">
+          <button class="btn" id="spotify-save">✅ Enregistrer</button>
+          <button class="btn alt" id="spotify-cancel">Annuler</button>
+        </div>
+      </div>
+      <iframe id="spotify-frame" class="spotify" src="about:blank" title="Playlist Spotify"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy"></iframe>
+    </div>
+  </section>
+
+  <!-- MICRO -->
+  <section id="screen-recorder" class="screen">
+    <header class="bar">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>🎙️ Micro</h2>
+      <span></span>
+    </header>
+    <div class="rec-zone">
+      <div id="rec-time" class="digits">0:00</div>
+      <canvas id="rec-live" class="live-wave" width="320" height="80" aria-label="Niveau du son"></canvas>
+      <button id="rec-btn" class="rec-btn" aria-label="Enregistrer"><span></span></button>
+      <p id="rec-state" class="hint">Appuie pour parler 🎤</p>
+    </div>
+    <ul id="rec-list" class="list"></ul>
+    <p id="rec-empty" class="hint">🎧 Pas encore d'enregistrements</p>
+  </section>
+
+  <!-- HEURE, SAISON, MÉTÉO -->
+  <section id="screen-clock" class="screen">
+    <header class="bar">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>🕐 Heure</h2>
+      <span></span>
+    </header>
+    <div class="clock-wrap">
+      <div class="digital"><span id="clock-hm">00:00</span><small id="clock-s">:00</small></div>
+      <div class="date-row">
+        <span id="date-text"></span>
+      </div>
+      <svg id="analog" class="analog" viewBox="0 0 200 200" role="img" aria-label="Horloge à aiguilles"></svg>
+      <div class="info-row">
+        <div class="info">
+          <span id="season-ico" class="info-ico">🍂</span>
+          <span id="season-name">Saison</span>
+        </div>
+        <div class="info">
+          <span id="weather-ico" class="info-ico">⏳</span>
+          <span id="weather-temp">--°</span>
+          <small id="weather-text"></small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script src="js/core.js"></script>
+<script src="js/draw.js"></script>
+<script src="js/notes.js"></script>
+<script src="js/calc.js"></script>
+<script src="js/gallery.js"></script>
+<script src="js/music.js"></script>
+<script src="js/recorder.js"></script>
+<script src="js/clock.js"></script>
+<script src="js/spotify.js"></script>
+<script src="js/home.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
