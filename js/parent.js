@@ -100,6 +100,28 @@
     fileInput.value = "";
   }
 
+  // Vide le cache de l'appli et recharge la page. Les créations (stockées à part) ne sont pas touchées.
+  async function updateApp() {
+    if (!navigator.onLine) {
+      msg.textContent = "Il faut une connexion pour mettre à jour l'appli";
+      return;
+    }
+    msg.textContent = "Mise à jour en cours…";
+    try {
+      if (window.caches) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+      }
+      if (navigator.serviceWorker) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map((r) => r.update()));
+      }
+      location.reload();
+    } catch (e) {
+      msg.textContent = "Mise à jour impossible : " + e.message;
+    }
+  }
+
   KA.parent = { open, close };
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -133,5 +155,6 @@
       if (fileInput.files[0]) importBackup(fileInput.files[0]);
     });
     document.getElementById("parent-close").addEventListener("click", close);
+    document.getElementById("parent-update").addEventListener("click", updateApp);
   });
 })();
