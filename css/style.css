@@ -549,6 +549,29 @@ audio {
   background: #f5f5f5;
 }
 
+/* Dinosaure de l'effet « Raptorize » (voir js/raptor.js) : il traverse l'écran */
+.raptor {
+  position: absolute;
+  left: 50%;
+  bottom: 22%;
+  z-index: 30;
+  margin-left: -70px;
+  font-size: 140px;
+  line-height: 1;
+  pointer-events: none;
+  animation: raptor-run 2.4s ease-in-out forwards;
+}
+
+@keyframes raptor-run {
+  0% { transform: translateX(-60vw) scaleX(-1); }
+  35% { transform: translate(0, -60px) scaleX(-1) rotate(-6deg); }
+  50% { transform: translate(0, 0) scaleX(-1) rotate(4deg); }
+  60% { transform: translate(-6px, 0) scaleX(-1) rotate(-4deg); }
+  70% { transform: translate(6px, 0) scaleX(-1) rotate(4deg); }
+  80% { transform: translate(0, -20px) scaleX(-1); }
+  100% { transform: translateX(60vw) scaleX(-1); }
+}
+
 /* Fenêtres par-dessus l'appli : question de contrôle et menu parent */
 .overlay {
   position: fixed;

@@ -8,7 +8,7 @@ const crypto = require("crypto");
 
 const root = path.join(__dirname, "..");
 const SKIP = new Set(["sw.js", "node_modules", ".git", "tools"]);
-const EXT = [".html", ".js", ".css", ".json", ".ttf", ".png"];
+const EXT = [".html", ".js", ".css", ".json", ".ttf", ".png", ".mp3", ".ogg"];
 
 function listFiles(dir, out) {
   for (const name of fs.readdirSync(dir)) {
