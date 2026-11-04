@@ -1410,6 +1410,13 @@ html[data-voice="off"] .speak-btn {
   gap: 8px;
 }
 
+/* Titre d'un groupe d'âge : prend toute la largeur de la grille */
+.parent-tiles .tile-age {
+  grid-column: 1 / -1;
+  margin: 8px 0 0;
+  font-weight: bold;
+}
+
 .parent-tiles label {
   display: flex;
   align-items: center;

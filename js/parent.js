@@ -260,14 +260,25 @@
   }
 
   // ---------- Tuiles de l'accueil ----------
+  // Classement par âge (noms des tuiles = data-open). Une tuile absente de la liste va dans « Autres ».
+  const AGE_GROUPS = [
+    { label: "👶 2 à 4 ans", names: ["draw", "music", "piano", "farts", "megaphone", "gallery", "recorder"] },
+    { label: "🧒 4 à 6 ans", names: ["shapes", "intrus", "memory", "calc", "notes"] },
+    { label: "👧 6 ans et plus", names: ["timer", "clock", "snake"] },
+  ];
+
   // Une case par tuile : décochée = la tuile disparaît de l'accueil
   function refreshTiles() {
     const box = document.getElementById("parent-tiles");
     if (!box) return;
     const hidden = KA.settings.get("hiddenTiles", []);
     box.innerHTML = "";
+    const tiles = {};
     document.querySelectorAll(".tile[data-open]").forEach((t) => {
-      const name = t.dataset.open;
+      tiles[t.dataset.open] = t;
+    });
+
+    const tileLabel = (name) => {
       const label = document.createElement("label");
       const cb = document.createElement("input");
       cb.type = "checkbox";
@@ -278,9 +289,26 @@
         KA.settings.set("hiddenTiles", now);
         KA.applyTiles();
       });
-      label.append(cb, " " + t.querySelector(".tile-label").textContent);
-      box.appendChild(label);
-    });
+      label.append(cb, " " + tiles[name].querySelector(".tile-label").textContent);
+      return label;
+    };
+
+    const placed = new Set();
+    const addGroup = (title, names) => {
+      const names2 = names.filter((n) => tiles[n]);
+      if (!names2.length) return;
+      const head = document.createElement("p");
+      head.className = "tile-age";
+      head.textContent = title;
+      box.appendChild(head);
+      names2.forEach((n) => {
+        placed.add(n);
+        box.appendChild(tileLabel(n));
+      });
+    };
+
+    AGE_GROUPS.forEach((g) => addGroup(g.label, g.names));
+    addGroup("Autres", Object.keys(tiles).filter((n) => !placed.has(n)));
   }
 
   // ---------- Ouverture et titre ----------
