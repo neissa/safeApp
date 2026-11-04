@@ -104,10 +104,15 @@
     return !!ctx;
   }
 
-  // Réutilise le micro déjà ouvert ; sinon demande l'accès une seule fois
+  // Réutilise le micro déjà ouvert ; sinon demande l'accès une seule fois.
+  // L'annulation d'écho coupe la voix du téléphone qui revient dans le micro (sifflements, écho).
   async function getMic() {
     const ok = micStream && micStream.getAudioTracks().some((t) => t.readyState === "live");
-    if (!ok) micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    if (!ok) {
+      micStream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+      });
+    }
     return micStream;
   }
 
