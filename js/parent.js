@@ -263,7 +263,7 @@
   // Classement par âge (noms des tuiles = data-open). Une tuile absente de la liste va dans « Autres ».
   const AGE_GROUPS = [
     { label: "👶 2 à 4 ans", names: ["draw", "music", "piano", "farts", "megaphone", "gallery", "recorder"] },
-    { label: "🧒 4 à 6 ans", names: ["shapes", "intrus", "memory", "calc", "notes"] },
+    { label: "🧒 4 à 6 ans", names: ["shapes", "intrus", "memory", "calc", "notes", "morpion", "puissance4"] },
     { label: "👧 6 ans et plus", names: ["timer", "clock", "snake"] },
   ];
 

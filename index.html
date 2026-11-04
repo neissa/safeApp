@@ -4,8 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="color-scheme" content="light">
-  <meta name="app-version" content="576c00be40c1">
-  <meta name="app-built" content="2026-11-04 10:35">
+  <meta name="app-version" content="ea749450fb0b">
+  <meta name="app-built" content="2026-11-04 10:44">
+
+
+
+
+
 
 
 
@@ -17,7 +22,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=3fe4853d69">
+  <link rel="stylesheet" href="css/style.css?v=b824712a0e">
 </head>
 <body>
 <div id="app">
@@ -50,6 +55,8 @@
       <button class="tile t-clock" data-open="clock" data-say="Date et heure" aria-label="Date et heure"><span class="tile-ico">🕐</span><span class="tile-label">Date et heure</span></button>
       <button class="tile t-farts" data-open="farts" data-say="Bruits de pet" aria-label="Bruits de pet"><span class="tile-ico">💨</span><span class="tile-label">Bruits de pet</span></button>
       <button class="tile t-mega" data-open="megaphone" data-say="Mégaphone" aria-label="Mégaphone"><span class="tile-ico">📢</span><span class="tile-label">Mégaphone</span></button>
+      <button class="tile t-morpion" data-open="morpion" data-say="Morpion" aria-label="Morpion"><span class="tile-ico">❌</span><span class="tile-label">Morpion</span></button>
+      <button class="tile t-puissance4" data-open="puissance4" data-say="Puissance 4" aria-label="Puissance 4"><span class="tile-ico">🔴</span><span class="tile-label">Puissance 4</span></button>
     </nav>
   </section>
 
@@ -332,6 +339,39 @@
     <p id="shapes-stars" class="game-stars"></p>
   </section>
 
+  <!-- MORPION -->
+  <section id="screen-morpion" class="screen">
+    <header class="bar">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>❌ Morpion</h2>
+      <span></span>
+    </header>
+    <p id="morpion-status" class="game-help"></p>
+    <div id="morpion-board" class="morpion-board"></div>
+    <div class="row">
+      <button class="btn" id="morpion-mode">👫 Chacun son tour</button>
+      <button class="btn" id="morpion-new">🔀 Nouvelle partie</button>
+    </div>
+  </section>
+
+  <!-- PUISSANCE 4 -->
+  <section id="screen-puissance4" class="screen">
+    <header class="bar">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>🔴 Puissance 4</h2>
+      <span></span>
+    </header>
+    <p id="p4-status" class="game-help"></p>
+    <div class="p4-wrap">
+      <div id="p4-drops" class="p4-drops"></div>
+      <div id="p4-board" class="p4-board"></div>
+    </div>
+    <div class="row">
+      <button class="btn" id="p4-mode">👫 Chacun son tour</button>
+      <button class="btn" id="p4-new">🔀 Nouvelle partie</button>
+    </div>
+  </section>
+
   <!-- L'INTRUS -->
   <section id="screen-intrus" class="screen">
     <header class="bar">
@@ -548,7 +588,7 @@
 <script src="js/recorder.js?v=7c25dc92e5"></script>
 <script src="js/clock.js?v=1fa3567f8c"></script>
 <script src="js/spotify.js?v=d6ebba8e7c"></script>
-<script src="js/parent.js?v=79031f9bbf"></script>
+<script src="js/parent.js?v=e04961707f"></script>
 <script src="js/stats.js?v=d8bd7df3de"></script>
 <script src="js/pin.js?v=3879420e83"></script>
 <script src="js/home.js?v=d6063d6cae"></script>
@@ -560,6 +600,8 @@
 <script src="js/snake.js?v=9d54ce7140"></script>
 <script src="js/farts.js?v=59cf93fe89"></script>
 <script src="js/megaphone.js?v=7cfa22a2d8"></script>
+<script src="js/morpion.js?v=ffc90e25d8"></script>
+<script src="js/puissance4.js?v=943ea7c640"></script>
 <script src="js/main.js?v=15ea266cbf"></script>
 <script>
   // Hors ligne : le service worker garde l'appli en cache (ignoré si le navigateur ne le gère pas)
