@@ -10,11 +10,15 @@
   const MAX_DIGITS = 12;
   const OBJECTS = ["🍎", "⭐", "🐟", "🎈", "🚗", "🌸"];
   const st = { current: "0", prev: null, op: null, fresh: true };
-  const game = { kind: "count", stars: 0, answer: 0, busy: false, playing: false };
+  const game = { kind: "count", stars: 0, answer: 0, busy: false, locked: false, playing: false };
   let displayEl = null;
   let keysEl = null;
   let modeBtn = null;
   let gameBox = null;
+  let lockEl = null;
+  let lockTimer = null;
+  // Après une mauvaise réponse, on ne peut plus appuyer pendant un court moment
+  const WRONG_WAIT_MS = 2000;
 
   // Nom vocal de chaque touche
   const KEY_NAMES = {
@@ -235,8 +239,20 @@
     else addQuestion();
   }
 
+  function lockFor(ms) {
+    game.locked = true;
+    lockEl.hidden = false;
+    clearTimeout(lockTimer);
+    lockTimer = setTimeout(unlock, ms);
+  }
+
+  function unlock() {
+    game.locked = false;
+    lockEl.hidden = true;
+  }
+
   function answer(n, btn) {
-    if (game.busy) return;
+    if (game.busy || game.locked) return;
     if (n === game.answer) {
       game.busy = true;
       game.stars += 1;
@@ -251,6 +267,7 @@
       void btn.offsetWidth; // relance l'animation
       btn.classList.add("shake");
       KA.speak("Essaie encore");
+      lockFor(WRONG_WAIT_MS);
     }
   }
 
@@ -273,6 +290,10 @@
     displayEl.hidden = on;
     gameBox.hidden = !on;
     modeBtn.textContent = on ? "🧮 Calculer" : "🎮 Jouer";
+    if (!on) {
+      clearTimeout(lockTimer);
+      unlock();
+    }
     if (on) {
       updateStars();
       newQuestion();
@@ -285,6 +306,7 @@
       keysEl = root.querySelector("#calc-keys");
       modeBtn = root.querySelector("#calc-mode");
       gameBox = root.querySelector("#calc-game");
+      lockEl = root.querySelector("#game-lock");
       buildKeys();
       root.querySelector("#calc-read").addEventListener("click", () => KA.speak(valueWords(st.current)));
       modeBtn.addEventListener("click", () => setGame(!game.playing));

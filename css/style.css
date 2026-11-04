@@ -1668,20 +1668,47 @@ html[data-voice="off"] .speak-btn {
 /* Calculatrice : mode jeu */
 .game {
   display: flex;
-  flex: 1 1 auto;
+  /* Ne rétrécit pas : la scène garde sa place, et les réponses restent sous les objets */
+  flex: 0 0 auto;
   flex-direction: column;
   gap: 12px;
-  min-height: 0;
+}
+
+/* Cadre de la scène : même taille quel que soit le nombre d'objets */
+#calc-game {
+  position: relative;
+}
+
+.game-lock {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  background: rgba(229, 57, 53, 0.92);
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  font-size: 26px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.game-lock[hidden] {
+  display: none;
 }
 
 .game-scene {
   display: flex;
   flex-wrap: wrap;
+  align-content: center;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  min-height: 120px;
-  padding: 12px;
+  gap: 4px;
+  height: clamp(140px, 26vh, 200px);
+  overflow: hidden;
+  padding: 10px;
   border-radius: 20px;
   background: var(--paper);
   box-shadow: 0 5px 0 var(--shadow);
@@ -1707,8 +1734,9 @@ html[data-voice="off"] .speak-btn {
   outline-offset: 2px;
 }
 
+/* Taille des objets : s'adapte à la largeur et à la hauteur de l'écran (32 px au maximum) */
 .game-obj {
-  font-size: 32px;
+  font-size: clamp(18px, min(7vw, 5.5vh), 32px);
   line-height: 1;
 }
 
