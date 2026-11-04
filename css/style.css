@@ -1694,6 +1694,12 @@ audio {
   background: rgba(0, 0, 0, 0.45);
 }
 
+/* La question de contrôle et le code passent devant le menu parent (ouvert depuis le menu, par exemple « Changer le code ») */
+#challenge,
+#pin {
+  z-index: 25;
+}
+
 .overlay-card {
   width: 100%;
   max-width: 400px;
