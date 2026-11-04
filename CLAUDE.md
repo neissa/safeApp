@@ -18,6 +18,10 @@ Le téléphone (APK) et les navigateurs gardent une copie en cache. Pour que les
 5. Commiter ensemble le code et les fichiers générés : `index.html`, `sw.js`, `version.json`.
 6. Ne pas committer ni pousser sans demande explicite de l'utilisateur.
 
+## Branches Git
+
+- Par défaut, on ne crée pas de branche : on commit directement sur `main`, sauf si l'utilisateur demande autre chose.
+
 Si on modifie quelque chose après le script, relancer le script avant le commit, sinon le cache et `version.json` ne correspondent plus au code.
 
 ## Ajouter un fichier JS
