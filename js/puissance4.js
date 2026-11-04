@@ -174,7 +174,7 @@
     game.timer = setTimeout(() => {
       game.busy = false;
       if (!game.active) return;
-      if (!drop(computerColumn(game.board), "Y")) setStatus("À toi de jouer !");
+      if (!drop(computerColumn(game.board), "Y")) setStatus("Clique ▼ au-dessus d'une colonne");
     }, COMPUTER_DELAY_MS);
   }
 
@@ -189,7 +189,7 @@
       setStatus("Tour de " + NAME.R);
       KA.speak("Nouvelle partie.");
     } else {
-      setStatus("À toi de jouer : clique ▼ au-dessus d'une colonne");
+      setStatus("Clique ▼ au-dessus d'une colonne");
       KA.speak("Nouvelle partie.");
     }
     modeBtn.textContent = game.mode === "two" ? "🤖 Contre l'ordi" : "👫 Chacun son tour";
