@@ -552,7 +552,10 @@ button:active {
   grid-template-columns: repeat(3, 64px);
   grid-template-rows: repeat(2, 56px);
   gap: 8px;
-  justify-content: center;
+  /* Le bloc ne prend que sa largeur et se place au centre de l'écran */
+  width: max-content;
+  align-self: center;
+  margin: 0 auto;
 }
 
 .lab-key {
@@ -582,7 +585,7 @@ button:active {
 .color-prompt {
   margin: 0;
   text-align: center;
-  font-size: clamp(28px, 6vh, 40px);
+  font-size: clamp(18px, 3.5vh, 24px);
   font-weight: bold;
   min-height: 1.4em;
 }
@@ -753,14 +756,15 @@ button:active {
 }
 
 /* Ombres : image en couleur, puis trois ombres noires à toucher */
+/* Image de départ : exactement la taille d'une des trois cases d'ombre (3 colonnes, espace de 12 px) */
 .ombre-target {
-  width: clamp(110px, 24vh, 170px);
+  width: calc((100% - 24px) / 3);
   aspect-ratio: 1;
   align-self: center;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(70px, 18vh, 120px);
+  font-size: 56px;
   line-height: 1;
   background: var(--paper);
   border-radius: 24px;
@@ -795,7 +799,7 @@ button:active {
 
 /* L'ombre : la même image, toute en noir */
 .ombre-sil {
-  font-size: clamp(56px, 14vh, 96px);
+  font-size: 56px;
   line-height: 1;
   filter: brightness(0);
 }

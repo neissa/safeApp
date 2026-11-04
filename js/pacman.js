@@ -38,7 +38,6 @@
   const KEYS = { ArrowUp: "N", ArrowDown: "S", ArrowLeft: "W", ArrowRight: "E" };
 
   let board = null;
-  let msgEl = null;
   let livesEl = null;
   let starsEl = null;
 
@@ -82,7 +81,6 @@
     started = false;
     resetPositions();
     stars.delete(key(player.x, player.y));
-    msgEl.textContent = "Touche une flèche pour commencer";
     render();
   }
 
@@ -131,7 +129,6 @@
   function loseLife() {
     lives -= 1;
     if (lives <= 0) {
-      msgEl.textContent = "Oh non ! On recommence 🙂";
       KA.speak("Oh non ! On recommence");
       clearTimeout(resetTimer);
       resetTimer = setTimeout(() => {
@@ -142,7 +139,6 @@
       render();
       return;
     }
-    msgEl.textContent = "Aïe ! Encore une vie";
     KA.speak("Aïe !");
     resetPositions();
     render();
@@ -150,7 +146,6 @@
 
   function win() {
     stop();
-    msgEl.textContent = "🎉 Bravo, tu as tout mangé !";
     KA.speak("Bravo, tu as tout mangé !");
     clearTimeout(resetTimer);
     resetTimer = setTimeout(() => {
@@ -202,7 +197,6 @@
     want = d;
     if (!started) {
       started = true;
-      msgEl.textContent = "Mange toutes les étoiles ⭐";
       start();
     }
   }
@@ -217,7 +211,6 @@
   KA.panels.pacman = {
     init(root) {
       board = root.querySelector("#pm-board");
-      msgEl = root.querySelector("#pm-msg");
       livesEl = root.querySelector("#pm-lives");
       starsEl = root.querySelector("#pm-stars");
       root.querySelector("#pm-up").addEventListener("click", () => press("N"));
