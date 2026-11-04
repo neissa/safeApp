@@ -72,6 +72,14 @@ bunx serve .
 
 puis d'ouvrir `index.html` dans le navigateur. Pour les règles de développement (mise à jour du cache, ajout d'une tuile, etc.), voir [CLAUDE.md](CLAUDE.md).
 
+## Projets et ressources open source
+
+- **Raptorize** (licence MIT) : le cri du dinosaure. Voir `sounds/RAPTORIZE-LICENSE.txt`.
+- **Playwrite FR Trad** (licence OFL) : la police d'écriture cursive. Voir `css/fonts/OFL.txt`.
+- **Cris d'animaux** (Wikimedia Commons, licences CC BY-SA, CC BY, GFDL ou domaine public) : le chat, le chien, la vache, le canard, le cochon, le mouton, le cheval et le coq. Voir `sounds/animaux/LICENCES.txt`.
+- **Bruit blanc** : aucun fichier, les bruits d'ambiance (pluie, orage, vagues, vent, feu) sont fabriqués par le navigateur.
+- **Bun** : outil de développement pour le script de mise à jour du cache (`tools/update-cache.js`). Il n'est pas nécessaire pour utiliser l'application.
+
 ## Licence
 
-GPL-3.0 (voir [LICENSE](LICENSE)). Le cri du dinosaure vient de Raptorize (licence MIT, voir `sounds/RAPTORIZE-LICENSE.txt`) et la police Playwrite FR Trad est sous licence OFL (`css/fonts/OFL.txt`).
+GPL-3.0 (voir [LICENSE](LICENSE)).
