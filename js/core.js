@@ -196,7 +196,7 @@
   // ---------- Thème : clair, sombre, ou suit le thème de l'appareil ----------
   const darkQuery = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
   KA.applyTheme = function () {
-    const pref = KA.settings.get("theme", "light");
+    const pref = KA.settings.get("theme", "auto");
     const dark = pref === "dark" || (pref === "auto" && !!(darkQuery && darkQuery.matches));
     document.documentElement.dataset.theme = dark ? "dark" : "light";
   };

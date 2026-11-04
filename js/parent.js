@@ -136,7 +136,7 @@
 
   // ---------- Thème ----------
   function refreshTheme() {
-    const current = KA.settings.get("theme", "light");
+    const current = KA.settings.get("theme", "auto");
     document.querySelectorAll("#parent-theme .seg-btn").forEach((b) => {
       b.classList.toggle("active", b.dataset.theme === current);
     });
