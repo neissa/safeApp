@@ -4,8 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="color-scheme" content="light">
-  <meta name="app-version" content="38d0189fd1fd">
-  <meta name="app-built" content="2026-11-04 10:55">
+  <meta name="app-version" content="a2ab3920f09a">
+  <meta name="app-built" content="2026-11-04 11:38">
+
+
+
+
+
+
+
 
 
 
@@ -23,7 +30,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=b824712a0e">
+  <link rel="stylesheet" href="css/style.css?v=8ebb636b26">
 </head>
 <body>
 <div id="app">
@@ -58,6 +65,13 @@
       <button class="tile t-mega" data-open="megaphone" data-say="Mégaphone" aria-label="Mégaphone"><span class="tile-ico">📢</span><span class="tile-label">Mégaphone</span></button>
       <button class="tile t-morpion" data-open="morpion" data-say="Morpion" aria-label="Morpion"><span class="tile-ico">❌</span><span class="tile-label">Morpion</span></button>
       <button class="tile t-puissance4" data-open="puissance4" data-say="Puissance 4" aria-label="Puissance 4"><span class="tile-ico">🔴</span><span class="tile-label">Puissance 4</span></button>
+      <button class="tile t-alphabet" data-open="alphabet" data-say="Alphabet" aria-label="Alphabet"><span class="tile-ico">🔤</span><span class="tile-label">Alphabet</span></button>
+      <button class="tile t-puzzle" data-open="puzzle" data-say="Puzzle" aria-label="Puzzle"><span class="tile-ico">🧩</span><span class="tile-label">Puzzle</span></button>
+      <button class="tile t-labyrinthe" data-open="labyrinthe" data-say="Labyrinthe" aria-label="Labyrinthe"><span class="tile-ico">🗺️</span><span class="tile-label">Labyrinthe</span></button>
+      <button class="tile t-ombres" data-open="ombres" data-say="Ombres" aria-label="Ombres"><span class="tile-ico">🌘</span><span class="tile-label">Ombres</span></button>
+      <button class="tile t-animaux" data-open="animaux" data-say="Animaux" aria-label="Animaux"><span class="tile-ico">🐶</span><span class="tile-label">Animaux</span></button>
+      <button class="tile t-pacman" data-open="pacman" data-say="Pac-Man" aria-label="Pac-Man"><span class="tile-ico">🟡</span><span class="tile-label">Pac-Man</span></button>
+      <button class="tile t-cheval" data-open="cheval" data-say="Cheval" aria-label="Cheval"><span class="tile-ico">🐴</span><span class="tile-label">Cheval</span></button>
     </nav>
   </section>
 
@@ -340,6 +354,133 @@
     <p id="shapes-stars" class="game-stars"></p>
   </section>
 
+  <!-- ALPHABET -->
+  <section id="screen-alphabet" class="screen">
+    <header class="bar">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>🔤 Alphabet</h2>
+      <span></span>
+    </header>
+    <div id="alpha-card" class="alpha-card" aria-live="polite"></div>
+    <div id="alpha-grid" class="alpha-grid"></div>
+  </section>
+
+  <!-- PUZZLE -->
+  <section id="screen-puzzle" class="screen">
+    <header class="bar">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>🧩 Puzzle</h2>
+      <span></span>
+    </header>
+    <div id="puzzle-levels" class="seg memory-levels"></div>
+    <p id="puzzle-msg" class="game-help"></p>
+    <div id="puzzle-board" class="puzzle-board"></div>
+    <div class="row">
+      <button class="btn" id="puzzle-new">🔀 Nouvelle image</button>
+    </div>
+  </section>
+
+  <!-- LABYRINTHE -->
+  <section id="screen-labyrinthe" class="screen">
+    <header class="bar">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>🗺️ Labyrinthe</h2>
+      <span></span>
+    </header>
+    <div id="lab-levels" class="seg memory-levels"></div>
+    <p id="lab-msg" class="game-help"></p>
+    <div id="lab-board" class="lab-board"></div>
+    <div class="lab-pad">
+      <button class="lab-key" id="lab-up" aria-label="Haut">⬆️</button>
+      <button class="lab-key" id="lab-left" aria-label="Gauche">⬅️</button>
+      <button class="lab-key" id="lab-down" aria-label="Bas">⬇️</button>
+      <button class="lab-key" id="lab-right" aria-label="Droite">➡️</button>
+    </div>
+    <div class="row">
+      <button class="btn" id="lab-new">🔀 Nouveau labyrinthe</button>
+    </div>
+  </section>
+
+  <!-- OMBRES -->
+  <section id="screen-ombres" class="screen">
+    <header class="bar">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>🌘 Ombres</h2>
+      <span></span>
+    </header>
+    <p id="ombres-msg" class="game-help"></p>
+    <div id="ombres-target" class="ombre-target" aria-label="Image à retrouver"></div>
+    <div id="ombres-choices" class="ombre-choices"></div>
+    <div class="row">
+      <button class="btn" id="ombres-new">🔀 Autre image</button>
+    </div>
+  </section>
+
+  <!-- ANIMAUX -->
+  <section id="screen-animaux" class="screen">
+    <header class="bar">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>🐶 Animaux</h2>
+      <span></span>
+    </header>
+    <div id="animaux-modes" class="seg memory-levels">
+      <button class="seg-btn active" data-mode="listen">👂 Écouter</button>
+      <button class="seg-btn" data-mode="quiz">❓ Devine</button>
+    </div>
+    <p id="animaux-msg" class="game-help"></p>
+    <div id="animaux-grid" class="animal-grid"></div>
+    <div class="row">
+      <button class="btn" id="animaux-again" hidden>🔊 Réécouter</button>
+    </div>
+  </section>
+
+  <!-- PAC-MAN -->
+  <section id="screen-pacman" class="screen">
+    <header class="bar">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>🟡 Pac-Man</h2>
+      <span></span>
+    </header>
+    <div class="pm-status">
+      <span id="pm-lives" class="pm-lives" aria-label="Vies"></span>
+      <span id="pm-stars" class="pm-stars"></span>
+    </div>
+    <p id="pm-msg" class="game-help"></p>
+    <div id="pm-board" class="pm-board"></div>
+    <div class="lab-pad">
+      <button class="lab-key" id="pm-up" aria-label="Haut">⬆️</button>
+      <button class="lab-key" id="pm-left" aria-label="Gauche">⬅️</button>
+      <button class="lab-key" id="pm-down" aria-label="Bas">⬇️</button>
+      <button class="lab-key" id="pm-right" aria-label="Droite">➡️</button>
+    </div>
+    <div class="row">
+      <button class="btn" id="pm-new">🔀 Nouvelle partie</button>
+    </div>
+  </section>
+
+  <!-- CHEVAL -->
+  <section id="screen-cheval" class="screen">
+    <header class="bar">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>🐴 Cheval</h2>
+      <span></span>
+    </header>
+    <div class="cheval-status">
+      <span id="cheval-lives" class="pm-lives" aria-label="Vies"></span>
+      <span id="cheval-carrots" class="pm-stars"></span>
+    </div>
+    <div class="cheval-wrap">
+      <canvas id="cheval-canvas" class="cheval-canvas" aria-label="Le cheval court, touche l'écran pour sauter"></canvas>
+      <div id="cheval-overlay" class="cheval-overlay" hidden>
+        <p id="cheval-overlay-text" class="cheval-overlay-text"></p>
+        <button class="btn" id="cheval-play">▶️ Jouer</button>
+      </div>
+    </div>
+    <div class="row">
+      <button class="btn" id="cheval-jump">⬆️ Saute</button>
+    </div>
+  </section>
+
   <!-- MORPION -->
   <section id="screen-morpion" class="screen">
     <header class="bar">
@@ -589,7 +730,7 @@
 <script src="js/recorder.js?v=7c25dc92e5"></script>
 <script src="js/clock.js?v=1fa3567f8c"></script>
 <script src="js/spotify.js?v=d6ebba8e7c"></script>
-<script src="js/parent.js?v=e04961707f"></script>
+<script src="js/parent.js?v=b4c73c38e4"></script>
 <script src="js/stats.js?v=d8bd7df3de"></script>
 <script src="js/pin.js?v=3879420e83"></script>
 <script src="js/home.js?v=d6063d6cae"></script>
@@ -603,6 +744,13 @@
 <script src="js/megaphone.js?v=6ffe5dd9d8"></script>
 <script src="js/morpion.js?v=ffc90e25d8"></script>
 <script src="js/puissance4.js?v=454bcb0d40"></script>
+<script src="js/alphabet.js?v=0a98388536"></script>
+<script src="js/puzzle.js?v=a7fcaae489"></script>
+<script src="js/labyrinthe.js?v=587faed3ca"></script>
+<script src="js/ombres.js?v=3467238211"></script>
+<script src="js/animaux.js?v=8cce55abb7"></script>
+<script src="js/pacman.js?v=d47d12bf98"></script>
+<script src="js/cheval.js?v=6e326c2818"></script>
 <script src="js/main.js?v=15ea266cbf"></script>
 <script>
   // Hors ligne : le service worker garde l'appli en cache (ignoré si le navigateur ne le gère pas)

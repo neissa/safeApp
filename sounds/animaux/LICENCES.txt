@@ -1,0 +1,16 @@
+Sons d'animaux (dossier sounds/animaux/)
+Source : Wikimedia Commons (https://commons.wikimedia.org), fichiers libres de droits.
+Chaque son garde la licence indiquée ci-dessous ; les licences CC BY-SA et GFDL
+demandent d'indiquer l'auteur et la source, ce que fait ce fichier.
+
+chat.ogg      « Meow domestic cat.ogg »       GFDL       https://commons.wikimedia.org/wiki/File:Meow_domestic_cat.ogg
+chien.ogg     « Barking of a dog.ogg »        CC BY-SA 3.0  https://commons.wikimedia.org/wiki/File:Barking_of_a_dog.ogg
+vache.ogg     « Single Cow Moo.ogg »          CC BY-SA 4.0  https://commons.wikimedia.org/wiki/File:Single_Cow_Moo.ogg
+canard.mp3    « Anas platyrhynchos - Mallard XC518422 » (Marie-Lan Thai Pamart, xeno-canto)  CC BY-SA 4.0  https://commons.wikimedia.org/wiki/File:Anas_platyrhynchos_-_Mallard_XC518422.mp3
+cochon.ogg    « Mudchute pig 1.ogg »          CC BY-SA 3.0  https://commons.wikimedia.org/wiki/File:Mudchute_pig_1.ogg
+mouton.ogg    « Mudchute sheep 1.ogg »        CC BY-SA 3.0  https://commons.wikimedia.org/wiki/File:Mudchute_sheep_1.ogg
+cheval.ogg    « Segregation-of-information-about-emotional-arousal-and-valence-in-horse-whinnies-srep09989-s2.oga » (enregistrement de hennissement, étude scientifique)  CC BY 4.0  https://commons.wikimedia.org/wiki/File:Segregation-of-information-about-emotional-arousal-and-valence-in-horse-whinnies-srep09989-s2.oga
+coq.ogg       « Rooster crowing.ogg »         CC BY-SA 4.0  https://commons.wikimedia.org/wiki/File:Rooster_crowing.ogg
+
+Les textes des licences : CC BY-SA 3.0 / 4.0 (https://creativecommons.org/licenses/by-sa/)
+et GFDL (https://www.gnu.org/licenses/fdl-1.3.html).

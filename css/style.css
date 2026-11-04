@@ -315,6 +315,13 @@ button:active {
 .t-morpion { background: #ef6c00; }
 .t-puissance4 { background: #1565c0; }
 .t-snake { background: #2e7d32; }
+.t-alphabet { background: #8e24aa; }
+.t-puzzle { background: #f9a825; }
+.t-labyrinthe { background: #00897b; }
+.t-ombres { background: #546e7a; }
+.t-animaux { background: #ff7043; }
+.t-pacman { background: #1a237e; }
+.t-cheval { background: #d81b60; }
 
 /* Snake */
 .snake-info {
@@ -400,6 +407,364 @@ button:active {
 
 .morpion-cell.win {
   background: #c5e1a5;
+}
+
+/* Alphabet : une carte avec la lettre, l'image et le mot, puis la grille des 26 lettres */
+.alpha-card {
+  min-height: 170px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: var(--paper);
+  border-radius: 20px;
+  box-shadow: 0 5px 0 var(--shadow);
+  padding: 12px;
+  text-align: center;
+}
+
+.alpha-letter {
+  font-size: clamp(40px, 10vh, 64px);
+  font-weight: bold;
+  line-height: 1;
+}
+
+.alpha-pic {
+  font-size: clamp(56px, 14vh, 96px);
+  line-height: 1.1;
+}
+
+.alpha-word {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.alpha-hint {
+  font-size: 20px;
+}
+
+.alpha-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+  gap: 8px;
+}
+
+.alpha-btn {
+  aspect-ratio: 1;
+  border: none;
+  border-radius: 14px;
+  background: #ce93d8;
+  color: #fff;
+  font-size: 26px;
+  font-weight: bold;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+  padding: 0;
+}
+
+.alpha-btn.active {
+  background: #8e24aa;
+}
+
+/* Puzzle : l'image est coupée en n × n morceaux (taille du plateau = largeur de conteneur) */
+.puzzle-board {
+  --n: 2;
+  width: min(100%, 56vh);
+  aspect-ratio: 1;
+  align-self: center;
+  display: grid;
+  grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--n), minmax(0, 1fr));
+  container-type: inline-size;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 5px 0 var(--shadow);
+}
+
+.pz-slot {
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: -2px;
+}
+
+.pz-slot.sel {
+  outline: 6px solid #ff7043;
+  outline-offset: -6px;
+}
+
+/* Le contenu fait la taille du plateau entier, décalé pour ne montrer que son morceau */
+.pz-slot span {
+  position: absolute;
+  width: 100cqw;
+  height: 100cqw;
+  left: calc(var(--c) * -100cqw / var(--n));
+  top: calc(var(--r) * -100cqw / var(--n));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(100cqw * 0.8);
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* Labyrinthe : grille carrée, murs dessinés par les bords des cases */
+.lab-board {
+  --n: 5;
+  width: min(100%, 56vh);
+  aspect-ratio: 1;
+  align-self: center;
+  display: grid;
+  grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--n), minmax(0, 1fr));
+  container-type: inline-size;
+  background: #fff8e1;
+  border-radius: 14px;
+  box-shadow: 0 5px 0 var(--shadow);
+}
+
+.lab-cell {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-size: calc(100cqw / var(--n) * 0.7);
+  border-style: solid;
+  border-color: #5d4037;
+  border-width: 0;
+}
+
+.lab-cell.lw-t { border-top-width: 4px; }
+.lab-cell.lw-l { border-left-width: 4px; }
+.lab-cell.lw-b { border-bottom-width: 4px; }
+.lab-cell.lw-r { border-right-width: 4px; }
+
+.lab-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 64px);
+  grid-template-rows: repeat(2, 56px);
+  gap: 8px;
+  justify-content: center;
+}
+
+.lab-key {
+  border: none;
+  border-radius: 16px;
+  background: var(--paper);
+  font-size: 26px;
+  box-shadow: 0 4px 0 var(--shadow);
+  padding: 0;
+}
+
+.lab-key:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--shadow);
+}
+
+#lab-up,
+#pm-up { grid-column: 2; grid-row: 1; }
+#lab-left,
+#pm-left { grid-column: 1; grid-row: 2; }
+#lab-down,
+#pm-down { grid-column: 2; grid-row: 2; }
+#lab-right,
+#pm-right { grid-column: 3; grid-row: 2; }
+
+/* Cheval : jeu qui défile sur un canevas 800 × 360, avec un voile pour démarrer et recommencer */
+.cheval-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.cheval-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  align-self: center;
+}
+
+.cheval-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 800 / 360;
+  border-radius: 18px;
+  box-shadow: 0 5px 0 var(--shadow);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.cheval-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.82);
+  padding: 16px;
+  text-align: center;
+}
+
+.cheval-overlay-text {
+  margin: 0;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* Pac-Man : labyrinthe 13 × 11, murs bleus, étoiles, personnages en emoji */
+.pm-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.pm-board {
+  --cols: 13;
+  --rows: 11;
+  width: min(100%, calc((100dvh - 330px) * var(--cols) / var(--rows)));
+  aspect-ratio: var(--cols) / var(--rows);
+  align-self: center;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--rows), minmax(0, 1fr));
+  container-type: inline-size;
+  background: #000;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.pm-cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-size: calc(100cqw / var(--cols) * 0.85);
+}
+
+.pm-wall {
+  background: #3949ab;
+}
+
+.pm-star::after {
+  content: "";
+  position: absolute;
+  width: 22%;
+  height: 22%;
+  border-radius: 50%;
+  background: #fff59d;
+}
+
+/* Ombres : image en couleur, puis trois ombres noires à toucher */
+.ombre-target {
+  width: clamp(110px, 24vh, 170px);
+  aspect-ratio: 1;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(70px, 18vh, 120px);
+  line-height: 1;
+  background: var(--paper);
+  border-radius: 24px;
+  box-shadow: 0 5px 0 var(--shadow);
+}
+
+.ombre-choices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.ombre-choice {
+  aspect-ratio: 1;
+  border: none;
+  border-radius: 20px;
+  background: var(--paper);
+  box-shadow: 0 5px 0 var(--shadow);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ombre-choice.ok {
+  background: #c5e1a5;
+}
+
+.ombre-choice.bad {
+  background: #ffcdd2;
+}
+
+/* L'ombre : la même image, toute en noir */
+.ombre-sil {
+  font-size: clamp(56px, 14vh, 96px);
+  line-height: 1;
+  filter: brightness(0);
+}
+
+/* Animaux : grille d'animaux (mode Écouter) ou de choix (mode Devine) */
+.animal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 10px;
+}
+
+.animal-grid.quiz {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 420px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.animal-btn {
+  border: none;
+  border-radius: 20px;
+  background: var(--paper);
+  box-shadow: 0 5px 0 var(--shadow);
+  padding: 10px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.animal-ico {
+  font-size: clamp(44px, 12vh, 70px);
+  line-height: 1;
+}
+
+.animal-name {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.animal-grid.quiz .animal-btn {
+  aspect-ratio: 1;
+  justify-content: center;
+}
+
+.animal-btn.ok {
+  background: #c5e1a5;
+}
+
+.animal-btn.bad {
+  background: #ffcdd2;
 }
 
 /* Puissance 4 : 7 colonnes, 6 lignes */

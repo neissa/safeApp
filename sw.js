@@ -2,7 +2,7 @@
    Réseau d'abord (les mises à jour arrivent tout de suite), cache en secours.
    Spotify, la météo et les fichiers du téléphone ne sont jamais mis en cache.
    La version et la liste des fichiers sont mises à jour par tools/update-cache.js. */
-const CACHE = "mon-coin-magique-38d0189fd1fd";
+const CACHE = "mon-coin-magique-a2ab3920f09a";
 
 // BEGIN SHELL (généré par tools/update-cache.js)
 const SHELL = [
@@ -11,7 +11,10 @@ const SHELL = [
   "./css/style.css",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
+  "./js/alphabet.js",
+  "./js/animaux.js",
   "./js/calc.js",
+  "./js/cheval.js",
   "./js/clock.js",
   "./js/core.js",
   "./js/draw.js",
@@ -19,16 +22,20 @@ const SHELL = [
   "./js/gallery.js",
   "./js/games.js",
   "./js/home.js",
+  "./js/labyrinthe.js",
   "./js/main.js",
   "./js/megaphone.js",
   "./js/memory.js",
   "./js/morpion.js",
   "./js/music.js",
   "./js/notes.js",
+  "./js/ombres.js",
+  "./js/pacman.js",
   "./js/parent.js",
   "./js/piano.js",
   "./js/pin.js",
   "./js/puissance4.js",
+  "./js/puzzle.js",
   "./js/raptor.js",
   "./js/recorder.js",
   "./js/snake.js",
@@ -38,6 +45,14 @@ const SHELL = [
   "./js/ui.js",
   "./js/voice-worklet.js",
   "./manifest.json",
+  "./sounds/animaux/canard.mp3",
+  "./sounds/animaux/chat.ogg",
+  "./sounds/animaux/cheval.ogg",
+  "./sounds/animaux/chien.ogg",
+  "./sounds/animaux/cochon.ogg",
+  "./sounds/animaux/coq.ogg",
+  "./sounds/animaux/mouton.ogg",
+  "./sounds/animaux/vache.ogg",
   "./sounds/farts/apebble-fart-10-228250.mp3",
   "./sounds/farts/apebble-fart-2-228242.mp3",
   "./sounds/farts/apebble-fart-3-228243.mp3",
