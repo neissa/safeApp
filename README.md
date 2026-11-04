@@ -31,6 +31,17 @@ L'application est une page web statique en français. Elle s'installe comme une 
 | 🕐 **Date et heure** | Heure en chiffres et horloge à aiguilles, date du jour, saison et météo (Open-Meteo, selon la position ou Paris par défaut). Chaque élément est lu à voix haute quand on le touche. |
 | 💨 **Bruits de pet** | Une case par bruit, et un bouton « 🎲 Au hasard ». |
 | 📢 **Mégaphone** | Parler au micro et entendre sa voix changée en direct : normale, aiguë, grave, robot, écho ou mégaphone. Un casque évite les sifflements. |
+| ❌ **Morpion** | Aligner trois symboles, à deux sur le même écran. |
+| 🔴 **Puissance 4** | Aligner quatre jetons, à deux sur le même écran. |
+| 🔤 **Alphabet** | Toucher une lettre : on entend la lettre, puis un mot qui commence par elle (« A comme avion »), et on voit son image. |
+| 🧩 **Puzzle** | Remettre l'image en place : on touche deux morceaux pour les échanger. 2 × 2 ou 3 × 3. |
+| 🗺️ **Labyrinthe** | Guider le poussin 🐣 jusqu'au drapeau 🏁. 5 × 5, 7 × 7 ou 9 × 9, avec les flèches à l'écran ou au clavier. |
+| 🌘 **Ombres** | Retrouver l'ombre noire qui correspond à l'image en couleur. |
+| 🐶 **Animaux** | Écouter le cri de chaque animal, ou deviner l'animal au cri. Sons libres de droits (voir `sounds/animaux/LICENCES.txt`). |
+| 🟡 **Pac-Man** | Manger les étoiles du labyrinthe en évitant le fantôme. Trois vies, version douce pour les petits. |
+| 🐴 **Cheval** | Jeu de plateforme qui défile : le cheval mange carottes et foin, et saute les obstacles de CSO. Garder le doigt sur le bouton fait sauter plus loin. |
+| 🔴 **Couleurs** | La voix demande une couleur : on touche la bonne case parmi quatre. |
+| 🌧️ **Bruits doux** | Bruit blanc, pluie, orage, vagues, vent ou feu de bois, fabriqués par l'appareil. Un seul son à la fois, avec un minuteur de sommeil de 15 min, 30 min ou 1 h. |
 
 ## Menu parent
 

@@ -17,6 +17,7 @@ Le téléphone (APK) et les navigateurs gardent une copie en cache. Pour que les
 4. Ne jamais modifier à la main `version.json`, les `?v=`, `CACHE` ou le bloc `SHELL` : le script s'en charge.
 5. Commiter ensemble le code et les fichiers générés : `index.html`, `sw.js`, `version.json`.
 6. Ne pas committer ni pousser sans demande explicite de l'utilisateur.
+7. Avant chaque commit, décider si `README.md` doit être mis à jour (nouvelle fonctionnalité, jeu ajouté ou retiré, changement visible dans la liste des fonctions, procédure modifiée). Si oui, le mettre à jour dans le même commit. Si le changement est purement interne (correction, réglage, texte d'un mot), ne pas toucher au README.
 
 ## Branches Git
 
