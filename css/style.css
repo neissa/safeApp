@@ -929,9 +929,9 @@ audio {
 /* Piano : huit touches de couleur */
 /* Piano : clavier avec touches blanches et noires */
 .piano-keys {
-  flex: 1 1 auto;
+  /* Ne rétrécit pas : sur petit écran, l'écran défile au lieu de couper les touches */
+  flex: 0 0 auto;
   display: flex;
-  min-height: 0;
 }
 
 .keyboard {
@@ -1020,7 +1020,8 @@ audio {
 }
 
 .piano-simon .keyboard {
-  min-height: 170px;
+  height: 85px;
+  min-height: 0;
   background: #37474f;
 }
 
