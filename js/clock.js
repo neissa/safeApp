@@ -99,7 +99,8 @@
 
     // Chiffres des heures (1 à 12), petits et rapprochés du centre pour ne pas toucher les minutes
     for (let n = 1; n <= 12; n++) {
-      const p = polar(52, n * 5);
+      // Rayon 49,5 : environ 4 px plus près du centre qu'avant (52) sur le grand cadran
+      const p = polar(49.5, n * 5);
       const t = svgEl(
         "text",
         {
@@ -119,14 +120,16 @@
     // Les quarts (15, 30, 45, 60) sont plus gros et en orange ; les autres sont petits.
     for (let minute = 5; minute <= 60; minute += 5) {
       const quarter = minute % 15 === 0;
-      const p = polar(74, minute);
+      // Les quarts sont rentrés vers le centre (rayon 66, puis 68,5 : 4 px de plus vers le centre)
+      const p = polar(quarter ? 68.5 : 74, minute);
       const t = svgEl(
         "text",
         {
           x: p.x,
-          y: p.y + (quarter ? 5 : 3.5),
+          y: p.y + (quarter ? 4 : 3.5),
           "text-anchor": "middle",
-          "font-size": quarter ? 13 : 9,
+          // Les minutes simples sont 15 % plus petites (6,5 -> 5,5)
+          "font-size": quarter ? 11 : 5.5,
           "font-weight": quarter ? "bold" : "normal",
           fill: quarter ? "#e65100" : "#777",
         },
@@ -135,10 +138,18 @@
       t.textContent = minute;
     }
 
+    // Aiguilles des heures et des minutes : pointues au bout, plus larges au centre
+    const hand = (parent, tipY, halfWidth, tailY) =>
+      svgEl(
+        "polygon",
+        { points: `100,${tipY} ${100 + halfWidth},100 100,${tailY} ${100 - halfWidth},100`, fill: "#333" },
+        parent
+      );
     hands.hour = svgEl("g", {}, svg);
-    svgEl("line", { x1: 100, y1: 112, x2: 100, y2: 58, stroke: "#333", "stroke-width": 9, "stroke-linecap": "round" }, hands.hour);
+    // La queue reste sous le rond central (rayon 7) : rien ne dépasse de l'autre côté
+    hand(hands.hour, 58, 6, 104);
     hands.min = svgEl("g", {}, svg);
-    svgEl("line", { x1: 100, y1: 114, x2: 100, y2: 34, stroke: "#333", "stroke-width": 6, "stroke-linecap": "round" }, hands.min);
+    hand(hands.min, 34, 4.5, 104);
     hands.sec = svgEl("g", {}, svg);
     svgEl("line", { x1: 100, y1: 122, x2: 100, y2: 28, stroke: "#e53935", "stroke-width": 3, "stroke-linecap": "round" }, hands.sec);
     svgEl("circle", { cx: 100, cy: 100, r: 7, fill: "#ff7043" }, svg);

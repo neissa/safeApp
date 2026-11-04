@@ -1929,7 +1929,7 @@ html[data-voice="off"] .speak-btn {
 }
 
 .analog {
-  width: min(60vw, 210px);
+  width: min(84vw, 52vh, 320px);
   height: auto;
 }
 
