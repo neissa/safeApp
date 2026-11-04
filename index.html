@@ -4,8 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="color-scheme" content="light">
-  <meta name="app-version" content="a2ab3920f09a">
-  <meta name="app-built" content="2026-11-04 11:38">
+  <meta name="app-version" content="4d4dbe7c70c2">
+  <meta name="app-built" content="2026-11-04 11:57">
+
+
+
 
 
 
@@ -30,7 +33,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=8ebb636b26">
+  <link rel="stylesheet" href="css/style.css?v=a3396a49d0">
 </head>
 <body>
 <div id="app">
@@ -72,6 +75,8 @@
       <button class="tile t-animaux" data-open="animaux" data-say="Animaux" aria-label="Animaux"><span class="tile-ico">🐶</span><span class="tile-label">Animaux</span></button>
       <button class="tile t-pacman" data-open="pacman" data-say="Pac-Man" aria-label="Pac-Man"><span class="tile-ico">🟡</span><span class="tile-label">Pac-Man</span></button>
       <button class="tile t-cheval" data-open="cheval" data-say="Cheval" aria-label="Cheval"><span class="tile-ico">🐴</span><span class="tile-label">Cheval</span></button>
+      <button class="tile t-couleurs" data-open="couleurs" data-say="Couleurs" aria-label="Couleurs"><span class="tile-ico">🔴</span><span class="tile-label">Couleurs</span></button>
+      <button class="tile t-bruits" data-open="bruits" data-say="Bruits doux" aria-label="Bruits doux"><span class="tile-ico">🌧️</span><span class="tile-label">Bruits doux</span></button>
     </nav>
   </section>
 
@@ -481,6 +486,42 @@
     </div>
   </section>
 
+  <!-- COULEURS -->
+  <section id="screen-couleurs" class="screen">
+    <header class="bar">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>🔴 Couleurs</h2>
+      <span></span>
+    </header>
+    <p id="color-prompt" class="color-prompt" aria-live="polite"></p>
+    <div id="color-choices" class="color-choices"></div>
+    <p id="color-msg" class="game-help"></p>
+    <div class="row">
+      <button class="btn" id="color-again">🔊 Redire</button>
+      <button class="btn" id="color-new">🔀 Autre</button>
+    </div>
+  </section>
+
+  <!-- BRUITS DOUX -->
+  <section id="screen-bruits" class="screen">
+    <header class="bar">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>🌧️ Bruits doux</h2>
+      <span></span>
+    </header>
+    <div id="bruits-grid" class="bruit-grid"></div>
+    <label class="bruits-volume">🔈 <input type="range" id="bruits-volume" min="0" max="1" step="0.05" aria-label="Volume"> 🔊</label>
+    <div class="row">
+      <button class="btn" data-sleep="15">⏰ 15 min</button>
+      <button class="btn" data-sleep="30">⏰ 30 min</button>
+      <button class="btn" data-sleep="60">⏰ 1 h</button>
+    </div>
+    <p id="bruits-timer" class="game-help"></p>
+    <div class="row">
+      <button class="btn" id="bruits-stop">⏹️ Tout arrêter</button>
+    </div>
+  </section>
+
   <!-- MORPION -->
   <section id="screen-morpion" class="screen">
     <header class="bar">
@@ -730,7 +771,7 @@
 <script src="js/recorder.js?v=7c25dc92e5"></script>
 <script src="js/clock.js?v=1fa3567f8c"></script>
 <script src="js/spotify.js?v=d6ebba8e7c"></script>
-<script src="js/parent.js?v=b4c73c38e4"></script>
+<script src="js/parent.js?v=03a2f193cb"></script>
 <script src="js/stats.js?v=d8bd7df3de"></script>
 <script src="js/pin.js?v=3879420e83"></script>
 <script src="js/home.js?v=d6063d6cae"></script>
@@ -751,6 +792,8 @@
 <script src="js/animaux.js?v=8cce55abb7"></script>
 <script src="js/pacman.js?v=d47d12bf98"></script>
 <script src="js/cheval.js?v=6e326c2818"></script>
+<script src="js/couleurs.js?v=25458fd136"></script>
+<script src="js/bruits.js?v=e3d9b0863a"></script>
 <script src="js/main.js?v=15ea266cbf"></script>
 <script>
   // Hors ligne : le service worker garde l'appli en cache (ignoré si le navigateur ne le gère pas)
