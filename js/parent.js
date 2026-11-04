@@ -238,6 +238,13 @@
     if (homeBtn) homeBtn.hidden = !latestVersion;
   }
 
+  // Le lien vers l'APK n'est utile que hors de l'APK : dans l'APK (TWA), le navigateur
+  // indique « android-app:// » comme origine de la page.
+  function showApkLink() {
+    const link = document.getElementById("parent-apk");
+    if (link) link.hidden = document.referrer.startsWith("android-app://");
+  }
+
   // Vérifie en arrière-plan si une version plus récente est en ligne (silencieux hors ligne)
   async function checkUpdate() {
     if (!navigator.onLine) return;
@@ -462,6 +469,7 @@
 
     // Vérification en arrière-plan : au démarrage, toutes les 15 minutes, et au retour sur l'appli
     showUpdateState();
+    showApkLink();
     checkUpdate();
     setInterval(checkUpdate, 15 * 60 * 1000);
     document.addEventListener("visibilitychange", () => {
