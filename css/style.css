@@ -666,8 +666,21 @@ button:active {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 24px;
+  font-size: 16px;
   font-weight: bold;
+}
+
+/* Bouton « Saute » : même largeur que le jeu, sous le jeu, à hauteur de pouce */
+.cheval-actions {
+  width: 100%;
+  max-width: 800px;
+  align-self: center;
+}
+
+.cheval-jump {
+  width: 100%;
+  min-height: 64px;
+  font-size: 22px;
 }
 
 .cheval-wrap {
@@ -692,13 +705,17 @@ button:active {
 .cheval-overlay {
   position: absolute;
   inset: 0;
+  /* Le voile laisse passer les appuis : toucher l'écran fait sauter, même pendant le message */
+  pointer-events: none;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 14px;
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.82); /* mode clair */
+  background: color-mix(in srgb, var(--paper) 85%, transparent);
+  color: var(--ink);
   padding: 16px;
   text-align: center;
 }
