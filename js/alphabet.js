@@ -5,12 +5,12 @@
 
   const KA = window.KA;
   const LETTERS = [
-    ["A", "avion", "✈️"], ["B", "ballon", "🎈"], ["C", "chat", "🐱"], ["D", "dauphin", "🐬"],
-    ["E", "éléphant", "🐘"], ["F", "fraise", "🍓"], ["G", "girafe", "🦒"], ["H", "hibou", "🦉"],
+    ["A", "avion", "✈️"], ["B", "ballon", "🎈"], ["C", "carotte", "🥕"], ["D", "dauphin", "🐬"],
+    ["E", "éléphant", "🐘"], ["F", "fraise", "🍓"], ["G", "gâteau", "🎂"], ["H", "hibou", "🦉"],
     ["I", "île", "🏝️"], ["J", "jus", "🧃"], ["K", "koala", "🐨"], ["L", "lion", "🦁"],
-    ["M", "maison", "🏠"], ["N", "nez", "👃"], ["O", "oiseau", "🐦"], ["P", "poisson", "🐟"],
+    ["M", "maison", "🏠"], ["N", "nez", "👃"], ["O", "orange", "🍊"], ["P", "poisson", "🐟"],
     ["Q", "quille", "🎳"], ["R", "rose", "🌹"], ["S", "soleil", "☀️"], ["T", "tortue", "🐢"],
-    ["U", "usine", "🏭"], ["V", "vache", "🐮"], ["W", "wagon", "🚃"], ["X", "xylophone", "🎵"],
+    ["U", "usine", "🏭"], ["V", "vache", "🐮"], ["W", "wifi", "📶"], ["X", "xylophone", "🎵"],
     ["Y", "yaourt", "🥛"], ["Z", "zèbre", "🦓"],
   ];
 
