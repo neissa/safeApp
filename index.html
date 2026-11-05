@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="color-scheme" content="light">
-  <meta name="app-version" content="25c49e2af7b7">
-  <meta name="app-built" content="2026-11-04 17:49">
+  <meta name="app-version" content="eb5c0b10d38e">
+  <meta name="app-built" content="2026-11-05 11:30">
 
 
 
@@ -33,7 +33,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=49e8ac1b41">
+  <link rel="stylesheet" href="css/style.css?v=e11812d65f">
 </head>
 <body>
 <div id="app">
@@ -82,13 +82,10 @@
 
   <!-- DESSIN -->
   <section id="screen-draw" class="screen">
-    <header class="bar">
+    <header class="bar bar-wide">
       <button class="chip" data-back aria-label="Accueil">🏠</button>
       <h2>🎨 Dessin</h2>
-      <button class="chip" id="draw-undo" aria-label="Annuler la dernière action" disabled>↶</button>
-    </header>
-    <div class="tools">
-      <div class="row tool-row">
+      <div class="bar-actions">
         <div class="dropdown">
           <button class="chip dd-btn" id="drawings-btn" aria-label="Mes dessins"><span>🗂️</span></button>
           <div class="dd-menu dd-drawings" id="drawings-menu" hidden>
@@ -99,6 +96,11 @@
             </div>
           </div>
         </div>
+        <button class="chip" id="draw-undo" aria-label="Annuler la dernière action" disabled>↶</button>
+      </div>
+    </header>
+    <div class="tools">
+      <div class="row tool-row">
         <div class="dropdown">
           <button class="chip dd-btn" id="color-btn" aria-label="Choisir une couleur"><span id="color-current" class="color-current"></span></button>
           <div class="dd-menu" id="color-menu" hidden>
@@ -138,7 +140,7 @@
         </div>
       </div>
     </div>
-    <canvas id="draw-canvas" class="paper"></canvas>
+    <div class="fit fit-paper"><canvas id="draw-canvas" class="paper"></canvas></div>
   </section>
 
   <!-- BLOC NOTES -->
@@ -321,7 +323,7 @@
       <span id="memory-moves" class="memory-moves">Coups : 0</span>
       <button class="btn" id="memory-new">🔀 Nouvelle partie</button>
     </div>
-    <div id="memory-grid" class="memory-board"></div>
+    <div class="fit"><div id="memory-grid" class="memory-board"></div></div>
     <p id="memory-msg" class="hint"></p>
   </section>
 
@@ -339,12 +341,7 @@
     <div class="snake-board">
       <canvas id="snake-canvas" class="snake-canvas" width="336" height="336" aria-label="Terrain du serpent"></canvas>
     </div>
-    <div class="snake-pad">
-      <button class="snake-arrow" id="snake-up" aria-label="Haut">⬆️</button>
-      <button class="snake-arrow" id="snake-left" aria-label="Gauche">⬅️</button>
-      <button class="snake-arrow" id="snake-down" aria-label="Bas">⬇️</button>
-      <button class="snake-arrow" id="snake-right" aria-label="Droite">➡️</button>
-    </div>
+    <div class="dpad"></div>
   </section>
 
   <!-- FORMES -->
@@ -390,20 +387,12 @@
     <header class="bar">
       <button class="chip" data-back aria-label="Accueil">🏠</button>
       <h2>🗺️ Labyrinthe</h2>
-      <span></span>
+      <button class="chip" id="lab-new" aria-label="Nouveau labyrinthe">🔀</button>
     </header>
     <div id="lab-levels" class="seg memory-levels"></div>
     <p id="lab-msg" class="game-help"></p>
-    <div id="lab-board" class="lab-board"></div>
-    <div class="lab-pad">
-      <button class="lab-key" id="lab-up" aria-label="Haut">⬆️</button>
-      <button class="lab-key" id="lab-left" aria-label="Gauche">⬅️</button>
-      <button class="lab-key" id="lab-down" aria-label="Bas">⬇️</button>
-      <button class="lab-key" id="lab-right" aria-label="Droite">➡️</button>
-    </div>
-    <div class="row">
-      <button class="btn" id="lab-new">🔀 Nouveau labyrinthe</button>
-    </div>
+    <div class="fit"><div id="lab-board" class="lab-board"></div></div>
+    <div class="dpad"></div>
   </section>
 
   <!-- OMBRES -->
@@ -433,7 +422,7 @@
       <button class="seg-btn" data-mode="quiz">❓ Devine</button>
     </div>
     <p id="animaux-msg" class="game-help"></p>
-    <div id="animaux-grid" class="animal-grid"></div>
+    <div class="fit"><div id="animaux-grid" class="animal-grid"></div></div>
     <div class="row">
       <button class="btn" id="animaux-again" hidden>🔊 Réécouter</button>
     </div>
@@ -451,12 +440,7 @@
       <span id="pm-stars" class="pm-stars"></span>
     </div>
     <div id="pm-board" class="pm-board"></div>
-    <div class="lab-pad">
-      <button class="lab-key" id="pm-up" aria-label="Haut">⬆️</button>
-      <button class="lab-key" id="pm-left" aria-label="Gauche">⬅️</button>
-      <button class="lab-key" id="pm-down" aria-label="Bas">⬇️</button>
-      <button class="lab-key" id="pm-right" aria-label="Droite">➡️</button>
-    </div>
+    <div class="dpad"></div>
     <div class="row">
       <button class="btn" id="pm-new">🔀 Nouvelle partie</button>
     </div>
@@ -528,7 +512,7 @@
       <span></span>
     </header>
     <p id="morpion-status" class="game-help"></p>
-    <div id="morpion-board" class="morpion-board"></div>
+    <div class="fit"><div id="morpion-board" class="morpion-board"></div></div>
     <div class="row">
       <button class="btn" id="morpion-mode">👫 Chacun son tour</button>
       <button class="btn" id="morpion-new">🔀 Nouvelle partie</button>
@@ -543,9 +527,11 @@
       <span></span>
     </header>
     <p id="p4-status" class="game-help"></p>
-    <div class="p4-wrap">
-      <div id="p4-drops" class="p4-drops"></div>
-      <div id="p4-board" class="p4-board"></div>
+    <div class="fit">
+      <div class="p4-wrap">
+        <div id="p4-drops" class="p4-drops"></div>
+        <div id="p4-board" class="p4-board"></div>
+      </div>
     </div>
     <div class="row">
       <button class="btn" id="p4-mode">👫 Chacun son tour</button>
@@ -561,7 +547,7 @@
       <button class="chip speak-btn" id="intrus-say" aria-label="Répéter la consigne">🔊</button>
     </header>
     <p class="game-help">Trouve celui qui n'a rien à faire là</p>
-    <div id="intrus-grid" class="intrus-grid"></div>
+    <div class="fit"><div id="intrus-grid" class="intrus-grid"></div></div>
     <p id="intrus-stars" class="game-stars"></p>
   </section>
 
@@ -573,7 +559,7 @@
       <span></span>
     </header>
     <p class="game-help">Touche une case pour entendre un pet</p>
-    <div id="farts-grid" class="farts-grid"></div>
+    <div class="fit"><div id="farts-grid" class="farts-grid"></div></div>
     <p id="farts-msg" class="game-help" role="status"></p>
     <button id="farts-random" class="farts-random" data-silent>🎲 Au hasard</button>
   </section>
@@ -628,7 +614,7 @@
       <div class="date-row">
         <span id="date-text"></span>
       </div>
-      <svg id="analog" class="analog" viewBox="0 0 200 200" role="img" aria-label="Horloge à aiguilles"></svg>
+      <div class="fit"><svg id="analog" class="analog" viewBox="0 0 200 200" role="img" aria-label="Horloge à aiguilles"></svg></div>
       <div class="info-row">
         <div class="info">
           <span id="season-ico" class="info-ico">🍂</span>
@@ -761,7 +747,8 @@
 
 <script src="js/core.js?v=f0cf1e22dd"></script>
 <script src="js/ui.js?v=3d63d19598"></script>
-<script src="js/draw.js?v=c23b640ee3"></script>
+<script src="js/pad.js?v=721c09a79d"></script>
+<script src="js/draw.js?v=073fdb7171"></script>
 <script src="js/notes.js?v=0b82255267"></script>
 <script src="js/calc.js?v=eb829f7102"></script>
 <script src="js/gallery.js?v=ef63a40877"></script>
@@ -778,19 +765,19 @@
 <script src="js/memory.js?v=4792d1a37a"></script>
 <script src="js/timer.js?v=a2eca99d52"></script>
 <script src="js/games.js?v=fa71f6a408"></script>
-<script src="js/snake.js?v=9d54ce7140"></script>
+<script src="js/snake.js?v=5d0890a0fb"></script>
 <script src="js/farts.js?v=59cf93fe89"></script>
 <script src="js/megaphone.js?v=6ffe5dd9d8"></script>
 <script src="js/morpion.js?v=ffc90e25d8"></script>
 <script src="js/puissance4.js?v=454bcb0d40"></script>
 <script src="js/alphabet.js?v=c3496a9489"></script>
 <script src="js/puzzle.js?v=a7fcaae489"></script>
-<script src="js/labyrinthe.js?v=587faed3ca"></script>
+<script src="js/labyrinthe.js?v=199a9173ef"></script>
 <script src="js/ombres.js?v=3467238211"></script>
 <script src="js/animaux.js?v=8cce55abb7"></script>
-<script src="js/pacman.js?v=05deddd093"></script>
-<script src="js/cheval.js?v=8b9e792b4f"></script>
-<script src="js/couleurs.js?v=25458fd136"></script>
+<script src="js/pacman.js?v=436a2dc0a4"></script>
+<script src="js/cheval.js?v=a2260ed7d9"></script>
+<script src="js/couleurs.js?v=2b70a3668f"></script>
 <script src="js/bruits.js?v=e3d9b0863a"></script>
 <script src="js/main.js?v=15ea266cbf"></script>
 <script>

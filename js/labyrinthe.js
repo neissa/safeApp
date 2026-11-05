@@ -108,13 +108,7 @@
     newGame();
   }
 
-  const KEYS = { ArrowUp: "N", ArrowDown: "S", ArrowLeft: "W", ArrowRight: "E" };
-  function onKey(e) {
-    if (KEYS[e.key]) {
-      e.preventDefault();
-      move(KEYS[e.key]);
-    }
-  }
+  const PAD_DIRS = { up: "N", down: "S", left: "W", right: "E" }; // directions de js/pad.js
 
   KA.panels.labyrinthe = {
     init(root) {
@@ -130,22 +124,18 @@
         b.addEventListener("click", () => setSize(index));
         levelBox.appendChild(b);
       });
-      root.querySelector("#lab-up").addEventListener("click", () => move("N"));
-      root.querySelector("#lab-down").addEventListener("click", () => move("S"));
-      root.querySelector("#lab-left").addEventListener("click", () => move("W"));
-      root.querySelector("#lab-right").addEventListener("click", () => move("E"));
+      // Croix de direction, flèches du clavier et glissement du doigt sur le plateau (js/pad.js)
+      KA.pad(root, (d) => move(PAD_DIRS[d]), { swipe: board });
       root.querySelector("#lab-new").addEventListener("click", newGame);
       setSize(sizeIndex);
     },
     enter() {
       active = true;
-      document.addEventListener("keydown", onKey);
     },
     leave() {
       active = false;
       clearTimeout(winTimer);
       winTimer = null;
-      document.removeEventListener("keydown", onKey);
     },
   };
 })();

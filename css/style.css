@@ -104,6 +104,8 @@ button:active {
   padding: 10px 14px calc(28px + env(safe-area-inset-bottom, 0px));
   overflow-y: auto;
   overscroll-behavior: contain;
+  /* Sert de repère (cqw) pour limiter la hauteur des zones « fit » */
+  container-type: inline-size;
 }
 
 .screen.active {
@@ -121,8 +123,12 @@ button:active {
 .bar h2 {
   margin: 0;
   text-align: center;
-  font-size: 22px;
+  /* Plus petit sur un écran étroit, toujours sur une seule ligne */
+  font-size: clamp(16px, 5.2vw, 22px);
   font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .chip {
@@ -190,7 +196,7 @@ button:active {
 .home-head h1 {
   margin: 6px 0 0;
   text-align: center;
-  font-size: 30px;
+  font-size: clamp(18px, 5.4vw, 30px);
   font-weight: 700;
 }
 
@@ -338,6 +344,33 @@ button:active {
   font-weight: bold;
 }
 
+/* Zone « fit » : elle prend la hauteur qui reste dans l'écran. Le plateau placé dedans se règle
+   sur la plus petite des deux dimensions (cqw, cqh) : il tient en entier, même sur un écran de 350 × 582. */
+.fit {
+  flex: 1 1 0;
+  min-height: 140px;
+  /* Pas plus haute que le plateau (carré par défaut) : sur un grand écran, la place en trop reste en bas */
+  max-height: 100cqw;
+  container-type: size;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Puissance 4 : flèches (~40 px) + plateau 7 × 6 */
+.fit:has(> .p4-wrap) {
+  max-height: calc(100cqw * 6 / 7 + 40px);
+}
+
+/* Animaux : 4 × 2 en mode Écouter, 2 × 2 en mode Devine */
+.fit:has(> .animal-grid) {
+  max-height: calc(100cqw / 1.6);
+}
+
+.fit:has(> .animal-grid.quiz) {
+  max-height: min(100cqw, 420px);
+}
+
 /* Le terrain prend toute la place disponible, en restant carré */
 .snake-board {
   flex: 1 1 auto;
@@ -358,36 +391,45 @@ button:active {
   touch-action: none;
 }
 
-.snake-pad {
+/* Croix de direction commune aux jeux (créée par js/pad.js) : haut au milieu, gauche-bas-droite en dessous */
+.dpad {
   display: grid;
-  grid-template-columns: repeat(3, 62px);
+  grid-template-columns: repeat(3, 64px);
   grid-template-rows: repeat(2, 56px);
   gap: 8px;
   width: max-content;
+  align-self: center;
   margin: 0 auto;
+  flex: 0 0 auto;
 }
 
-.snake-arrow {
+.dpad-key {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   line-height: 1;
   border: none;
-  border-radius: 18px;
+  border-radius: 16px;
   background: var(--paper);
   font-size: 26px;
   box-shadow: 0 4px 0 var(--shadow);
+  touch-action: none;
 }
 
-#snake-up { grid-column: 2; grid-row: 1; }
-#snake-left { grid-column: 1; grid-row: 2; }
-#snake-down { grid-column: 2; grid-row: 2; }
-#snake-right { grid-column: 3; grid-row: 2; }
+.dpad-key:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--shadow);
+}
+
+.dpad-up { grid-column: 2; grid-row: 1; }
+.dpad-left { grid-column: 1; grid-row: 2; }
+.dpad-down { grid-column: 2; grid-row: 2; }
+.dpad-right { grid-column: 3; grid-row: 2; }
 
 /* Morpion : grille 3 x 3 carrée */
 .morpion-board {
-  width: min(100%, 56vh);
+  width: min(100cqw, 100cqh);
   aspect-ratio: 1;
   align-self: center;
   display: grid;
@@ -402,7 +444,7 @@ button:active {
   border-radius: 18px;
   background: var(--paper);
   box-shadow: 0 5px 0 var(--shadow);
-  font-size: clamp(36px, 12vh, 72px);
+  font-size: calc(min(100cqw, 100cqh) * 0.2);
   line-height: 1;
   padding: 0;
 }
@@ -413,43 +455,53 @@ button:active {
 
 /* Alphabet : une carte avec la lettre, l'image et le mot, puis la grille des 26 lettres */
 .alpha-card {
-  min-height: 170px;
+  /* Hauteur fixe : le cadre ne bouge pas quand on touche une lettre */
+  height: clamp(84px, 15vh, 140px);
+  flex: 0 0 auto;
   display: flex;
-  flex-direction: column;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 10px;
   background: var(--paper);
   border-radius: 20px;
   box-shadow: 0 5px 0 var(--shadow);
-  padding: 12px;
+  padding: 8px 12px;
+  overflow: hidden;
   text-align: center;
 }
 
+/* Lettre, image et mot sur une seule ligne : tailles réglées sur la largeur (cqw) et la hauteur (vh) */
 .alpha-letter {
-  font-size: clamp(40px, 10vh, 64px);
+  flex: 0 0 auto;
+  font-size: clamp(28px, min(6vh, 10cqw), 56px);
   font-weight: bold;
   line-height: 1;
+  white-space: nowrap;
 }
 
 .alpha-pic {
-  font-size: clamp(56px, 14vh, 96px);
-  line-height: 1.1;
+  flex: 0 0 auto;
+  font-size: clamp(34px, min(7.5vh, 13cqw), 80px);
+  line-height: 1;
 }
 
 .alpha-word {
-  font-size: 24px;
+  flex: 0 0 auto;
+  font-size: clamp(15px, 6cqw, 26px);
   font-weight: bold;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
 .alpha-hint {
-  font-size: 20px;
+  font-size: clamp(16px, 5cqw, 20px);
 }
 
 .alpha-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+  gap: 6px;
 }
 
 .alpha-btn {
@@ -458,7 +510,7 @@ button:active {
   border-radius: 14px;
   background: #ce93d8;
   color: #fff;
-  font-size: 26px;
+  font-size: 24px;
   font-weight: bold;
   box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
   padding: 0;
@@ -518,7 +570,7 @@ button:active {
 /* Labyrinthe : grille carrée, murs dessinés par les bords des cases */
 .lab-board {
   --n: 5;
-  width: min(100%, 56vh);
+  width: min(100cqw, 100cqh);
   aspect-ratio: 1;
   align-self: center;
   display: grid;
@@ -546,40 +598,6 @@ button:active {
 .lab-cell.lw-l { border-left-width: 4px; }
 .lab-cell.lw-b { border-bottom-width: 4px; }
 .lab-cell.lw-r { border-right-width: 4px; }
-
-.lab-pad {
-  display: grid;
-  grid-template-columns: repeat(3, 64px);
-  grid-template-rows: repeat(2, 56px);
-  gap: 8px;
-  /* Le bloc ne prend que sa largeur et se place au centre de l'écran */
-  width: max-content;
-  align-self: center;
-  margin: 0 auto;
-}
-
-.lab-key {
-  border: none;
-  border-radius: 16px;
-  background: var(--paper);
-  font-size: 26px;
-  box-shadow: 0 4px 0 var(--shadow);
-  padding: 0;
-}
-
-.lab-key:active {
-  transform: translateY(2px);
-  box-shadow: 0 2px 0 var(--shadow);
-}
-
-#lab-up,
-#pm-up { grid-column: 2; grid-row: 1; }
-#lab-left,
-#pm-left { grid-column: 1; grid-row: 2; }
-#lab-down,
-#pm-down { grid-column: 2; grid-row: 2; }
-#lab-right,
-#pm-right { grid-column: 3; grid-row: 2; }
 
 /* Couleurs : consigne en grand, quatre grandes cases de couleur */
 .color-prompt {
@@ -620,8 +638,8 @@ button:active {
 /* Bruits doux : grille de sons, réglage du volume, minuteur */
 .bruit-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
 }
 
 .bruit-btn {
@@ -629,18 +647,20 @@ button:active {
   border-radius: 20px;
   background: var(--paper);
   box-shadow: 0 5px 0 var(--shadow);
-  padding: 16px 8px;
+  padding: 8px 4px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  font-size: 18px;
+  gap: 7px;
+  font-size: 15px;
+  /* La police cursive dépasse au-dessus de sa ligne : interligne large pour ne pas toucher l'icône */
+  line-height: 1.55;
   font-weight: bold;
 }
 
 .bruit-ico {
-  font-size: 44px;
-  line-height: 1;
+  font-size: 30px;
+  line-height: 1.2;
 }
 
 .bruit-btn.active {
@@ -722,7 +742,7 @@ button:active {
 
 .cheval-overlay-text {
   margin: 0;
-  font-size: 22px;
+  font-size: clamp(16px, 5vw, 22px);
   font-weight: bold;
 }
 
@@ -762,6 +782,24 @@ button:active {
 .pm-wall {
   background: #3949ab;
 }
+
+/* Pac-Man : rond jaune avec une bouche en part de tarte, tournée vers sa direction.
+   Bouche presque fermée ou grande ouverte (même nombre de points) : elle reste toujours visible. */
+.pm-pac {
+  width: 84%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #ffd600;
+  clip-path: polygon(50% 50%, 100% 40%, 100% 0, 0 0, 0 100%, 100% 100%, 100% 60%);
+}
+
+.pm-pac.open {
+  clip-path: polygon(50% 50%, 100% 12%, 100% 0, 0 0, 0 100%, 100% 100%, 100% 88%);
+}
+
+.pm-face-S { transform: rotate(90deg); }
+.pm-face-W { transform: scaleX(-1); }
+.pm-face-N { transform: rotate(-90deg); }
 
 .pm-star::after {
   content: "";
@@ -823,16 +861,20 @@ button:active {
 
 /* Animaux : grille d'animaux (mode Écouter) ou de choix (mode Devine) */
 .animal-grid {
+  --w: min(100cqw, 160cqh);
+  width: var(--w);
+  aspect-ratio: 1.6;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 8px;
 }
 
 .animal-grid.quiz {
+  --w: min(100cqw, 100cqh, 420px);
+  aspect-ratio: 1;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  max-width: 420px;
-  width: 100%;
-  margin: 0 auto;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
 }
 
 .animal-btn {
@@ -840,26 +882,28 @@ button:active {
   border-radius: 20px;
   background: var(--paper);
   box-shadow: 0 5px 0 var(--shadow);
-  padding: 10px 4px;
+  padding: 4px 2px;
+  min-width: 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  gap: 2px;
 }
 
 .animal-ico {
-  font-size: clamp(44px, 12vh, 70px);
+  font-size: calc(var(--w) / 4 * 0.5);
   line-height: 1;
 }
 
 .animal-name {
-  font-size: 18px;
+  font-size: clamp(13px, calc(var(--w) / 4 * 0.19), 18px);
   font-weight: bold;
 }
 
-.animal-grid.quiz .animal-btn {
-  aspect-ratio: 1;
-  justify-content: center;
+.animal-grid.quiz .animal-ico {
+  font-size: calc(var(--w) / 2 * 0.5);
 }
 
 .animal-btn.ok {
@@ -872,7 +916,7 @@ button:active {
 
 /* Puissance 4 : 7 colonnes, 6 lignes */
 .p4-wrap {
-  width: min(100%, 60vh);
+  width: min(100cqw, (100cqh - 40px) * 7 / 6);
   align-self: center;
   display: flex;
   flex-direction: column;
@@ -932,7 +976,7 @@ button:active {
 .game-help {
   margin: 0;
   text-align: center;
-  font-size: 18px;
+  font-size: clamp(15px, 4.6vw, 18px);
 }
 
 #shapes-help {
@@ -973,10 +1017,11 @@ button:active {
 }
 
 .intrus-grid {
-  flex: 1 1 auto;
+  width: min(100cqw, 100cqh);
+  aspect-ratio: 1;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  align-content: center;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
   gap: 14px;
 }
 
@@ -986,7 +1031,7 @@ button:active {
   border-radius: 22px;
   background: var(--paper);
   box-shadow: 0 5px 0 var(--shadow);
-  font-size: clamp(44px, 16vw, 72px);
+  font-size: calc(min(100cqw, 100cqh) * 0.2);
   line-height: 1;
 }
 
@@ -1023,7 +1068,7 @@ button:active {
   position: relative;
   width: min(72vw, 280px);
   aspect-ratio: 1;
-  margin: 8px auto;
+  margin: 2px auto;
 }
 
 .ring-svg {
@@ -1081,8 +1126,8 @@ button:active {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 6px 0;
+  gap: 6px;
+  padding: 0;
 }
 
 .mega-grid {
@@ -1095,8 +1140,8 @@ button:active {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 12px 4px;
+  gap: 2px;
+  padding: 7px 4px;
   border: none;
   border-radius: 18px;
   background: var(--paper);
@@ -1106,7 +1151,7 @@ button:active {
 }
 
 .mega-ico {
-  font-size: 28px;
+  font-size: 24px;
   line-height: 1;
 }
 
@@ -1118,10 +1163,11 @@ button:active {
 
 /* Bruits de pet : grille de cases et bouton au hasard */
 .farts-grid {
-  flex: 1 1 auto;
+  width: min(100cqw, 100cqh);
+  aspect-ratio: 1;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  align-content: center;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -1131,7 +1177,7 @@ button:active {
   border-radius: 22px;
   background: var(--paper);
   box-shadow: 0 5px 0 var(--shadow);
-  font-size: clamp(36px, 12vw, 56px);
+  font-size: calc(min(100cqw, 100cqh) * 0.14);
   line-height: 1;
 }
 
@@ -1207,10 +1253,16 @@ button:active {
   font-size: 19px;
 }
 
+/* Feuille de dessin : toujours au format 3:4 (portrait), la plus grande possible dans la place libre.
+   La forme ne dépend pas de l'écran, donc un dessin n'est jamais étiré d'un appareil à l'autre. */
+.fit-paper {
+  max-height: calc(100cqw * 4 / 3);
+}
+
 .paper {
-  flex: 1 1 auto;
-  min-height: 200px;
-  width: 100%;
+  width: min(100cqw, 100cqh * 3 / 4);
+  aspect-ratio: 3 / 4;
+  height: auto;
   display: block;
   background: #ffffff; /* le dessin reste sur fond blanc, même en thème sombre */
   border-radius: 20px;
@@ -1629,19 +1681,34 @@ audio {
 }
 
 .memory-moves {
-  font-size: 20px;
+  font-size: 14px;
   font-weight: bold;
+  white-space: nowrap;
+}
+
+.memory-bar .btn {
+  white-space: nowrap;
+  min-height: 40px;
+  font-size: 14px;
 }
 
 .memory-levels {
   margin: 0;
 }
 
+/* Memory : boutons de niveau plus petits (Puzzle et Labyrinthe gardent les leurs) */
+#memory-levels .seg-btn {
+  min-height: 34px;
+  /* Que des chiffres : police des chiffres, bien plus compacte que la cursive */
+  font-family: var(--font-digits);
+  font-size: 15px;
+}
+
 /* Grille toujours carrée, et assez petite pour tenir en entier à l'écran */
 .memory-board {
   --cols: 4;
   --rows: 4;
-  width: min(100%, calc((100dvh - 260px) * var(--cols) / var(--rows)));
+  width: min(100cqw, 100cqh * var(--cols) / var(--rows));
   aspect-ratio: var(--cols) / var(--rows);
   margin: 0 auto;
   display: grid;
@@ -1660,7 +1727,7 @@ audio {
   border: none;
   border-radius: 12px;
   background: #81d4fa;
-  font-size: calc(min(100vw - 40px, 100dvh - 260px) / max(var(--cols), var(--rows)) * 0.5);
+  font-size: calc(min(100cqw / var(--cols), 100cqh / var(--rows)) * 0.5);
   line-height: 1;
   box-shadow: 0 3px 0 rgba(0, 0, 0, 0.15);
 }
@@ -1669,6 +1736,11 @@ audio {
 .card-gap {
   width: 100%;
   height: 100%;
+}
+
+/* Carte cachée : point d'interrogation discret (les images retournées restent grandes) */
+.card:not(.up):not(.matched) {
+  font-size: calc(min(100cqw / var(--cols), 100cqh / var(--rows)) * 0.28);
 }
 
 .card.up {
@@ -1928,7 +2000,7 @@ html[data-voice="off"] .speak-btn {
 }
 
 .pin-key {
-  height: 60px;
+  height: min(60px, 9dvh);
   border: none;
   border-radius: 18px;
   background: var(--paper);
@@ -2135,6 +2207,28 @@ html[data-voice="off"] .speak-btn {
   width: 220px;
 }
 
+/* En-tête avec deux boutons à droite (Dessin : mes dessins + annuler).
+   Colonnes de même largeur à gauche et à droite : le titre reste centré. */
+.bar.bar-wide {
+  grid-template-columns: 98px 1fr 98px;
+}
+
+.bar-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+/* Le menu passe au-dessus des outils, et s'ouvre aligné à droite pour rester dans l'écran */
+.bar-actions .dropdown {
+  z-index: 20;
+}
+
+.bar-actions .dd-drawings {
+  left: auto;
+  right: 0;
+}
+
 .dd-drawings .draw-list {
   display: grid;
   grid-template-columns: repeat(3, 56px);
@@ -2225,7 +2319,8 @@ html[data-voice="off"] .speak-btn {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain; /* vignette entière, sans déformer le dessin */
+  background: #ffffff;
 }
 
 .thumb.selected {
@@ -2464,6 +2559,8 @@ html[data-voice="off"] .speak-btn {
 }
 
 .clock-wrap {
+  flex: 1 1 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2495,8 +2592,13 @@ html[data-voice="off"] .speak-btn {
   text-align: center;
 }
 
+.clock-wrap .fit {
+  align-self: stretch;
+  max-height: min(100cqw, 320px);
+}
+
 .analog {
-  width: min(84vw, 52vh, 320px);
+  width: min(100cqw, 100cqh, 320px);
   height: auto;
 }
 

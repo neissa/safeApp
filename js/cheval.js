@@ -133,7 +133,7 @@
     } else {
       // Une seule friandise à la fois : carotte (🥕) ou foin (🌾), au ras du sol ou en l'air (il faut sauter)
       const high = Math.random() < 0.5;
-      const y = high ? GROUND - 130 : GROUND - 35;
+      const y = high ? GROUND - 170 : GROUND - 35;
       const kind = Math.random() < 0.7 ? "carrot" : "hay";
       carrots.push({ x: W + 40, y, kind, taken: false });
     }
@@ -154,8 +154,9 @@
     speed = Math.min(8, 5 + dist / 2500);
     dist += speed;
 
-    // Galop : les pattes avancent tant que le cheval touche le sol
-    if (horse.y >= GROUND) runPhase += speed * 0.06;
+    // Galop : les pattes avancent tant que le cheval touche le sol. Une foulée = STRIDE pixels de course,
+    // donc un sabot posé recule exactement à la vitesse du sol (il ne glisse pas)
+    if (horse.y >= GROUND) runPhase += (speed * Math.PI * 2) / STRIDE;
 
     // Doigt maintenu pendant la montée : la pesanteur est plus faible, donc le saut monte plus haut et dure plus longtemps
     const soft = holding && horse.vy < 0 && airFrames < HOLD_MAX;
@@ -332,9 +333,28 @@
   const SOCK = "#f7f1e3"; // balzane blanche
   const HOOF = "#2b1d16";
   const MANE = "#2f1b0f";
-  const HIP_Y = -60; // hauteur de la hanche et de l'épaule
-  const UPPER = 31; // partie haute de la patte (hanche -> genou)
-  const LOWER = 29; // partie basse (genou -> sabot)
+  // ---------- Galop ----------
+  // runPhase avance de speed × 2π / STRIDE par image : une foulée complète = STRIDE pixels de course.
+  // Pendant l'appui, le sabot recule exactement de STRIDE × STANCE : il reste fixe sur le sol qui défile.
+  const STRIDE = 200; // longueur d'une foulée (px)
+  const STANCE = 0.32; // part de la foulée où le sabot touche le sol
+  const REACH = (STRIDE * STANCE) / 2; // demi-course du sabot posé
+  // Galop à gauche : postérieur droit, postérieur gauche, antérieur droit, antérieur gauche, puis suspension
+  // (pattes rassemblées sous le ventre). Le cheval regarde à droite : on voit son côté gauche (pattes « proches »).
+  const LEGS = {
+    rh: { hip: { x: -30, y: -58 }, front: false, phase: 0 },
+    lh: { hip: { x: -37, y: -58 }, front: false, phase: 0.12 },
+    rf: { hip: { x: 30, y: -54 }, front: true, phase: 0.38 },
+    lf: { hip: { x: 24, y: -54 }, front: true, phase: 0.5 },
+  };
+  const BODY_LIFT = 8; // le corps est porté au-dessus des hanches de base : pattes plus longues
+  // Les antérieurs se posent loin devant, les postérieurs poussent loin derrière
+  const LEG_CENTER = { front: 14, hind: -16 };
+  const LEG_LIFT = { front: 26, hind: 20 };
+  // Le haut de la patte (avant-bras, jambe) s'allonge quand la patte s'étend, comme l'épaule d'un cheval :
+  // longueur haute entre min et max, longueur basse (canon + paturon) fixe
+  const LEG_LEN = { front: { min: 28, max: 50, lower: 30 }, hind: { min: 32, max: 52, lower: 32 } };
+  const LEG_W = { front: [11, 7.5, 6], hind: [13, 8, 6] }; // largeur en haut, à l'articulation, au sabot
 
   // « flow » : 1 au repos, plus grand quand le cheval saute (la queue s'envole)
   function flowAmount() {
@@ -361,59 +381,100 @@
     }
   }
 
-  // Queue : deux mèches, une claire devant et une plus sombre derrière, pour du volume
-  function drawTail(flow) {
+  // Queue : deux mèches, une sombre derrière et une plus claire devant, pour du volume.
+  // droop : pente de la queue (grande au repos, faible au galop : la queue file vers l'arrière)
+  function drawTail(flow, droop) {
     const back = [];
     const front = [];
     for (let i = 0; i <= 8; i++) {
-      back.push({ x: -56 - i * 4.4, y: -78 + i * 4.6 });
-      front.push({ x: -58 - i * 4.6, y: -82 + i * 4.2 });
+      back.push({ x: -56 - i * 4.6, y: -78 + i * (droop + 0.4) });
+      front.push({ x: -58 - i * 4.8, y: -82 + i * droop });
     }
     strand(back, flow, 0.9, 13, 4, "#4a2a16");
     strand(front, flow, 0, 17, 5, MANE);
   }
 
-  // Angles des deux segments d'une patte (a : haut, b : bas), selon le galop ou la pose en l'air
-  function legAngles(ph, onGround, front) {
-    if (onGround) {
-      const th = runPhase + ph;
-      const a = 0.32 * Math.cos(th); // la patte avance, puis pousse vers l'arrière
-      const swing = Math.max(0, -Math.sin(th)); // 1 quand le sabot est au plus haut
-      // Devant, le canon se replie vers l'arrière (genou) ; derrière, le jarret replie le sabot vers l'avant
-      const fold = front ? -0.75 : 0.75;
-      return { a, b: a * 0.3 + fold * swing };
-    }
-    // En l'air (pose de saut) : pattes avant vers l'avant, pattes arrière vers l'arrière
-    return front ? { a: 1.0, b: 0.3 } : { a: -0.9, b: -0.6 };
+  // Où est le sabot pendant la foulée (p de 0 à 1), par rapport à la hanche
+  function hoofOffset(leg, p) {
+    const center = leg.front ? LEG_CENTER.front : LEG_CENTER.hind;
+    if (p < STANCE) return { dx: center + REACH - (2 * REACH * p) / STANCE, lift: 0 }; // posé : recule avec le sol
+    const q = (p - STANCE) / (1 - STANCE); // levé : revient vers l'avant en se repliant
+    const ease = q * q * (3 - 2 * q);
+    const lift = (leg.front ? LEG_LIFT.front : LEG_LIFT.hind) * Math.sin(Math.PI * q);
+    return { dx: center - REACH + 2 * REACH * ease, lift };
   }
 
-  // Une patte : hanche, genou, canon et sabot. Balzane blanche possible sur le canon.
-  function drawLeg(hx, ph, onGround, color, front, sock) {
-    const { a, b } = legAngles(ph, onGround, front);
-    const kneeX = hx + Math.sin(a) * UPPER;
-    const kneeY = HIP_Y + Math.cos(a) * UPPER;
-    const footX = kneeX + Math.sin(b) * LOWER;
-    const footY = kneeY + Math.cos(b) * LOWER;
-    ctx.lineCap = "round";
-    const seg = (x1, y1, x2, y2, w, col) => {
-      ctx.strokeStyle = col;
-      ctx.lineWidth = w;
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
+  // Cinématique inverse à deux segments : où se trouve le genou (ou le jarret) pour que le sabot soit en (bx, by).
+  // Devant, le genou pointe vers l'avant ; derrière, le jarret pointe vers l'arrière.
+  function solveLeg(ax, ay, bx, by, l1, l2, front) {
+    let dx = bx - ax;
+    let dy = by - ay;
+    let d = Math.hypot(dx, dy);
+    const max = l1 + l2 - 0.01;
+    if (d > max) {
+      // Trop loin : la patte est tendue, le sabot s'arrête au bout
+      bx = ax + (dx / d) * max;
+      by = ay + (dy / d) * max;
+      d = max;
+    }
+    d = Math.max(d, Math.abs(l1 - l2) + 0.01);
+    const base = Math.atan2(by - ay, bx - ax);
+    const cos = (l1 * l1 + d * d - l2 * l2) / (2 * l1 * d);
+    const a = Math.acos(Math.max(-1, Math.min(1, cos)));
+    const ang = front ? base - a : base + a;
+    return { kx: ax + Math.cos(ang) * l1, ky: ay + Math.sin(ang) * l1, fx: bx, fy: by };
+  }
+
+  // Segment effilé (largeur w1 au début, w2 à la fin)
+  function taper(x1, y1, w1, x2, y2, w2) {
+    const len = Math.hypot(x2 - x1, y2 - y1) || 1;
+    const nx = -(y2 - y1) / len;
+    const ny = (x2 - x1) / len;
+    ctx.beginPath();
+    ctx.moveTo(x1 + (nx * w1) / 2, y1 + (ny * w1) / 2);
+    ctx.lineTo(x2 + (nx * w2) / 2, y2 + (ny * w2) / 2);
+    ctx.lineTo(x2 - (nx * w2) / 2, y2 - (ny * w2) / 2);
+    ctx.lineTo(x1 - (nx * w1) / 2, y1 - (ny * w1) / 2);
+    ctx.closePath();
+  }
+
+  function disc(x, y, r) {
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+  }
+
+  // Une patte complète : hanche (hx, hy), sabot visé (tx, ty). Contour foncé, puis couleur.
+  function drawLeg(leg, hx, hy, tx, ty, color, sock) {
+    const len = leg.front ? LEG_LEN.front : LEG_LEN.hind;
+    const w = leg.front ? LEG_W.front : LEG_W.hind;
+    // Patte presque tendue quand le sabot est loin, repliée quand il est près (sabot levé)
+    const d = Math.hypot(tx - hx, ty - hy);
+    const upper = Math.max(len.min, Math.min(len.max, d / 0.97 - len.lower));
+    const j = solveLeg(hx, hy, tx, ty, upper, len.lower, leg.front);
+    const shapes = [
+      [() => taper(hx, hy, w[0], j.kx, j.ky, w[1]), color],
+      [() => disc(j.kx, j.ky, w[1] / 2 + 0.5), color],
+      [() => taper(j.kx, j.ky, w[1] - 1, j.fx, j.fy - 4, w[2]), sock ? SOCK : color],
+    ];
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = OUT;
+    ctx.lineWidth = 3.5;
+    shapes.forEach(([build]) => {
+      build();
       ctx.stroke();
-    };
-    seg(hx, HIP_Y, kneeX, kneeY, 13, OUT); // contour du haut de la patte
-    seg(hx, HIP_Y, kneeX, kneeY, 9, color);
-    seg(kneeX, kneeY, footX, footY, 10.5, OUT); // contour du canon, plus fin
-    seg(kneeX, kneeY, footX, footY, 7, sock ? SOCK : color);
-    // Sabot
+    });
+    shapes.forEach(([build, col]) => {
+      build();
+      ctx.fillStyle = col;
+      ctx.fill();
+    });
+    // Sabot, posé à plat
     ctx.fillStyle = HOOF;
     ctx.beginPath();
-    ctx.moveTo(footX - 6, footY);
-    ctx.lineTo(footX + 6, footY);
-    ctx.lineTo(footX + 5, footY - 7);
-    ctx.lineTo(footX - 5, footY - 7);
+    ctx.moveTo(j.fx - 5.5, j.fy);
+    ctx.lineTo(j.fx + 6.5, j.fy);
+    ctx.lineTo(j.fx + 4.5, j.fy - 7);
+    ctx.lineTo(j.fx - 4.5, j.fy - 7);
     ctx.closePath();
     ctx.fill();
   }
@@ -432,32 +493,75 @@
   }
 
   function pathNeck() {
+    ctx.save();
+    neckSpace();
     ctx.beginPath();
     ctx.moveTo(6, -94);
-    ctx.bezierCurveTo(22, -118, 40, -134, 58, -142); // dessus de l'encolure, jusqu'à la nuque
-    ctx.lineTo(72, -136);
-    ctx.bezierCurveTo(62, -116, 50, -98, 40, -70); // dessous de l'encolure
+    ctx.bezierCurveTo(24, -120, 44, -140, 60, -148); // dessus de l'encolure, jusqu'à la nuque
+    const throat = headPoint(66, -122); // gorge : sous la joue, suit la taille de la tête
+    ctx.lineTo(throat.x, throat.y);
+    ctx.bezierCurveTo(50, -120, 40, -100, 34, -80); // dessous de l'encolure : cou fin, base plus large
     ctx.lineTo(24, -74);
+    ctx.closePath();
+    ctx.restore();
+  }
+
+  // Tête : dessinée dans son propre repère (nuque en 56, -142), puis réduite et placée au bout de l'encolure.
+  // Une tête de cheval est longue et fine, nettement plus petite que le corps.
+  const HEAD_POLL = { x: 60, y: -148 }; // nuque, au bout de l'encolure
+  const HEAD_SCALE = 0.64;
+  // Un point du repère de la tête, ramené sur le cheval
+  function headPoint(x, y) {
+    return { x: HEAD_POLL.x + (x - 56) * HEAD_SCALE, y: HEAD_POLL.y + (y + 142) * HEAD_SCALE };
+  }
+  // Encolure : elle pivote autour de sa base (vers l'avant pendant la course, comme un cheval qui s'étire)
+  const NECK_BASE = { x: 22, y: -84 };
+  let neckTilt = 0; // angle en radians, réglé à chaque image par drawHorse
+  function neckSpace() {
+    ctx.translate(NECK_BASE.x, NECK_BASE.y);
+    ctx.rotate(neckTilt);
+    ctx.translate(-NECK_BASE.x, -NECK_BASE.y);
+  }
+
+  function headSpace() {
+    ctx.translate(HEAD_POLL.x, HEAD_POLL.y);
+    ctx.rotate(-neckTilt * 0.75); // la tête se redresse : le nez reste dirigé vers l'avant
+    ctx.scale(HEAD_SCALE, HEAD_SCALE);
+    ctx.translate(-56, 142);
+  }
+
+  // Contour de la tête, dans le repère de la tête
+  function headOutline() {
+    ctx.beginPath();
+    ctx.moveTo(56, -142); // front, à la nuque
+    ctx.bezierCurveTo(72, -146, 92, -126, 104, -108); // chanfrein, long
+    ctx.bezierCurveTo(110, -100, 108, -92, 101, -90); // bout du nez
+    ctx.bezierCurveTo(94, -90, 86, -94, 80, -100); // mâchoire
+    ctx.bezierCurveTo(72, -108, 66, -116, 64, -126); // joue, fine
+    ctx.bezierCurveTo(62, -134, 60, -139, 56, -142);
     ctx.closePath();
   }
 
+  // Chemins placés sur le cheval (repères appliqués seulement pendant la construction :
+  // le contour garde la même épaisseur que le reste du corps)
   function pathHead() {
-    ctx.beginPath();
-    ctx.moveTo(56, -142); // front, à la nuque
-    ctx.bezierCurveTo(74, -144, 90, -128, 100, -114); // chanfrein
-    ctx.bezierCurveTo(106, -106, 106, -96, 100, -92); // naseaux
-    ctx.bezierCurveTo(92, -90, 84, -92, 78, -98); // mâchoire
-    ctx.bezierCurveTo(70, -104, 64, -114, 66, -126); // joue
-    ctx.bezierCurveTo(64, -134, 60, -138, 56, -142);
-    ctx.closePath();
+    ctx.save();
+    neckSpace();
+    headSpace();
+    headOutline();
+    ctx.restore();
   }
 
   function pathEar() {
+    ctx.save();
+    neckSpace();
+    headSpace();
     ctx.beginPath();
     ctx.moveTo(54, -140);
-    ctx.lineTo(50, -160);
-    ctx.lineTo(63, -146);
+    ctx.lineTo(51, -158);
+    ctx.lineTo(62, -145);
     ctx.closePath();
+    ctx.restore();
   }
 
   // Dessine plusieurs formes comme une seule silhouette : contours d'abord, couleur ensuite
@@ -504,9 +608,9 @@
 
   // Crinière : trois mèches fixes qui suivent l'encolure
   const MANE_STRANDS = [
-    [[58, -140], [44, -146], [30, -138], [20, -124], [12, -110], [6, -96]],
-    [[54, -132], [40, -136], [28, -126], [18, -112], [12, -98]],
-    [[48, -122], [34, -126], [22, -114], [14, -102]],
+    [[60, -152], [48, -150], [34, -138], [20, -122], [10, -106], [5, -95]],
+    [[56, -145], [44, -143], [31, -131], [19, -115], [11, -100]],
+    [[50, -139], [38, -136], [26, -124], [16, -108]],
   ];
 
   // Ligne courbe qui passe par plusieurs points
@@ -527,72 +631,121 @@
   }
 
   function drawMane() {
+    ctx.save();
+    neckSpace();
     MANE_STRANDS.forEach((pts) => curveThrough(pts, 9, OUT));
     MANE_STRANDS.forEach((pts) => curveThrough(pts, 6, MANE));
+    ctx.restore();
   }
 
   // Visage : balzane blanche sur le front, museau clair, naseau, œil avec reflet
   function drawFace() {
     ctx.save();
-    pathHead();
+    neckSpace();
+    headSpace(); // tout le visage est dans le repère de la tête
+    ctx.save();
+    headOutline();
     ctx.clip();
     ctx.strokeStyle = "#fbf7ee";
     ctx.lineWidth = 5;
     ctx.lineCap = "round";
     ctx.beginPath();
-    ctx.moveTo(70, -141);
-    ctx.quadraticCurveTo(84, -128, 98, -108);
+    ctx.moveTo(70, -143);
+    ctx.quadraticCurveTo(86, -128, 101, -104);
     ctx.stroke();
     ctx.restore();
 
     ctx.fillStyle = "rgba(240, 200, 150, 0.6)";
     ctx.beginPath();
-    ctx.ellipse(95, -101, 8, 6, -0.4, 0, Math.PI * 2);
+    ctx.ellipse(98, -98, 8, 6, -0.6, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.fillStyle = "#4a2c1a";
     ctx.beginPath();
-    ctx.ellipse(100, -102, 2.2, 3, 0, 0, Math.PI * 2);
+    ctx.ellipse(103, -99, 2.2, 3, -0.3, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.strokeStyle = BODY_DARK;
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.arc(73, -131, 5, 3.6, 5.6);
+    ctx.arc(72, -132, 5, 3.6, 5.6);
     ctx.stroke();
     ctx.fillStyle = "#1d120b";
     ctx.beginPath();
-    ctx.ellipse(73, -127, 3.2, 3.6, 0, 0, Math.PI * 2);
+    ctx.ellipse(72, -128, 3.4, 3.8, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.fillStyle = "#ffffff";
     ctx.beginPath();
-    ctx.arc(74, -128.4, 1.1, 0, Math.PI * 2);
+    ctx.arc(73, -129.4, 1.2, 0, Math.PI * 2);
     ctx.fill();
+    ctx.restore();
   }
 
   // Cheval complet. (ox, oy) = point entre les sabots, au niveau du sol
   function drawHorse(ox, oy) {
     const onGround = oy >= GROUND;
-    const bob = onGround ? -Math.abs(Math.sin(runPhase)) * 3 : 0;
+    const running = onGround && state === "play";
+    const p = (((runPhase / (Math.PI * 2)) % 1) + 1) % 1; // position dans la foulée, de 0 à 1
+    // Le corps monte pendant la suspension (vers p = 0,92) et bascule : avant relevé quand les postérieurs poussent
+    const bob = running ? -3 * Math.cos(Math.PI * 2 * (p - 0.92)) - 0.5 : 0;
+    const rot = running ? -0.05 * Math.sin(Math.PI * 2 * p) : onGround ? 0 : -0.06;
+    // Encolure tendue vers l'avant au galop (elle descend un peu quand les antérieurs se posent)
+    neckTilt = running ? 0.34 + 0.07 * Math.sin(Math.PI * 2 * (p - 0.3)) : onGround ? 0 : 0.2;
     const flow = flowAmount();
+    const cr = Math.cos(rot);
+    const sr = Math.sin(rot);
+
     ctx.save();
-    ctx.translate(ox, oy + bob);
-    // Léger tangage pendant le galop, cabré en l'air
-    ctx.rotate(onGround ? Math.sin(runPhase * 2) * 0.025 : -0.06);
+    ctx.translate(ox, oy);
 
-    drawTail(flow);
+    // Position de chaque hanche (le corps a bougé) et du sabot visé
+    const place = (key) => {
+      const leg = LEGS[key];
+      const hx = leg.hip.x * cr - leg.hip.y * sr;
+      const hy = leg.hip.x * sr + leg.hip.y * cr + bob - BODY_LIFT;
+      let tx;
+      let ty;
+      if (running) {
+        const o = hoofOffset(leg, (p - leg.phase + 1) % 1);
+        tx = hx + o.dx;
+        ty = -o.lift;
+      } else if (onGround) {
+        tx = hx + (leg.front ? 2 : 4); // debout : sabots sous les hanches, jarret un peu plié
+        ty = 0;
+      } else if (leg.front) {
+        tx = hx + 18; // en l'air : antérieurs repliés vers l'avant
+        ty = hy + 32;
+      } else {
+        tx = hx - 30; // postérieurs tendus vers l'arrière
+        ty = hy + 42;
+      }
+      return { leg, hx, hy, tx, ty };
+    };
+    const body = (fn) => {
+      ctx.save();
+      ctx.translate(0, bob - BODY_LIFT);
+      ctx.rotate(rot);
+      fn();
+      ctx.restore();
+    };
+    const leg = (key, color, sock) => {
+      const l = place(key);
+      drawLeg(l.leg, l.hx, l.hy, l.tx, l.ty, color, sock);
+    };
+
+    body(() => drawTail(flow, running ? 1.6 : onGround ? 4.2 : 2.4));
     // Membres du côté éloigné : derrière le corps
-    drawLeg(-46, 4.4, onGround, BODY_DARK, false, false);
-    drawLeg(22, 0, onGround, BODY_DARK, true, false);
-
-    paintShapes([pathTorso, pathNeck, pathHead, pathEar], BODY);
-    shadeBody();
-    drawMane();
-    drawFace();
-
+    leg("rh", BODY_DARK, false);
+    leg("rf", BODY_DARK, false);
+    body(() => {
+      paintShapes([pathTorso, pathNeck, pathHead, pathEar], BODY);
+      shadeBody();
+      drawMane();
+      drawFace();
+    });
     // Membres du côté proche : devant le corps
-    drawLeg(-36, 3.1, onGround, BODY, false, false);
-    drawLeg(34, 1.3, onGround, BODY, true, true);
+    leg("lh", BODY, false);
+    leg("lf", BODY, true);
     ctx.restore();
   }
 

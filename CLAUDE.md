@@ -38,6 +38,11 @@ Si on modifie quelque chose après le script, relancer le script avant le commit
 3. Dans `css/style.css`, une couleur `.t-<nom> { background: #…; }`.
 4. Les statistiques de lancement et la case du menu parent sont automatiques.
 
+## Composants communs
+
+- Croix de direction (jeux) : mettre une boîte vide `<div class="dpad"></div>` dans l'écran, puis appeler `KA.pad(root, onDir, { swipe: plateau })` (voir `js/pad.js`). `onDir` reçoit `"up"`, `"down"`, `"left"` ou `"right"`. Le composant gère les boutons, les flèches du clavier (seulement quand l'écran est affiché) et le glissement du doigt : ne pas refaire ces gestionnaires dans le jeu.
+- Plateau qui doit tenir à l'écran : l'envelopper dans `<div class="fit">…</div>` et le dimensionner avec `min(100cqw, 100cqh)` (voir `.fit` dans `css/style.css`).
+
 ## Autres fichiers
 
 - Un nouveau type de fichier (par exemple `.wav`) doit être ajouté à `EXT` dans `tools/update-cache.js`, sinon il n'est pas mis hors ligne.

@@ -304,33 +304,15 @@
         if (st.running) pause();
         else start();
       });
-      ["up", "down", "left", "right"].forEach((name) => {
-        root.querySelector("#snake-" + name).addEventListener("click", () => steer(name));
-      });
-
-      // Glisser le doigt sur le terrain
-      let touch = null;
-      canvas.addEventListener("touchstart", (e) => {
-        const t = e.touches[0];
-        touch = { x: t.clientX, y: t.clientY };
-      });
-      canvas.addEventListener("touchend", (e) => {
-        if (!touch) return;
-        const t = e.changedTouches[0];
-        const dx = t.clientX - touch.x;
-        const dy = t.clientY - touch.y;
-        touch = null;
-        if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return;
-        if (Math.abs(dx) > Math.abs(dy)) steer(dx > 0 ? "right" : "left");
-        else steer(dy > 0 ? "down" : "up");
-      });
+      // Croix de direction, flèches du clavier et glissement du doigt sur le terrain (js/pad.js)
+      KA.pad(root, steer, { swipe: canvas });
     },
     leave() {
       pause();
     },
   };
 
-  // Flèches du clavier (ordinateur)
+  // Barre d'espace (ordinateur) : pause ou reprise. Les flèches sont gérées par js/pad.js.
   document.addEventListener("keydown", (e) => {
     const screen = document.getElementById("screen-snake");
     if (!screen || !screen.classList.contains("active")) return;
@@ -339,12 +321,6 @@
       e.preventDefault();
       if (st.running) pause();
       else start();
-      return;
-    }
-    const map = { ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right" };
-    if (map[e.key]) {
-      e.preventDefault();
-      steer(map[e.key]);
     }
   });
 })();

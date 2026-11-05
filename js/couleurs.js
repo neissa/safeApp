@@ -30,12 +30,13 @@
     return arr;
   }
 
-  function ask() {
+  // Affiche la consigne ; la dit à voix haute sauf au démarrage de l'appli (écran pas encore ouvert)
+  function ask(silent) {
     promptEl.textContent = "Touche " + target.art + target.name + " !";
-    KA.speak("Touche " + target.art + target.name + " !");
+    if (!silent) KA.speak("Touche " + target.art + target.name + " !");
   }
 
-  function newRound() {
+  function newRound(silent) {
     clearTimeout(nextTimer);
     busy = false;
     const options = shuffle(COLORS.slice()).slice(0, CHOICES);
@@ -50,7 +51,7 @@
       choicesEl.appendChild(b);
     });
     msgEl.textContent = "";
-    ask();
+    ask(silent === true);
   }
 
   function answer(btn, ok) {
@@ -77,12 +78,14 @@
       root.querySelector("#color-again").addEventListener("click", () => {
         if (target) KA.speak("Touche " + target.art + target.name + " !");
       });
-      root.querySelector("#color-new").addEventListener("click", newRound);
-      newRound();
+      root.querySelector("#color-new").addEventListener("click", () => newRound());
+      newRound(true); // première question préparée sans la dire : l'écran n'est pas encore ouvert
     },
     enter() {
-      // Une nouvelle question à chaque ouverture, si la précédente est terminée
+      // À chaque ouverture, la consigne est dite : nouvelle question si la précédente est terminée,
+      // sinon la même question est répétée
       if (busy) newRound();
+      else ask();
     },
     leave() {
       clearTimeout(nextTimer);

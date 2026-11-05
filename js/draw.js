@@ -90,7 +90,17 @@
     ctx.restore();
   }
 
-  // Adapte la résolution du canvas à sa taille affichée, en conservant le dessin
+  // Dessine une image entière dans la feuille, sans la déformer : mise à l'échelle et centrée
+  // (bords blancs si l'image n'a pas la même forme, par exemple un ancien dessin)
+  function drawContain(src, sw, sh) {
+    if (!sw || !sh) return;
+    const s = Math.min(canvas.width / sw, canvas.height / sh);
+    const dw = sw * s;
+    const dh = sh * s;
+    ctx.drawImage(src, (canvas.width - dw) / 2, (canvas.height - dh) / 2, dw, dh);
+  }
+
+  // Adapte la résolution du canvas à sa taille affichée, en conservant le dessin (mis à l'échelle)
   function resize() {
     const rect = canvas.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
@@ -110,7 +120,7 @@
     canvas.height = h;
     clearHistory(); // les anciennes images n'ont plus la bonne taille
     fillWhite();
-    if (snapshot.width) ctx.drawImage(snapshot, 0, 0);
+    if (snapshot.width) drawContain(snapshot, snapshot.width, snapshot.height);
     applyBrush();
   }
 
@@ -322,7 +332,7 @@
     const url = URL.createObjectURL(blob);
     img.onload = () => {
       fillWhite();
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      drawContain(img, img.naturalWidth, img.naturalHeight);
       URL.revokeObjectURL(url);
     };
     img.src = url;

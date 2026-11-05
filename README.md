@@ -35,10 +35,10 @@ L'application est une page web statique en français. Elle s'installe comme une 
 | 🔴 **Puissance 4** | Aligner quatre jetons, à deux sur le même écran. |
 | 🔤 **Alphabet** | Toucher une lettre : on entend la lettre, puis un mot qui commence par elle (« A comme avion »), et on voit son image. |
 | 🧩 **Puzzle** | Remettre l'image en place : on touche deux morceaux pour les échanger. 2 × 2 ou 3 × 3. |
-| 🗺️ **Labyrinthe** | Guider le poussin 🐣 jusqu'au drapeau 🏁. 5 × 5, 7 × 7 ou 9 × 9, avec les flèches à l'écran ou au clavier. |
+| 🗺️ **Labyrinthe** | Guider le poussin 🐣 jusqu'au drapeau 🏁. 5 × 5, 7 × 7 ou 9 × 9, avec les flèches à l'écran, au clavier ou en glissant le doigt. |
 | 🌘 **Ombres** | Retrouver l'ombre noire qui correspond à l'image en couleur. |
 | 🐶 **Animaux** | Écouter le cri de chaque animal, ou deviner l'animal au cri. Sons libres de droits (voir `sounds/animaux/LICENCES.txt`). |
-| 🟡 **Pac-Man** | Manger les étoiles du labyrinthe en évitant le fantôme. Trois vies, version douce pour les petits. |
+| 🟡 **Pac-Man** | Manger les étoiles du labyrinthe en évitant le fantôme, avec les flèches à l'écran, au clavier ou en glissant le doigt. Trois vies, version douce pour les petits. |
 | 🐴 **Cheval** | Jeu de plateforme qui défile : le cheval mange carottes et foin, et saute les obstacles de CSO. Garder le doigt sur le bouton fait sauter plus loin. |
 | 🔴 **Couleurs** | La voix demande une couleur : on touche la bonne case parmi quatre. |
 | 🌧️ **Bruits doux** | Bruit blanc, pluie, orage, vagues, vent ou feu de bois, fabriqués par l'appareil. Un seul son à la fois, avec un minuteur de sommeil de 15 min, 30 min ou 1 h. |

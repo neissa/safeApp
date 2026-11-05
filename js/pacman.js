@@ -1,6 +1,6 @@
 /* Panneau Pac-Man, version douce pour les petits : on mange toutes les étoiles ⭐ du labyrinthe.
    Le fantôme 👻 bouge lentement. Trois vies ❤️ : un contact avec le fantôme fait perdre une vie,
-   et on repart de la case de départ. Les flèches à l'écran (ou du clavier) dirigent 🟡. */
+   et on repart de la case de départ. Les flèches à l'écran (ou du clavier) dirigent Pac-Man. */
 (function () {
   "use strict";
 
@@ -35,7 +35,7 @@
     W: { dx: -1, dy: 0 },
   };
   const OPPOSITE = { N: "S", S: "N", E: "W", W: "E" };
-  const KEYS = { ArrowUp: "N", ArrowDown: "S", ArrowLeft: "W", ArrowRight: "E" };
+  const PAD_DIRS = { up: "N", down: "S", left: "W", right: "E" }; // directions de js/pad.js
 
   let board = null;
   let livesEl = null;
@@ -46,6 +46,7 @@
   let player = { x: 0, y: 0 };
   let dir = null; // direction actuelle du joueur (nom N/S/E/W) ou null
   let want = null; // direction demandée par l'enfant, appliquée dès que possible
+  let facing = "E"; // côté vers lequel Pac-Man ouvre la bouche
   let ghosts = [];
   let lives = LIVES_START;
   let timer = null;
@@ -66,6 +67,7 @@
     player = { x: PLAYER_START.x, y: PLAYER_START.y };
     dir = null;
     want = null;
+    facing = "E";
     ghosts = GHOST_STARTS.map((g) => ({ x: g.x, y: g.y, dir: "W" }));
   }
 
@@ -95,7 +97,13 @@
         if (isWall(x, y)) cls += " pm-wall";
         else if (stars.has(key(x, y))) cls += " pm-star";
         div.className = cls;
-        if (x === player.x && y === player.y) div.textContent = "🟡";
+        if (x === player.x && y === player.y) {
+          // Pac-Man : la bouche s'ouvre et se ferme à chaque pas (ouverte à l'arrêt)
+          const pac = document.createElement("span");
+          const open = !started || tickN % 2 === 0;
+          pac.className = "pm-pac pm-face-" + facing + (open ? " open" : "");
+          div.appendChild(pac);
+        }
         else if (ghosts.some((g) => g.x === x && g.y === y)) div.textContent = "👻";
         board.appendChild(div);
       }
@@ -158,6 +166,7 @@
     tickN += 1;
     // Le joueur : prend la direction demandée si c'est possible, sinon continue
     if (want && canGo(player.x, player.y, want)) dir = want;
+    if (dir) facing = dir;
     if (dir && canGo(player.x, player.y, dir)) {
       player.x += DIRS[dir].dx;
       player.y += DIRS[dir].dy;
@@ -201,22 +210,13 @@
     }
   }
 
-  function onKey(e) {
-    if (KEYS[e.key]) {
-      e.preventDefault();
-      press(KEYS[e.key]);
-    }
-  }
-
   KA.panels.pacman = {
     init(root) {
       board = root.querySelector("#pm-board");
       livesEl = root.querySelector("#pm-lives");
       starsEl = root.querySelector("#pm-stars");
-      root.querySelector("#pm-up").addEventListener("click", () => press("N"));
-      root.querySelector("#pm-down").addEventListener("click", () => press("S"));
-      root.querySelector("#pm-left").addEventListener("click", () => press("W"));
-      root.querySelector("#pm-right").addEventListener("click", () => press("E"));
+      // Croix de direction, flèches du clavier et glissement du doigt sur le plateau (js/pad.js)
+      KA.pad(root, (d) => press(PAD_DIRS[d]), { swipe: board });
       root.querySelector("#pm-new").addEventListener("click", () => {
         stop();
         clearTimeout(resetTimer);
@@ -227,14 +227,12 @@
     },
     enter() {
       active = true;
-      document.addEventListener("keydown", onKey);
     },
     leave() {
       active = false;
       stop();
       clearTimeout(resetTimer);
       resetTimer = null;
-      document.removeEventListener("keydown", onKey);
       newGame();
     },
   };
