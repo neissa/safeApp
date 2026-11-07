@@ -345,7 +345,8 @@ button:active {
 }
 
 /* Menu de vitesse (à côté du bouton pause) : icône seule sur le bouton, icône et nom dans le menu */
-.dd-speed {
+/* Aligné sur le bord droit du bouton : le menu reste dans l'écran (sélecteur renforcé pour passer après .dd-menu) */
+.dd-menu.dd-speed {
   left: auto;
   right: 0;
   width: 150px;
@@ -394,16 +395,7 @@ button:active {
   max-height: min(100cqw, 420px);
 }
 
-/* Le terrain prend toute la place disponible, en restant carré */
-.snake-board {
-  flex: 1 1 auto;
-  min-height: 0;
-  container-type: size;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
+/* Le terrain (dans la zone « fit ») prend la plus petite place possible en restant carré */
 .snake-canvas {
   display: block;
   width: min(100cqw, 100cqh);
