@@ -344,24 +344,24 @@ button:active {
   font-weight: bold;
 }
 
-/* Choix de la vitesse : trois boutons, celui du réglage actuel est surligné */
-.snake-speed {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
+/* Menu de vitesse (à côté du bouton pause) : icône seule sur le bouton, icône et nom dans le menu */
+.dd-speed {
+  left: auto;
+  right: 0;
+  width: 150px;
 }
 
-.snake-speed-btn {
-  min-height: 44px;
+.snake-speed-opt {
+  min-height: 42px;
   border: none;
-  border-radius: 16px;
+  border-radius: 14px;
   background: var(--paper);
   font-size: 16px;
   font-weight: bold;
   box-shadow: 0 3px 0 var(--shadow);
 }
 
-.snake-speed-btn.on {
+.snake-speed-opt.on {
   background: #ffe082;
   outline: 3px solid #ffb300;
   outline-offset: 2px;

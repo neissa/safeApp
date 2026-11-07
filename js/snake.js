@@ -8,9 +8,9 @@
   const N = 14; // cases par côté
   // Vitesses : délai en ms entre deux déplacements (« moyen » = l'ancienne vitesse)
   const SPEEDS = {
-    slow: { ms: 380, label: "🐢 Lent" },
-    mid: { ms: 260, label: "🙂 Moyen" },
-    fast: { ms: 150, label: "🐇 Rapide" },
+    slow: { ms: 380, icon: "🐢", label: "Lent" },
+    mid: { ms: 260, icon: "🙂", label: "Moyen" },
+    fast: { ms: 150, icon: "🐇", label: "Rapide" },
   };
   const DIRS = {
     up: { x: 0, y: -1 },
@@ -35,7 +35,9 @@
   let scoreEl = null;
   let bestEl = null;
   let startBtn = null;
-  let speedBtns = [];
+  let speedBtn = null; // bouton du menu (icône seule)
+  let speedOpts = []; // choix du menu (icône et nom)
+  let speedMenu = null;
 
   // Bouton Jouer / Pause (en haut à droite) : icône et nom accessible
   function setBtn(icon, label) {
@@ -51,17 +53,25 @@
 
   function showSpeed() {
     const current = speed();
-    speedBtns.forEach((b) => {
+    speedBtn.querySelector("span").textContent = SPEEDS[current].icon;
+    speedBtn.setAttribute("aria-label", "Vitesse : " + SPEEDS[current].label);
+    speedOpts.forEach((b) => {
       const on = b.dataset.speed === current;
       b.classList.toggle("on", on);
       b.setAttribute("aria-pressed", on ? "true" : "false");
     });
   }
 
+  function closeSpeedMenu() {
+    speedMenu.hidden = true;
+    speedBtn.setAttribute("aria-expanded", "false");
+  }
+
   // Changer de vitesse : pris en compte tout de suite si la partie tourne
   function setSpeed(name) {
     KA.settings.set("snakeSpeed", name);
     showSpeed();
+    closeSpeedMenu();
     if (st.running) {
       stop();
       st.timer = setInterval(step, SPEEDS[name].ms);
@@ -328,7 +338,9 @@
       scoreEl = root.querySelector("#snake-score");
       bestEl = root.querySelector("#snake-best");
       startBtn = root.querySelector("#snake-start");
-      speedBtns = Array.from(root.querySelectorAll("[data-speed]"));
+      speedBtn = root.querySelector("#snake-speed-btn");
+      speedMenu = root.querySelector("#snake-speed-menu");
+      speedOpts = Array.from(speedMenu.querySelectorAll("[data-speed]"));
       showBest();
       showSpeed();
       reset();
@@ -337,7 +349,18 @@
         if (st.running) pause();
         else start();
       });
-      speedBtns.forEach((b) => b.addEventListener("click", () => setSpeed(b.dataset.speed)));
+      // Ouvre ou ferme le menu de vitesse ; un choix change la vitesse
+      speedBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const open = speedMenu.hidden;
+        speedMenu.hidden = !open;
+        speedBtn.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+      speedOpts.forEach((b) => b.addEventListener("click", () => setSpeed(b.dataset.speed)));
+      // Un appui ailleurs referme le menu
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest || !e.target.closest(".dropdown")) closeSpeedMenu();
+      });
       // Croix de direction, flèches du clavier et glissement du doigt sur le terrain (js/pad.js)
       KA.pad(root, steer, { swipe: canvas });
     },
