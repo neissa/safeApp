@@ -344,6 +344,29 @@ button:active {
   font-weight: bold;
 }
 
+/* Choix de la vitesse : trois boutons, celui du réglage actuel est surligné */
+.snake-speed {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.snake-speed-btn {
+  min-height: 44px;
+  border: none;
+  border-radius: 16px;
+  background: var(--paper);
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0 3px 0 var(--shadow);
+}
+
+.snake-speed-btn.on {
+  background: #ffe082;
+  outline: 3px solid #ffb300;
+  outline-offset: 2px;
+}
+
 /* Zone « fit » : elle prend la hauteur qui reste dans l'écran. Le plateau placé dedans se règle
    sur la plus petite des deux dimensions (cqw, cqh) : il tient en entier, même sur un écran de 350 × 582. */
 .fit {

@@ -6,7 +6,12 @@
 
   const KA = window.KA;
   const N = 14; // cases par côté
-  const TICK = 260; // ms entre deux déplacements (assez lent pour les petits)
+  // Vitesses : délai en ms entre deux déplacements (« moyen » = l'ancienne vitesse)
+  const SPEEDS = {
+    slow: { ms: 380, label: "🐢 Lent" },
+    mid: { ms: 260, label: "🙂 Moyen" },
+    fast: { ms: 150, label: "🐇 Rapide" },
+  };
   const DIRS = {
     up: { x: 0, y: -1 },
     down: { x: 0, y: 1 },
@@ -30,11 +35,37 @@
   let scoreEl = null;
   let bestEl = null;
   let startBtn = null;
+  let speedBtns = [];
 
   // Bouton Jouer / Pause (en haut à droite) : icône et nom accessible
   function setBtn(icon, label) {
     startBtn.textContent = icon;
     startBtn.setAttribute("aria-label", label);
+  }
+
+  // Vitesse choisie (mémorisée sur l'appareil) : lent, moyen ou rapide
+  function speed() {
+    const name = KA.settings.get("snakeSpeed", "mid");
+    return SPEEDS[name] ? name : "mid";
+  }
+
+  function showSpeed() {
+    const current = speed();
+    speedBtns.forEach((b) => {
+      const on = b.dataset.speed === current;
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+
+  // Changer de vitesse : pris en compte tout de suite si la partie tourne
+  function setSpeed(name) {
+    KA.settings.set("snakeSpeed", name);
+    showSpeed();
+    if (st.running) {
+      stop();
+      st.timer = setInterval(step, SPEEDS[name].ms);
+    }
   }
 
   function best() {
@@ -264,7 +295,7 @@
     st.running = true;
     setBtn("⏸️", "Pause");
     stop();
-    st.timer = setInterval(step, TICK);
+    st.timer = setInterval(step, SPEEDS[speed()].ms);
   }
 
   function pause() {
@@ -297,13 +328,16 @@
       scoreEl = root.querySelector("#snake-score");
       bestEl = root.querySelector("#snake-best");
       startBtn = root.querySelector("#snake-start");
+      speedBtns = Array.from(root.querySelectorAll("[data-speed]"));
       showBest();
+      showSpeed();
       reset();
 
       startBtn.addEventListener("click", () => {
         if (st.running) pause();
         else start();
       });
+      speedBtns.forEach((b) => b.addEventListener("click", () => setSpeed(b.dataset.speed)));
       // Croix de direction, flèches du clavier et glissement du doigt sur le terrain (js/pad.js)
       KA.pad(root, steer, { swipe: canvas });
     },

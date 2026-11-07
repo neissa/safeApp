@@ -27,7 +27,7 @@ L'application est une page web statique en français. Elle s'installe comme une 
 | ⏱️ **Minuteur** | Compte à rebours avec durées rapides (1 min, 5 min, 10 min, 30 min, 1 h) et anneau qui se vide. Continue si l'on change d'activité. À la fin : alarme et annonce vocale. |
 | 🔶 **Formes** | Toucher la forme demandée à voix haute. Une étoile par bonne réponse. |
 | 🔍 **L'intrus** | Trouver l'image qui n'a rien à faire avec les autres. Consigne dite à voix haute, étoiles à gagner. |
-| 🐍 **Snake** | Guider le serpent vers les pommes avec les flèches ou en glissant le doigt. Le serpent traverse les bords ; on ne perd qu'en se mordant la queue. Meilleur score gardé. |
+| 🐍 **Snake** | Guider le serpent vers les pommes avec les flèches ou en glissant le doigt. Trois vitesses (lent, moyen, rapide). Le serpent traverse les bords ; on ne perd qu'en se mordant la queue. Meilleur score gardé. |
 | 🕐 **Date et heure** | Heure en chiffres et horloge à aiguilles, date du jour, saison et météo (Open-Meteo, selon la position ou Paris par défaut). Chaque élément est lu à voix haute quand on le touche. |
 | 💨 **Bruits de pet** | Une case par bruit, et un bouton « 🎲 Au hasard ». |
 | 📢 **Mégaphone** | Parler au micro et entendre sa voix changée en direct : normale, aiguë, grave, robot, écho ou mégaphone. Un casque évite les sifflements. |
