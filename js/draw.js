@@ -90,14 +90,16 @@
     ctx.restore();
   }
 
-  // Dessine une image entière dans la feuille, sans la déformer : mise à l'échelle et centrée
-  // (bords blancs si l'image n'a pas la même forme, par exemple un ancien dessin)
+  // Dessine une image entière dans la feuille, sans la déformer et sans l'agrandir :
+  // une image plus petite que la feuille garde sa taille réelle (1 pixel = 1 pixel),
+  // une image plus grande est réduite pour tenir entière. Elle est centrée, avec du blanc autour
+  // (par exemple un ancien dessin dans un autre format).
   function drawContain(src, sw, sh) {
     if (!sw || !sh) return;
-    const s = Math.min(canvas.width / sw, canvas.height / sh);
+    const s = Math.min(1, canvas.width / sw, canvas.height / sh);
     const dw = sw * s;
     const dh = sh * s;
-    ctx.drawImage(src, (canvas.width - dw) / 2, (canvas.height - dh) / 2, dw, dh);
+    ctx.drawImage(src, Math.round((canvas.width - dw) / 2), Math.round((canvas.height - dh) / 2), dw, dh);
   }
 
   // Adapte la résolution du canvas à sa taille affichée, en conservant le dessin (mis à l'échelle)
@@ -578,9 +580,13 @@
       canvas.addEventListener("pointermove", move);
       canvas.addEventListener("pointerup", up);
       canvas.addEventListener("pointercancel", up);
-      window.addEventListener("resize", () => {
+      // La feuille change de taille quand la barre d'outils change de hauteur ou quand la fenêtre bouge :
+      // on adapte le canvas à chaque fois, sinon le dessin serait étiré. Seulement quand l'écran est affiché.
+      const onSizeChange = () => {
         if (root.classList.contains("active")) resize();
-      });
+      };
+      window.addEventListener("resize", onSizeChange);
+      if ("ResizeObserver" in window) new ResizeObserver(onSizeChange).observe(canvas);
     },
     async enter() {
       resize();

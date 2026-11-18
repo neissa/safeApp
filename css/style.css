@@ -1,16 +1,16 @@
 /* Mon coin magique : style pour téléphone vertical, boutons généreux et couleurs vives */
 
-/* Écriture scolaire française attachée (Playwrite FR Trad, SIL OFL), embarquée pour fonctionner hors ligne */
+/* Écriture cursive scolaire française attachée (Marelle, SIL OFL 1.1, ministère de l'Éducation nationale), embarquée pour fonctionner hors ligne */
 @font-face {
-  font-family: "Playwrite FR Trad";
+  font-family: "Marelle";
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("fonts/PlaywriteFRTrad-Regular.ttf") format("truetype");
+  src: url("fonts/Marelle-Regular.woff2") format("woff2");
 }
 
 :root {
-  --font-script: "Playwrite FR Trad", "Comic Sans MS", cursive;
+  --font-script: "Marelle", "Comic Sans MS", cursive;
   --font-digits: "Trebuchet MS", system-ui, sans-serif;
   --ink: #2b2b2b;
   --paper: #ffffff;
@@ -86,7 +86,7 @@ button:active {
 /* ---------- Conteneur et écrans ---------- */
 #app {
   position: relative;
-  max-width: 480px;
+  /* Tous les écrans prennent toute la largeur de la fenêtre (téléphone, tablette, PC) */
   height: 100vh;
   height: 100dvh;
   margin: 0 auto;
@@ -214,9 +214,10 @@ button:active {
   margin-top: 8px;
 }
 
+/* Au moins 2 colonnes (même à 320px), plus de colonnes quand l'écran est plus large */
 .tiles {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(170px, calc(50% - 8px)), 1fr));
   gap: 12px;
   padding: 6px 0;
   align-content: center;
@@ -224,16 +225,19 @@ button:active {
 }
 
 .tile {
-  aspect-ratio: 1.9;
+  aspect-ratio: 1.2;
   padding: 0;
   border: none;
-  border-radius: 24px;
+  border-radius: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 72px;
   line-height: 1;
   box-shadow: 0 6px 0 rgba(0, 0, 0, 0.18);
+  /* Tailles de l'icône et du nom calculées sur la largeur de la tuile (cqw) */
+  container-type: inline-size;
+  transition: transform 0.1s;
 }
 
 /* Icône au-dessus, nom en dessous, le tout centré dans la tuile */
@@ -243,22 +247,31 @@ button:active {
   padding: 8px;
 }
 
+/* L'icône est le repère principal : elle occupe environ un tiers de la largeur de la tuile */
 .tile-ico {
   display: block;
-  font-size: 38px;
-  line-height: 1.2;
+  font-size: clamp(48px, 34cqw, 110px);
+  line-height: 1.1;
 }
 
+/* Le nom reste lisible mais secondaire ; il passe à la ligne plutôt que de déborder */
 .tile-label {
   display: block;
   max-width: 100%;
   font-family: var(--font-script);
-  font-size: 17px;
-  white-space: nowrap;
+  font-size: clamp(14px, 11cqw, 22px);
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
   font-weight: bold;
   line-height: 1.1;
   color: #fff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+/* Retour visuel au toucher */
+.tile:active {
+  transform: scale(0.96);
 }
 
 .t-notes .tile-label {
@@ -386,13 +399,14 @@ button:active {
   max-height: calc(100cqw * 6 / 7 + 40px);
 }
 
-/* Animaux : 4 × 2 en mode Écouter, 2 × 2 en mode Devine */
+/* Animaux : 4 × 2 en mode Écouter, 2 × 2 en mode Devine. La zone « fit » prend toute la place libre
+   (plus de plafond de hauteur) : la grille garde ses proportions et reste centrée. */
 .fit:has(> .animal-grid) {
-  max-height: calc(100cqw / 1.6);
+  max-height: none;
 }
 
 .fit:has(> .animal-grid.quiz) {
-  max-height: min(100cqw, 420px);
+  max-height: none;
 }
 
 /* Le terrain (dans la zone « fit ») prend la plus petite place possible en restant carré */
@@ -404,6 +418,25 @@ button:active {
   border-radius: 18px;
   box-shadow: 0 5px 0 var(--shadow);
   touch-action: none;
+}
+
+/* Snake : terrain et croix prennent la place sous la barre ; en paysage, la croix passe à côté du terrain */
+.snake-play {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.snake-play > .fit {
+  flex: 1 1 0;
+}
+
+@media (orientation: landscape) {
+  .snake-play {
+    flex-direction: row;
+  }
 }
 
 /* Croix de direction commune aux jeux (créée par js/pad.js) : haut au milieu, gauche-bas-droite en dessous */
@@ -513,22 +546,83 @@ button:active {
   font-size: clamp(16px, 5cqw, 20px);
 }
 
+/* Lettres de l'alphabet : majuscule en bâton, minuscule en cursive (côte à côte) */
+.alpha-up {
+  font-family: var(--font-digits);
+  font-weight: bold;
+}
+
+.alpha-low {
+  font-family: var(--font-script);
+}
+
+/* Dans la carte, la minuscule est collée à la majuscule avec un petit espace */
+.alpha-letter .alpha-low {
+  margin-left: 0.15em;
+}
+
+/* La carte a overflow: hidden : ce padding laisse la place aux jambages (g, j, p, q, y) */
+.alpha-letter {
+  padding-bottom: 0.4em;
+}
+
+/* Alphabet : la grille est dans la zone « fit ». alphabet.js choisit le nombre de colonnes (--cols)
+   et la taille des cases (--cell) pour remplir la place libre. Les valeurs ici ne servent que de repli.
+   La largeur est juste celle de --cols cases : chaque ligne, même la dernière, reste centrée. */
+/* Alphabet : la zone « fit » prend toute la place libre (sans le plafond de hauteur commun) */
+#screen-alphabet .fit {
+  max-height: none;
+}
+
 .alpha-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+  --cols: 6;
+  --cell: 46px;
+  width: calc(var(--cols) * var(--cell) + (var(--cols) - 1) * 6px);
+  max-width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 6px;
 }
 
 .alpha-btn {
+  /* Case carrée de la taille calculée par alphabet.js ; la lettre grandit avec la case */
+  flex: 0 0 auto;
+  width: var(--cell);
+  /* Hauteur explicite : sinon la ligne flex étire la case (les lettres débordent) */
+  height: var(--cell);
   aspect-ratio: 1;
   border: none;
   border-radius: 14px;
   background: #ce93d8;
   color: #fff;
-  font-size: 24px;
   font-weight: bold;
   box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
   padding: 0;
+  /* Majuscule et minuscule sur une même ligne de base. Le groupe est centré dans la case ;
+     le padding-bottom (petit) descend la ligne de base pour que les hampes (b, f, h, k, l, t)
+     et les jambages (f, g, j, p, q, y, z) aient à peu près la même marge en haut et en bas. */
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  align-content: center;
+  justify-content: center;
+  column-gap: calc(var(--cell) * 0.04);
+  padding-bottom: calc(var(--cell) * 0.10);
+  overflow: hidden;
+  line-height: 1;
+}
+
+/* Tailles réglées sur la case (Marelle a une petite hauteur d'x : la minuscule est plus grande que l'ancienne police,
+   mais pas trop, pour que les hampes et les jambages gardent au moins 8 % de marge de chaque côté de la case) */
+.alpha-btn .alpha-up {
+  font-size: calc(var(--cell) * 0.38);
+  line-height: 1;
+}
+
+.alpha-btn .alpha-low {
+  font-size: calc(var(--cell) * 0.33);
+  line-height: 1;
 }
 
 .alpha-btn.active {
@@ -538,7 +632,8 @@ button:active {
 /* Puzzle : l'image est coupée en n × n morceaux (taille du plateau = largeur de conteneur) */
 .puzzle-board {
   --n: 2;
-  width: min(100%, 56vh);
+  /* Carré le plus grand possible dans la zone « fit » (voir index.html) */
+  width: min(100cqw, 100cqh);
   aspect-ratio: 1;
   align-self: center;
   display: grid;
@@ -582,6 +677,25 @@ button:active {
   pointer-events: none;
 }
 
+/* Labyrinthe : terrain et croix prennent la place sous la barre ; en paysage, la croix passe à côté */
+.lab-play {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lab-play > .fit {
+  flex: 1 1 0;
+}
+
+@media (orientation: landscape) {
+  .lab-play {
+    flex-direction: row;
+  }
+}
+
 /* Labyrinthe : grille carrée, murs dessinés par les bords des cases */
 .lab-board {
   --n: 5;
@@ -618,7 +732,7 @@ button:active {
 .color-prompt {
   margin: 0;
   text-align: center;
-  font-size: clamp(18px, 3.5vh, 24px);
+  font-size: clamp(18px, 3.5vh, 40px);
   font-weight: bold;
   min-height: 1.4em;
 }
@@ -627,10 +741,10 @@ button:active {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
-  width: min(100%, 520px);
+  /* Carré le plus grand possible dans la zone « fit » (largeur ou hauteur) */
+  width: min(100cqw, 100cqh);
   aspect-ratio: 1;
   align-self: center;
-  max-height: 62vh;
 }
 
 .color-btn {
@@ -651,9 +765,14 @@ button:active {
 }
 
 /* Bruits doux : grille de sons, réglage du volume, minuteur */
+/* La grille (3 × 2) prend le plus de place possible en gardant un rapport 3 / 2 : les cases sont carrées */
 .bruit-grid {
+  container-type: size;
+  width: min(100cqw, 150cqh);
+  aspect-ratio: 3 / 2;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -666,15 +785,17 @@ button:active {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 7px;
-  font-size: 15px;
+  /* Le nom grandit avec la case (cqw = largeur de la grille) */
+  font-size: clamp(15px, 4.5cqw, 30px);
   /* La police cursive dépasse au-dessus de sa ligne : interligne large pour ne pas toucher l'icône */
   line-height: 1.55;
   font-weight: bold;
 }
 
 .bruit-ico {
-  font-size: 30px;
+  font-size: clamp(30px, 10cqw, 90px);
   line-height: 1.2;
 }
 
@@ -718,10 +839,41 @@ button:active {
   font-size: 22px;
 }
 
+/* Cheval : jeu et bouton prennent la place sous la barre ; en paysage, le bouton passe à côté du jeu */
+.cheval-play {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cheval-play > .fit {
+  flex: 1 1 0;
+}
+
+@media (orientation: landscape) {
+  .cheval-play {
+    flex-direction: row;
+  }
+
+  .cheval-actions {
+    width: auto;
+    max-width: none;
+    flex: 0 0 auto;
+    align-self: center;
+  }
+
+  .cheval-jump {
+    width: auto;
+    min-width: 150px;
+  }
+}
+
+/* Le jeu garde son format 800 × 360 : le plus grand possible dans la zone « fit » */
 .cheval-wrap {
   position: relative;
-  width: 100%;
-  max-width: 800px;
+  width: min(100cqw, calc(100cqh * 800 / 360));
   align-self: center;
 }
 
@@ -773,7 +925,8 @@ button:active {
 .pm-board {
   --cols: 13;
   --rows: 11;
-  width: min(100%, calc((100dvh - 330px) * var(--cols) / var(--rows)));
+  /* Plus grand rectangle 13 × 11 dans la zone « fit » (plus de hauteur d'écran fixée à la main) */
+  width: min(100cqw, calc(100cqh * var(--cols) / var(--rows)));
   aspect-ratio: var(--cols) / var(--rows);
   align-self: center;
   display: grid;
@@ -783,6 +936,25 @@ button:active {
   background: #000;
   border-radius: 10px;
   overflow: hidden;
+}
+
+/* Pac-Man : terrain et croix prennent la place sous la barre ; en paysage, la croix passe à côté */
+.pm-play {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pm-play > .fit {
+  flex: 1 1 0;
+}
+
+@media (orientation: landscape) {
+  .pm-play {
+    flex-direction: row;
+  }
 }
 
 .pm-cell {
@@ -826,31 +998,45 @@ button:active {
 }
 
 /* Ombres : image en couleur, puis trois ombres noires à toucher */
-/* Image de départ : exactement la taille d'une des trois cases d'ombre (3 colonnes, espace de 12 px) */
+/* Le bloc (image + 3 ombres) prend la plus grande taille qui tient dans la zone « fit » :
+   --s = côté d'une case (l'image de départ a la même taille qu'une ombre), --g = espace entre les cases.
+   Les cases restent carrées : rien n'est déformé. */
+.ombre-board {
+  --g: 12px;
+  --s: min(calc((100cqw - 2 * var(--g)) / 3), calc((100cqh - var(--g)) / 2));
+  width: calc(3 * var(--s) + 2 * var(--g));
+  height: calc(2 * var(--s) + var(--g));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--g);
+}
+
 .ombre-target {
-  width: calc((100% - 24px) / 3);
-  aspect-ratio: 1;
-  align-self: center;
+  width: var(--s);
+  height: var(--s);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 56px;
+  font-size: calc(var(--s) * 0.55);
   line-height: 1;
   background: var(--paper);
-  border-radius: 24px;
+  border-radius: calc(var(--s) * 0.22);
   box-shadow: 0 5px 0 var(--shadow);
 }
 
 .ombre-choices {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(3, var(--s));
+  gap: var(--g);
 }
 
 .ombre-choice {
-  aspect-ratio: 1;
+  width: var(--s);
+  height: var(--s);
   border: none;
-  border-radius: 20px;
+  border-radius: calc(var(--s) * 0.2);
   background: var(--paper);
   box-shadow: 0 5px 0 var(--shadow);
   padding: 0;
@@ -869,7 +1055,7 @@ button:active {
 
 /* L'ombre : la même image, toute en noir */
 .ombre-sil {
-  font-size: 56px;
+  font-size: calc(var(--s) * 0.55);
   line-height: 1;
   filter: brightness(0);
 }
@@ -886,7 +1072,7 @@ button:active {
 }
 
 .animal-grid.quiz {
-  --w: min(100cqw, 100cqh, 420px);
+  --w: min(100cqw, 100cqh);
   aspect-ratio: 1;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-template-rows: repeat(2, minmax(0, 1fr));
@@ -913,7 +1099,7 @@ button:active {
 }
 
 .animal-name {
-  font-size: clamp(13px, calc(var(--w) / 4 * 0.19), 18px);
+  font-size: clamp(13px, calc(var(--w) / 4 * 0.19), 32px);
   font-weight: bold;
 }
 
@@ -999,8 +1185,12 @@ button:active {
   font-weight: bold;
 }
 
+/* Formes : trois formes en une rangée, dans la zone « fit ». La rangée prend toute la largeur
+   disponible sans dépasser la hauteur (rapport 3 : trois cases carrées côte à côte). */
 .shape-choices {
-  flex: 1 1 auto;
+  flex: 0 0 auto;
+  width: min(100cqw, 300cqh);
+  aspect-ratio: 3;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   align-content: center;
@@ -1125,6 +1315,29 @@ button:active {
   color: #e53935;
 }
 
+/* Minuteur : les boutons prennent toute la largeur ; l'anneau est dans la zone « fit » et prend le plus grand carré possible */
+#screen-timer .timer-presets {
+  width: 100%;
+}
+
+#screen-timer .timer-preset {
+  min-height: clamp(52px, 8vh, 72px);
+  font-size: clamp(18px, 2.6vh, 26px);
+}
+
+#screen-timer .timer-ring {
+  width: min(100cqw, 100cqh);
+}
+
+#screen-timer .timer-display {
+  font-size: clamp(36px, 18cqmin, 100px);
+}
+
+#screen-timer .row .btn {
+  min-height: clamp(52px, 8vh, 72px);
+  font-size: clamp(18px, 2.6vh, 26px);
+}
+
 
 .t-draw { background: #ff7043; }
 .t-notes { background: #ffca28; }
@@ -1136,7 +1349,35 @@ button:active {
 .t-farts { background: #9e9d24; }
 .t-mega { background: #ff8f00; }
 
-/* Mégaphone : bouton pour parler et choix de la voix */
+/* Mégaphone : bouton pour parler et choix de la voix.
+   Tout le contenu est dans la zone « fit » (container nommé « mega ») : il grandit avec la place disponible.
+   Portrait : voix en 3 colonnes ; plus large que haut : 6 voix sur une seule ligne. */
+#screen-megaphone .mega-fit {
+  max-height: none;
+  flex-direction: column;
+  gap: 10px;
+  container: mega / size;
+}
+
+/* Gros bouton rond : taille selon la plus petite dimension de la zone (--m) */
+#screen-megaphone #mega-btn {
+  --m: clamp(90px, min(40cqw, 36cqh), 300px);
+  width: var(--m);
+  height: var(--m);
+  border-width: calc(var(--m) * 0.07);
+  box-shadow: 0 calc(var(--m) * 0.05) 0 var(--shadow);
+}
+
+#screen-megaphone #mega-btn span {
+  width: calc(var(--m) * 0.42);
+  height: calc(var(--m) * 0.42);
+}
+
+#screen-megaphone #mega-btn.recording span {
+  width: calc(var(--m) * 0.33);
+  height: calc(var(--m) * 0.33);
+}
+
 .mega-zone {
   display: flex;
   flex-direction: column;
@@ -1146,27 +1387,36 @@ button:active {
 }
 
 .mega-grid {
+  width: min(100cqw, 900px);
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
+}
+
+@container mega (min-aspect-ratio: 1 / 1) {
+  .mega-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
 }
 
 .mega-effect {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 2px;
+  min-height: clamp(70px, 14cqh, 150px);
   padding: 7px 4px;
   border: none;
   border-radius: 18px;
   background: var(--paper);
   box-shadow: 0 4px 0 var(--shadow);
   font-family: var(--font-script);
-  font-size: 15px;
+  font-size: clamp(15px, 4cqmin, 26px);
 }
 
 .mega-ico {
-  font-size: 24px;
+  font-size: clamp(24px, 9cqmin, 56px);
   line-height: 1;
 }
 
@@ -1192,7 +1442,7 @@ button:active {
   border-radius: 22px;
   background: var(--paper);
   box-shadow: 0 5px 0 var(--shadow);
-  font-size: calc(min(100cqw, 100cqh) * 0.14);
+  font-size: calc(min(100cqw, 100cqh) * 0.18);
   line-height: 1;
 }
 
@@ -1268,16 +1518,17 @@ button:active {
   font-size: 19px;
 }
 
-/* Feuille de dessin : toujours au format 3:4 (portrait), la plus grande possible dans la place libre.
-   La forme ne dépend pas de l'écran, donc un dessin n'est jamais étiré d'un appareil à l'autre. */
+/* Feuille de dessin : elle remplit toute la place libre sous la barre d'outils (largeur et hauteur).
+   Le canvas est redimensionné par draw.js d'après sa taille affichée, donc le trait reste sous le doigt.
+   La marge du bas laisse place à l'ombre de la feuille (5px). */
 .fit-paper {
-  max-height: calc(100cqw * 4 / 3);
+  max-height: none;
+  padding-bottom: 6px;
 }
 
 .paper {
-  width: min(100cqw, 100cqh * 3 / 4);
-  aspect-ratio: 3 / 4;
-  height: auto;
+  width: 100cqw;
+  height: 100cqh;
   display: block;
   background: #ffffff; /* le dessin reste sur fond blanc, même en thème sombre */
   border-radius: 20px;
@@ -1311,6 +1562,11 @@ button:active {
 
 .paper-text:focus {
   outline: 3px solid #ffb300;
+}
+
+/* Bloc notes : la feuille prend toute la largeur et toute la hauteur */
+#screen-notes .paper-text {
+  font-size: clamp(20px, 2.8vmin, 30px);
 }
 
 /* ---------- Calculatrice ---------- */
@@ -1358,6 +1614,37 @@ button:active {
   font-size: 30px;
 }
 .key.zero { grid-column: span 2; }
+
+/* Nombre : affichage et clavier prennent toute la largeur ; le clavier remplit la hauteur restante
+   (c'est un conteneur « size » : les touches grandissent avec sa hauteur) */
+#screen-calc .display {
+  width: 100%;
+}
+
+#screen-calc .keys {
+  flex: 1 1 0;
+  min-height: 200px;
+  width: 100%;
+  container-type: size;
+}
+
+#calc-game {
+  width: 100%;
+}
+
+#screen-calc .display {
+  min-height: clamp(80px, 13vh, 120px);
+  /* Le chiffre reste dans la largeur de l'écran, même sur un téléphone étroit */
+  font-size: min(clamp(40px, 9vh, 64px), 12vw);
+}
+
+#screen-calc .key {
+  font-size: clamp(24px, 7cqh, 56px);
+}
+
+#screen-calc .key.eq {
+  font-size: clamp(30px, 9cqh, 64px);
+}
 
 /* ---------- Galerie ---------- */
 .actions {
@@ -1450,6 +1737,18 @@ button:active {
 .viewer-bar {
   display: flex;
   gap: 20px;
+}
+
+/* Galerie : grille de carrés, avec plus de colonnes quand l'écran est large */
+#screen-gallery .grid {
+  grid-template-columns: repeat(auto-fill, minmax(clamp(96px, 30cqw, 220px), 1fr));
+  gap: 8px;
+}
+
+/* Boutons et caméra : toute la largeur */
+#screen-gallery .actions,
+#screen-gallery .cam {
+  width: 100%;
 }
 
 /* ---------- Musique ---------- */
@@ -1580,7 +1879,8 @@ audio {
   background: linear-gradient(#ffffff, #f2f2f2);
   box-shadow: inset 0 -6px 0 #d6d6d6;
   font-family: var(--font-digits);
-  font-size: 16px;
+  /* Le nom de la note grandit avec la largeur de la touche (sur tablette et PC) */
+  font-size: clamp(16px, 4.5cqw, 32px);
   font-weight: bold;
   color: #555;
   display: flex;
@@ -1623,14 +1923,16 @@ audio {
   margin-top: 10px;
 }
 
-/* Piano libre plus bas, pour que les deux claviers tiennent sur l'écran */
+/* Piano : les deux claviers prennent la hauteur restante (le libre un peu plus haut que Simon).
+   La hauteur du clavier vient de son rang (flex, align stretch), pas d'une valeur fixe. */
 #piano-keys {
-  flex: 0 0 auto;
+  flex: 3 1 0;
+  min-height: 150px;
 }
 
 #piano-keys .keyboard {
   flex: 1 1 0;
-  height: 170px;
+  height: auto;
   min-height: 0;
 }
 
@@ -1640,8 +1942,13 @@ audio {
   margin: 6px 0;
 }
 
+#piano-simon {
+  flex: 2 1 0;
+  min-height: 90px;
+}
+
 .piano-simon .keyboard {
-  height: 85px;
+  height: auto;
   min-height: 0;
   background: #37474f;
 }
@@ -1660,7 +1967,7 @@ audio {
   color: #fff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
   font-family: var(--font-digits);
-  font-size: 15px;
+  font-size: clamp(15px, 4.5cqw, 30px);
   font-weight: bold;
   display: flex;
   align-items: flex-end;
@@ -1719,10 +2026,12 @@ audio {
   font-size: 15px;
 }
 
-/* Grille toujours carrée, et assez petite pour tenir en entier à l'écran */
+/* Grille toujours carrée, et assez grande pour remplir la place (largeur ou hauteur).
+   Elle sert de repère (cqw) aux cartes : leur taille suit la largeur réelle du plateau. */
 .memory-board {
   --cols: 4;
   --rows: 4;
+  container-type: inline-size;
   width: min(100cqw, 100cqh * var(--cols) / var(--rows));
   aspect-ratio: var(--cols) / var(--rows);
   margin: 0 auto;
@@ -1742,7 +2051,7 @@ audio {
   border: none;
   border-radius: 12px;
   background: #81d4fa;
-  font-size: calc(min(100cqw / var(--cols), 100cqh / var(--rows)) * 0.5);
+  font-size: calc(100cqw / var(--cols) * 0.5);
   line-height: 1;
   box-shadow: 0 3px 0 rgba(0, 0, 0, 0.15);
 }
@@ -1755,7 +2064,7 @@ audio {
 
 /* Carte cachée : point d'interrogation discret (les images retournées restent grandes) */
 .card:not(.up):not(.matched) {
-  font-size: calc(min(100cqw / var(--cols), 100cqh / var(--rows)) * 0.28);
+  font-size: calc(100cqw / var(--cols) * 0.28);
 }
 
 .card.up {
@@ -1900,6 +2209,15 @@ audio {
   justify-content: space-between;
   font-size: 12px;
   opacity: 0.7;
+}
+
+/* Musique : la zone qui défile (et l'iframe Spotify) prend toute la largeur et la hauteur restante */
+#screen-music .music-scroll > * {
+  width: 100%;
+}
+
+#screen-music .mini-player > * {
+  width: 100%;
 }
 
 /* Voix coupée : on cache les 🔊 des jeux (sans décaler la barre du haut) */
@@ -2154,6 +2472,11 @@ html[data-voice="off"] .speak-btn {
 .tool-row {
   position: relative;
   z-index: 15;
+}
+
+/* Dessin en pleine largeur : la barre d'outils est centrée, et la feuille garde le reste de la place */
+#screen-draw {
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
 }
 
 .dropdown {
@@ -2565,6 +2888,41 @@ html[data-voice="off"] .speak-btn {
   to { transform: scale(1.06); }
 }
 
+/* Micro : le bouton et le niveau en direct grandissent avec la hauteur de l'écran (unités vh) */
+#screen-recorder .rec-zone {
+  flex: 1 1 auto;
+  justify-content: center;
+}
+
+#screen-recorder .digits {
+  font-size: clamp(36px, 6vh, 64px);
+}
+
+#screen-recorder .live-wave {
+  width: min(100%, 560px);
+  height: clamp(70px, 13vh, 130px);
+}
+
+#screen-recorder .rec-btn {
+  width: clamp(110px, 22vh, 210px);
+  height: clamp(110px, 22vh, 210px);
+}
+
+#screen-recorder .rec-btn span {
+  width: 42%;
+  height: 42%;
+}
+
+#screen-recorder .rec-btn.recording span {
+  width: 33%;
+  height: 33%;
+}
+
+/* Liste des enregistrements : toute la largeur */
+#screen-recorder .list {
+  width: 100%;
+}
+
 /* ---------- Heure, saison, météo ---------- */
 .digital,
 .analog,
@@ -2645,4 +3003,29 @@ html[data-voice="off"] .speak-btn {
 .info small {
   font-size: 13px;
   opacity: 0.7;
+}
+
+/* Heure : l'horloge à aiguilles prend la place qui reste (560 px au maximum) ; le texte grandit avec la hauteur */
+#screen-clock .clock-wrap .fit {
+  max-height: none;
+}
+
+#screen-clock .analog {
+  width: min(100cqw, 100cqh, 560px);
+}
+
+#screen-clock .digital {
+  font-size: clamp(44px, 9vh, 88px);
+}
+
+#screen-clock .date-row {
+  font-size: clamp(19px, 2.8vh, 28px);
+}
+
+#screen-clock .info-row {
+  width: 100%;
+}
+
+#screen-clock .info-ico {
+  font-size: clamp(32px, 4.5vh, 48px);
 }

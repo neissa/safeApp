@@ -7,6 +7,8 @@ L'application est une page web statique en français. Elle s'installe comme une 
 ## Accueil
 
 - Grandes tuiles avec une icône et un nom. Chaque tuile est annoncée à voix haute quand on la touche.
+- Les tuiles s'adaptent à l'écran : au moins 2 colonnes sur téléphone, davantage sur tablette ou ordinateur.
+- Chaque activité utilise toute la place de l'écran (téléphone vertical ou horizontal, tablette, ordinateur).
 - Un appui sur l'icône du titre la change (les icônes défilent).
 - Surprise : quinze appuis rapides sur cette icône font traverser l'écran à un dinosaure qui rugit.
 - Bouton « 🔄 Mise à jour » quand une nouvelle version est disponible.
@@ -33,7 +35,7 @@ L'application est une page web statique en français. Elle s'installe comme une 
 | 📢 **Mégaphone** | Parler au micro et entendre sa voix changée en direct : normale, aiguë, grave, robot, écho ou mégaphone. Un casque évite les sifflements. |
 | ❌ **Morpion** | Aligner trois symboles, à deux sur le même écran. |
 | 🔴 **Puissance 4** | Aligner quatre jetons, à deux sur le même écran. |
-| 🔤 **Alphabet** | Toucher une lettre : on entend la lettre, puis un mot qui commence par elle (« A comme avion »), et on voit son image. |
+| 🔤 **Alphabet** | Chaque case montre la majuscule en écriture bâton et la minuscule en cursive. Toucher une lettre : on entend la lettre, puis un mot qui commence par elle (« A comme avion »), et on voit son image. |
 | 🧩 **Puzzle** | Remettre l'image en place : on touche deux morceaux pour les échanger. 2 × 2 ou 3 × 3. |
 | 🗺️ **Labyrinthe** | Guider le poussin 🐣 jusqu'au drapeau 🏁. 5 × 5, 7 × 7 ou 9 × 9, avec les flèches à l'écran, au clavier ou en glissant le doigt. |
 | 🌘 **Ombres** | Retrouver l'ombre noire qui correspond à l'image en couleur. |
@@ -75,7 +77,7 @@ puis d'ouvrir `index.html` dans le navigateur. Pour les règles de développemen
 ## Projets et ressources open source
 
 - **Raptorize** (licence MIT) : le cri du dinosaure. Voir `sounds/RAPTORIZE-LICENSE.txt`.
-- **Playwrite FR Trad** (licence OFL) : la police d'écriture cursive. Voir `css/fonts/OFL.txt`.
+- **Marelle** (licence OFL 1.1) : la police d'écriture cursive, créée par le ministère de l'Éducation nationale (DNE) et publiée sur la [forge des communs numériques éducatifs](https://marelle.forge.apps.education.fr/) (présentation sur [Eduscol](https://eduscol.education.gouv.fr/6690/marelle-une-police-cursive-libre)). Voir `css/fonts/Marelle-LICENCE.txt`.
 - **Cris d'animaux** (Wikimedia Commons, licences CC BY-SA, CC BY, GFDL ou domaine public) : le chat, le chien, la vache, le canard, le cochon, le mouton, le cheval et le coq. Voir `sounds/animaux/LICENCES.txt`.
 - **Bruit blanc** : aucun fichier, les bruits d'ambiance (pluie, orage, vagues, vent, feu) sont fabriqués par le navigateur.
 - **Bun** : outil de développement pour le script de mise à jour du cache (`tools/update-cache.js`). Il n'est pas nécessaire pour utiliser l'application.

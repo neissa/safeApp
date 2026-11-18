@@ -12,7 +12,7 @@ const crypto = require("crypto");
 const root = path.join(__dirname, "..");
 const SKIP = new Set(["sw.js", "node_modules", ".git", "tools"]);
 const GENERATED = new Set(["version.json"]); // écrit par ce script, donc exclu du calcul
-const EXT = [".html", ".js", ".css", ".json", ".ttf", ".png", ".mp3", ".ogg"];
+const EXT = [".html", ".js", ".css", ".json", ".ttf", ".woff2", ".png", ".mp3", ".ogg"];
 const META = /[ \t]*<meta name="app-(?:version|built)"[^>]*>\n?/g; // lignes de version dans index.html
 
 function listFiles(dir, out) {

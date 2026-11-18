@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="color-scheme" content="light">
-  <meta name="app-version" content="a1569ff45982">
-  <meta name="app-built" content="2026-11-07 14:51">
+  <meta name="app-version" content="43ec8f68f03a">
+  <meta name="app-built" content="2026-11-18 17:38">
 
 
 
@@ -33,7 +33,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=0e15598fa9">
+  <link rel="stylesheet" href="css/style.css?v=f904f113d6">
 </head>
 <body>
 <div id="app">
@@ -348,10 +348,13 @@
       <span id="snake-score" class="snake-score">Pommes : 0</span>
       <span id="snake-best" class="hint"></span>
     </div>
-    <div class="fit">
-      <canvas id="snake-canvas" class="snake-canvas" width="336" height="336" aria-label="Terrain du serpent"></canvas>
+    <!-- Terrain et croix : l'un sous l'autre sur téléphone debout, côte à côte en paysage (CSS) -->
+    <div class="snake-play">
+      <div class="fit">
+        <canvas id="snake-canvas" class="snake-canvas" width="336" height="336" aria-label="Terrain du serpent"></canvas>
+      </div>
+      <div class="dpad"></div>
     </div>
-    <div class="dpad"></div>
   </section>
 
   <!-- FORMES -->
@@ -362,7 +365,7 @@
       <button class="chip speak-btn" id="shapes-say" aria-label="Répéter la consigne">🔊</button>
     </header>
     <p id="shapes-help" class="game-help">Touche la forme demandée</p>
-    <div id="shapes-choices" class="shape-choices"></div>
+    <div class="fit"><div id="shapes-choices" class="shape-choices"></div></div>
     <p id="shapes-stars" class="game-stars"></p>
   </section>
 
@@ -374,7 +377,7 @@
       <span></span>
     </header>
     <div id="alpha-card" class="alpha-card" aria-live="polite"></div>
-    <div id="alpha-grid" class="alpha-grid"></div>
+    <div class="fit"><div id="alpha-grid" class="alpha-grid"></div></div>
   </section>
 
   <!-- PUZZLE -->
@@ -386,7 +389,7 @@
     </header>
     <div id="puzzle-levels" class="seg memory-levels"></div>
     <p id="puzzle-msg" class="game-help"></p>
-    <div id="puzzle-board" class="puzzle-board"></div>
+    <div class="fit"><div id="puzzle-board" class="puzzle-board"></div></div>
     <div class="row">
       <button class="btn" id="puzzle-new">🔀 Nouvelle image</button>
     </div>
@@ -401,8 +404,11 @@
     </header>
     <div id="lab-levels" class="seg memory-levels"></div>
     <p id="lab-msg" class="game-help"></p>
-    <div class="fit"><div id="lab-board" class="lab-board"></div></div>
-    <div class="dpad"></div>
+    <!-- Labyrinthe et croix : l'un sous l'autre sur téléphone debout, côte à côte en paysage (CSS) -->
+    <div class="lab-play">
+      <div class="fit"><div id="lab-board" class="lab-board"></div></div>
+      <div class="dpad"></div>
+    </div>
   </section>
 
   <!-- OMBRES -->
@@ -413,8 +419,12 @@
       <span></span>
     </header>
     <p id="ombres-msg" class="game-help"></p>
-    <div id="ombres-target" class="ombre-target" aria-label="Image à retrouver"></div>
-    <div id="ombres-choices" class="ombre-choices"></div>
+    <div class="fit">
+      <div class="ombre-board">
+        <div id="ombres-target" class="ombre-target" aria-label="Image à retrouver"></div>
+        <div id="ombres-choices" class="ombre-choices"></div>
+      </div>
+    </div>
     <div class="row">
       <button class="btn" id="ombres-new">🔀 Autre image</button>
     </div>
@@ -449,8 +459,11 @@
       <span id="pm-lives" class="pm-lives" aria-label="Vies"></span>
       <span id="pm-stars" class="pm-stars"></span>
     </div>
-    <div id="pm-board" class="pm-board"></div>
-    <div class="dpad"></div>
+    <!-- Pac-Man et croix : l'un sous l'autre sur téléphone debout, côte à côte en paysage (CSS) -->
+    <div class="pm-play">
+      <div class="fit"><div id="pm-board" class="pm-board"></div></div>
+      <div class="dpad"></div>
+    </div>
     <div class="row">
       <button class="btn" id="pm-new">🔀 Nouvelle partie</button>
     </div>
@@ -467,14 +480,19 @@
       <span id="cheval-lives" class="pm-lives" aria-label="Vies"></span>
       <span id="cheval-carrots" class="pm-stars"></span>
     </div>
-    <div class="cheval-wrap">
-      <canvas id="cheval-canvas" class="cheval-canvas" aria-label="Le cheval court, touche l'écran pour sauter"></canvas>
-      <div id="cheval-overlay" class="cheval-overlay" hidden>
-        <p id="cheval-overlay-text" class="cheval-overlay-text"></p>
+    <!-- Jeu et bouton : l'un sous l'autre sur téléphone debout, côte à côte en paysage (CSS) -->
+    <div class="cheval-play">
+      <div class="fit">
+        <div class="cheval-wrap">
+          <canvas id="cheval-canvas" class="cheval-canvas" aria-label="Le cheval court, touche l'écran pour sauter"></canvas>
+          <div id="cheval-overlay" class="cheval-overlay" hidden>
+            <p id="cheval-overlay-text" class="cheval-overlay-text"></p>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="cheval-actions">
-      <button class="btn cheval-jump" id="cheval-jump">⬆️ Saute</button>
+      <div class="cheval-actions">
+        <button class="btn cheval-jump" id="cheval-jump">⬆️ Saute</button>
+      </div>
     </div>
   </section>
 
@@ -486,7 +504,7 @@
       <span></span>
     </header>
     <p id="color-prompt" class="color-prompt" aria-live="polite"></p>
-    <div id="color-choices" class="color-choices"></div>
+    <div class="fit"><div id="color-choices" class="color-choices"></div></div>
     <p id="color-msg" class="game-help"></p>
     <div class="row">
       <button class="btn" id="color-again">🔊 Redire</button>
@@ -501,7 +519,7 @@
       <h2>🌧️ Bruits doux</h2>
       <span></span>
     </header>
-    <div id="bruits-grid" class="bruit-grid"></div>
+    <div class="fit"><div id="bruits-grid" class="bruit-grid"></div></div>
     <label class="bruits-volume">🔈 <input type="range" id="bruits-volume" min="0" max="1" step="0.05" aria-label="Volume"> 🔊</label>
     <div class="row">
       <button class="btn" data-sleep="15">⏰ 15 min</button>
@@ -582,12 +600,14 @@
       <span></span>
     </header>
     <p class="game-help">Parle, puis écoute ta voix changée</p>
-    <div class="mega-zone">
-      <button id="mega-btn" class="rec-btn" aria-label="Parler" data-silent><span></span></button>
-      <p id="mega-state" class="hint"></p>
+    <div class="fit mega-fit">
+      <div class="mega-zone">
+        <button id="mega-btn" class="rec-btn" aria-label="Parler" data-silent><span></span></button>
+        <p id="mega-state" class="hint"></p>
+      </div>
+      <p class="hint">Choisis ta voix</p>
+      <div id="mega-effects" class="mega-grid"></div>
     </div>
-    <p class="hint">Choisis ta voix</p>
-    <div id="mega-effects" class="mega-grid"></div>
   </section>
 
   <!-- MINUTEUR -->
@@ -598,12 +618,14 @@
       <span></span>
     </header>
     <div id="timer-presets" class="timer-presets"></div>
-    <div class="timer-ring">
-      <svg viewBox="0 0 120 120" class="ring-svg" aria-hidden="true">
-        <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
-        <circle id="timer-arc" class="ring-arc" cx="60" cy="60" r="52"></circle>
-      </svg>
-      <div id="timer-display" class="timer-display">05:00</div>
+    <div class="fit">
+      <div class="timer-ring">
+        <svg viewBox="0 0 120 120" class="ring-svg" aria-hidden="true">
+          <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
+          <circle id="timer-arc" class="ring-arc" cx="60" cy="60" r="52"></circle>
+        </svg>
+        <div id="timer-display" class="timer-display">05:00</div>
+      </div>
     </div>
     <div class="row">
       <button class="btn" id="timer-toggle">▶️ Démarrer</button>
@@ -758,12 +780,12 @@
 <script src="js/core.js?v=f0cf1e22dd"></script>
 <script src="js/ui.js?v=3d63d19598"></script>
 <script src="js/pad.js?v=721c09a79d"></script>
-<script src="js/draw.js?v=073fdb7171"></script>
+<script src="js/draw.js?v=803e6ff922"></script>
 <script src="js/notes.js?v=0b82255267"></script>
 <script src="js/calc.js?v=eb829f7102"></script>
 <script src="js/gallery.js?v=ef63a40877"></script>
 <script src="js/music.js?v=7e8b9510e0"></script>
-<script src="js/recorder.js?v=7c25dc92e5"></script>
+<script src="js/recorder.js?v=01d0ef8e3d"></script>
 <script src="js/clock.js?v=1fa3567f8c"></script>
 <script src="js/spotify.js?v=d6ebba8e7c"></script>
 <script src="js/parent.js?v=03a2f193cb"></script>
@@ -775,18 +797,18 @@
 <script src="js/memory.js?v=4792d1a37a"></script>
 <script src="js/timer.js?v=a2eca99d52"></script>
 <script src="js/games.js?v=fa71f6a408"></script>
-<script src="js/snake.js?v=7baab1cc52"></script>
+<script src="js/snake.js?v=1f67ff5035"></script>
 <script src="js/farts.js?v=59cf93fe89"></script>
 <script src="js/megaphone.js?v=6ffe5dd9d8"></script>
 <script src="js/morpion.js?v=ffc90e25d8"></script>
 <script src="js/puissance4.js?v=454bcb0d40"></script>
-<script src="js/alphabet.js?v=c3496a9489"></script>
+<script src="js/alphabet.js?v=9b4ee775f5"></script>
 <script src="js/puzzle.js?v=a7fcaae489"></script>
 <script src="js/labyrinthe.js?v=199a9173ef"></script>
 <script src="js/ombres.js?v=3467238211"></script>
 <script src="js/animaux.js?v=8cce55abb7"></script>
 <script src="js/pacman.js?v=436a2dc0a4"></script>
-<script src="js/cheval.js?v=a2260ed7d9"></script>
+<script src="js/cheval.js?v=ce018648d9"></script>
 <script src="js/couleurs.js?v=2b70a3668f"></script>
 <script src="js/bruits.js?v=e3d9b0863a"></script>
 <script src="js/main.js?v=15ea266cbf"></script>

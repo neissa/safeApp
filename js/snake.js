@@ -259,6 +259,18 @@
     drawHead(s);
   }
 
+  // Résolution interne du terrain = taille affichée × devicePixelRatio (net, sans étirement).
+  // Le dessin ne dépend que de canvas.width, donc on redessine après un changement de taille.
+  function resize() {
+    const rect = canvas.getBoundingClientRect();
+    if (!rect.width) return; // écran caché : rien à mesurer
+    const size = Math.round(rect.width * (window.devicePixelRatio || 1));
+    if (canvas.width === size) return;
+    canvas.width = size;
+    canvas.height = size; // carré
+    draw();
+  }
+
   function gameOver() {
     stop();
     st.running = false;
@@ -344,6 +356,12 @@
       showBest();
       showSpeed();
       reset();
+      // Le terrain suit la taille de l'écran (seulement quand l'écran est affiché)
+      if ("ResizeObserver" in window) {
+        new ResizeObserver(() => {
+          if (root.classList.contains("active")) resize();
+        }).observe(canvas);
+      }
 
       startBtn.addEventListener("click", () => {
         if (st.running) pause();
@@ -363,6 +381,9 @@
       });
       // Croix de direction, flèches du clavier et glissement du doigt sur le terrain (js/pad.js)
       KA.pad(root, steer, { swipe: canvas });
+    },
+    enter() {
+      resize();
     },
     leave() {
       pause();

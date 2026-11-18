@@ -37,6 +37,7 @@
   let progressRaf = null;
   const peaksCache = new Map(); // id -> formes d'onde (ou null si illisible)
   const rowCanvases = new Map(); // id -> canvas de la ligne affichée
+  const rowPeaks = new Map(); // id -> formes d'onde déjà calculées (pour redessiner après un changement de taille)
 
   function pickMime() {
     if (!window.MediaRecorder || !MediaRecorder.isTypeSupported) return "";
@@ -68,6 +69,27 @@
       g.fillStyle = (i + 0.5) / n <= progress ? COLOR_PLAYED : COLOR_REST;
       g.fillRect(i * (bw + gap), (h - bh) / 2, bw, bh);
     }
+  }
+
+  // ---------- Taille des canvas ----------
+  // La taille interne suit la taille affichée (sinon les barres sont floues ou étirées)
+  function sizeCanvas(canvas, peaks) {
+    const dpr = window.devicePixelRatio || 1;
+    const w = Math.round(canvas.clientWidth * dpr);
+    const h = Math.round(canvas.clientHeight * dpr);
+    if (!w || !h) return; // élément caché : rien à faire
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width = w;
+      canvas.height = h;
+    }
+    drawBars(canvas, peaks, 0);
+  }
+
+  // Appelé quand la taille de l'écran change, et après l'affichage de la liste
+  function resizeAll() {
+    if (!root || !root.classList.contains("active")) return; // écran caché : la taille est nulle
+    if (liveCanvas) sizeCanvas(liveCanvas, FLAT_LIVE);
+    rowCanvases.forEach((canvas, id) => sizeCanvas(canvas, rowPeaks.get(id) || FLAT));
   }
 
   // ---------- Niveau en direct pendant l'enregistrement ----------
@@ -351,6 +373,7 @@
 
   async function remove(id) {
     peaksCache.delete(id);
+    rowPeaks.delete(id);
     await KA.db.del(id);
     render();
   }
@@ -386,7 +409,9 @@
       drawBars(canvas, FLAT, 0);
       rowCanvases.set(r.id, canvas);
       getPeaks(r).then((peaks) => {
-        if (peaks && rowCanvases.get(r.id) === canvas && activeCanvas !== canvas) drawBars(canvas, peaks, 0);
+        if (!peaks) return;
+        rowPeaks.set(r.id, peaks);
+        if (rowCanvases.get(r.id) === canvas && activeCanvas !== canvas) drawBars(canvas, peaks, 0);
       });
 
       info.append(name, canvas);
@@ -400,6 +425,7 @@
       li.append(playBtn, info, delBtn);
       list.appendChild(li);
     });
+    resizeAll(); // les nouvelles lignes prennent la largeur affichée
   }
 
   KA.panels.recorder = {
@@ -413,6 +439,8 @@
       liveCanvas = root.querySelector("#rec-live");
       drawBars(liveCanvas, FLAT_LIVE, 0);
       btn.addEventListener("click", toggle);
+      // Quand la fenêtre change de taille (ou que l'écran s'affiche), on recale les canvas
+      if (window.ResizeObserver) new ResizeObserver(resizeAll).observe(root);
     },
     enter() {
       leaving = false;

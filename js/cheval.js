@@ -821,6 +821,18 @@
     if (JUMP_KEYS.indexOf(e.key) >= 0) releaseJump();
   }
 
+  // Résolution interne = taille affichée × devicePixelRatio. Le dessin reste en 800 × 360 : on met seulement l'échelle.
+  function resize() {
+    const rect = canvas.getBoundingClientRect();
+    if (!rect.width) return; // écran caché : rien à mesurer
+    const w = Math.round(rect.width * (window.devicePixelRatio || 1));
+    const h = Math.round((w * H) / W);
+    if (canvas.width === w && canvas.height === h) return;
+    canvas.width = w;
+    canvas.height = h; // changer la taille remet le contexte à zéro : on remet l'échelle tout de suite
+    ctx.setTransform(w / W, 0, 0, h / H, 0, 0);
+  }
+
   KA.panels.cheval = {
     init(root) {
       canvas = root.querySelector("#cheval-canvas");
@@ -845,8 +857,15 @@
       state = "ready";
       updateHud();
       draw();
+      // Le jeu suit la taille de l'écran (seulement pendant que l'écran est affiché)
+      if ("ResizeObserver" in window) {
+        new ResizeObserver(() => {
+          if (active) resize();
+        }).observe(canvas);
+      }
     },
     enter() {
+      resize();
       active = true;
       holding = false;
       document.addEventListener("keydown", onKeyDown);

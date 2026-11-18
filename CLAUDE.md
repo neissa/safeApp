@@ -2,6 +2,18 @@
 
 Appli web statique en français pour enfants (PWA + APK TWA via PWABuilder). Pas de build : des `<script>` classiques dans `index.html`, un espace global `window.KA`, et un service worker `sw.js` qui garde l'appli hors ligne.
 
+## Public visé
+
+- L'utilisateur de base est un enfant de 3 à 10 ans qui ne sait pas forcément lire.
+- Boutons gros et très visuels : l'icône (emoji, image) porte le sens, le texte n'est qu'un complément.
+- Éviter toute action qui demande de lire pour être comprise ; préférer les images, les couleurs et la voix (`data-say`).
+
+## Travail avec des agents
+
+- Pour chaque tâche demandée par l'utilisateur, déléguer le travail à des sous-agents (outil Agent) avec `model: "haiku"` et `effort: "medium"`.
+- Donner à chaque agent une consigne complète et autonome (fichiers concernés, but, règles de ce fichier à respecter), puis vérifier son résultat avant de répondre à l'utilisateur.
+- Les tâches indépendantes peuvent être confiées à plusieurs agents en parallèle.
+
 ## Mise à jour avant chaque commit
 
 Le téléphone (APK) et les navigateurs gardent une copie en cache. Pour que les changements arrivent, chaque commit doit contenir les fichiers générés à jour. Procédure :
