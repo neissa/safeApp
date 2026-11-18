@@ -27,9 +27,7 @@
   let msgEl = null;
   let presetBox = null;
 
-  function pad(n) {
-    return String(n).padStart(2, "0");
-  }
+  const pad = KA.pad2;
 
   function format(ms) {
     const s = Math.ceil(ms / 1000);

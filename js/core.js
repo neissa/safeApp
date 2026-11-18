@@ -253,6 +253,22 @@
     }
   });
 
+  // ---------- Utilitaires communs ----------
+  // Mélange un tableau sur place (Fisher-Yates) et le retourne.
+  // Pour garder le tableau d'origine, passer une copie : shuffle(liste.slice()).
+  KA.shuffle = function (arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  };
+
+  // Nombre sur deux chiffres (7 devient "07"), pour les heures, minutes et dates
+  KA.pad2 = function (n) {
+    return String(n).padStart(2, "0");
+  };
+
   // ---------- Double appui de sécurité : évite d'effacer quelque chose par erreur ----------
   KA.armed = function (btn, onConfirm) {
     if (btn.classList.contains("armed")) {

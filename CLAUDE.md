@@ -25,7 +25,7 @@ Le téléphone (APK) et les navigateurs gardent une copie en cache. Pour que les
    - écrit `version.json` ;
    - met à jour dans `index.html` les balises `app-version` et `app-built` (date et heure locales, « AAAA-MM-JJ HH:MM ») ;
    - ajoute un `?v=<hash>` à chaque `<script src>` et `<link href>` de `js/` et `css/` ;
-   - met à jour `CACHE` et la liste `SHELL` dans `sw.js` (tous les fichiers de type `.html .js .css .json .ttf .png .mp3 .ogg`).
+   - met à jour `CACHE` et la liste `SHELL` dans `sw.js` (tous les fichiers de type `.html .js .css .json .ttf .woff2 .png .mp3 .ogg`).
 4. Ne jamais modifier à la main `version.json`, les `?v=`, `CACHE` ou le bloc `SHELL` : le script s'en charge.
 5. Commiter ensemble le code et les fichiers générés : `index.html`, `sw.js`, `version.json`.
 6. Ne pas committer ni pousser sans demande explicite de l'utilisateur.
@@ -58,7 +58,7 @@ Si on modifie quelque chose après le script, relancer le script avant le commit
 ## Autres fichiers
 
 - Un nouveau type de fichier (par exemple `.wav`) doit être ajouté à `EXT` dans `tools/update-cache.js`, sinon il n'est pas mis hors ligne.
-- Les sons sont dans `sounds/` (`raptor-sound.*`, `farts/*.mp3`).
+- Les sons sont dans `sounds/` (`raptor-sound.*`, `farts/*.mp3`, `animaux/*`).
 
 ## Vérification
 

@@ -195,9 +195,12 @@ button:active {
 /* ---------- Accueil ---------- */
 .home-head h1 {
   margin: 6px 0 0;
-  text-align: center;
+  grid-column: 1;
+  /* Titre à gauche (la règle plus bas l'emportait déjà) */
+  text-align: left;
   font-size: clamp(18px, 5.4vw, 30px);
   font-weight: 700;
+  padding-left: 4px;
 }
 
 /* Icône et titre personnalisables (voir js/home.js) */
@@ -208,10 +211,6 @@ button:active {
 
 .home-icon {
   display: inline-block;
-}
-
-.home-head .set-box {
-  margin-top: 8px;
 }
 
 /* Au moins 2 colonnes (même à 320px), plus de colonnes quand l'écran est plus large */
@@ -226,10 +225,13 @@ button:active {
 
 .tile {
   aspect-ratio: 1.2;
-  padding: 0;
+  padding: 8px;
   border: none;
   border-radius: 32px;
   display: flex;
+  /* Icône au-dessus, nom en dessous, le tout centré dans la tuile */
+  flex-direction: column;
+  gap: 8px;
   align-items: center;
   justify-content: center;
   font-size: 72px;
@@ -238,13 +240,6 @@ button:active {
   /* Tailles de l'icône et du nom calculées sur la largeur de la tuile (cqw) */
   container-type: inline-size;
   transition: transform 0.1s;
-}
-
-/* Icône au-dessus, nom en dessous, le tout centré dans la tuile */
-.tile {
-  flex-direction: column;
-  gap: 8px;
-  padding: 8px;
 }
 
 /* L'icône est le repère principal : elle occupe environ un tiers de la largeur de la tuile */
@@ -292,12 +287,6 @@ button:active {
   grid-template-columns: 1fr auto;
   align-items: center;
   gap: 8px;
-}
-
-.home-head h1 {
-  grid-column: 1;
-  text-align: left;
-  padding-left: 4px;
 }
 
 /* Bouton de mise à jour (visible seulement quand une version plus récente existe), à côté du menu parent */
@@ -526,6 +515,8 @@ button:active {
   font-weight: bold;
   line-height: 1;
   white-space: nowrap;
+  /* La carte a overflow: hidden : ce padding laisse la place aux jambages (g, j, p, q, y) */
+  padding-bottom: 0.4em;
 }
 
 .alpha-pic {
@@ -559,11 +550,6 @@ button:active {
 /* Dans la carte, la minuscule est collée à la majuscule avec un petit espace */
 .alpha-letter .alpha-low {
   margin-left: 0.15em;
-}
-
-/* La carte a overflow: hidden : ce padding laisse la place aux jambages (g, j, p, q, y) */
-.alpha-letter {
-  padding-bottom: 0.4em;
 }
 
 /* Alphabet : la grille est dans la zone « fit ». alphabet.js choisit le nombre de colonnes (--cols)
@@ -1511,13 +1497,6 @@ button:active {
   background: #ffe082;
 }
 
-#draw-eraser,
-#draw-clear {
-  width: 40px;
-  height: 40px;
-  font-size: 19px;
-}
-
 /* Feuille de dessin : elle remplit toute la place libre sous la barre d'outils (largeur et hauteur).
    Le canvas est redimensionné par draw.js d'après sa taille affichée, donc le trait reste sous le doigt.
    La marge du bas laisse place à l'ombre de la feuille (5px). */
@@ -1619,6 +1598,9 @@ button:active {
    (c'est un conteneur « size » : les touches grandissent avec sa hauteur) */
 #screen-calc .display {
   width: 100%;
+  min-height: clamp(80px, 13vh, 120px);
+  /* Le chiffre reste dans la largeur de l'écran, même sur un téléphone étroit */
+  font-size: min(clamp(40px, 9vh, 64px), 12vw);
 }
 
 #screen-calc .keys {
@@ -1628,14 +1610,10 @@ button:active {
   container-type: size;
 }
 
+/* Cadre de la scène : même taille quel que soit le nombre d'objets */
 #calc-game {
   width: 100%;
-}
-
-#screen-calc .display {
-  min-height: clamp(80px, 13vh, 120px);
-  /* Le chiffre reste dans la largeur de l'écran, même sur un téléphone étroit */
-  font-size: min(clamp(40px, 9vh, 64px), 12vw);
+  position: relative;
 }
 
 #screen-calc .key {
@@ -1785,26 +1763,6 @@ button:active {
 
 audio {
   width: 100%;
-}
-
-/* Champ caché pour changer la playlist Spotify */
-.set-box {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 10px;
-  border-radius: 16px;
-  background: var(--paper);
-  box-shadow: 0 3px 0 var(--shadow);
-}
-
-.set-box input {
-  font: inherit;
-  font-size: 16px;
-  padding: 10px;
-  border: 2px solid var(--line);
-  border-radius: 12px;
-  color: var(--ink);
 }
 
 .spotify {
@@ -2054,12 +2012,6 @@ audio {
   font-size: calc(100cqw / var(--cols) * 0.5);
   line-height: 1;
   box-shadow: 0 3px 0 rgba(0, 0, 0, 0.15);
-}
-
-/* Case vide des grilles impaires (3×3, 5×5) */
-.card-gap {
-  width: 100%;
-  height: 100%;
 }
 
 /* Carte cachée : point d'interrogation discret (les images retournées restent grandes) */
@@ -2472,6 +2424,8 @@ html[data-voice="off"] .speak-btn {
 .tool-row {
   position: relative;
   z-index: 15;
+  /* Outils visibles en ligne, à côté des tailles : une seule rangée pour gagner de la hauteur */
+  gap: 6px;
 }
 
 /* Dessin en pleine largeur : la barre d'outils est centrée, et la feuille garde le reste de la place */
@@ -2516,11 +2470,6 @@ html[data-voice="off"] .speak-btn {
 .dd-tools {
   left: auto;
   right: 0;
-}
-
-/* Outils visibles en ligne, à côté des tailles : une seule rangée pour gagner de la hauteur */
-.tool-row {
-  gap: 6px;
 }
 
 .tool-row .chip.tool {
@@ -2672,11 +2621,6 @@ html[data-voice="off"] .speak-btn {
   flex: 0 0 auto;
   flex-direction: column;
   gap: 12px;
-}
-
-/* Cadre de la scène : même taille quel que soit le nombre d'objets */
-#calc-game {
-  position: relative;
 }
 
 .game-lock {

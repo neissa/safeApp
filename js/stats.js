@@ -7,9 +7,7 @@
   const KEY = "mcm.stats";
   const KEEP_DAYS = 60;
 
-  function pad(n) {
-    return String(n).padStart(2, "0");
-  }
+  const pad = KA.pad2;
 
   // Date locale au format AAAA-MM-JJ
   function dayKey(d) {

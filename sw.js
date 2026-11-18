@@ -1,8 +1,8 @@
 /* Service worker : l'appli fonctionne hors ligne une fois chargée.
    Réseau d'abord (les mises à jour arrivent tout de suite), cache en secours.
-   Spotify, la météo et les fichiers du téléphone ne sont jamais mis en cache.
+   Spotify, la météo, version.json et les fichiers du téléphone ne sont jamais mis en cache.
    La version et la liste des fichiers sont mises à jour par tools/update-cache.js. */
-const CACHE = "mon-coin-magique-43ec8f68f03a";
+const CACHE = "mon-coin-magique-d2767e1844e5";
 
 // BEGIN SHELL (généré par tools/update-cache.js)
 const SHELL = [
@@ -97,14 +97,22 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
   // Retour de connexion Spotify : toujours depuis le réseau
   if (url.searchParams.has("code")) return;
+  // Vérification de mise à jour (version.json?t=…) : toujours depuis le réseau, jamais dans le cache
+  if (url.pathname.endsWith("/version.json")) return;
 
   event.respondWith(
     // « no-cache » : on demande toujours la version actuelle au serveur (pas l'ancienne copie du navigateur)
     fetch(req, { cache: "no-cache" })
       .then((res) => {
-        if (res.ok) {
+        // Seulement les réponses complètes (200) : une 206 (morceau d'audio) ne peut pas être mise en cache
+        if (res.status === 200) {
           const copy = res.clone();
-          caches.open(CACHE).then((cache) => cache.put(req, copy));
+          // Page HTML (navigation) : une seule clé sans paramètres, pour ne pas remplir le cache de « ?maj=… »
+          const key = req.mode === "navigate" ? "./index.html" : req;
+          caches
+            .open(CACHE)
+            .then((cache) => cache.put(key, copy))
+            .catch(() => {}); // cache plein ou refusé : l'appli continue sans le cache
         }
         return res;
       })
