@@ -2,7 +2,7 @@
 
 Une application pour les petits : un écran d'accueil avec de grosses tuiles colorées, des activités simples à utiliser sans savoir lire, et un menu parent protégé par un code.
 
-L'application est une page web statique en français. Elle s'installe comme une application (PWA) ou sur Android avec l'APK (TWA générée avec PWABuilder, dans `apk/`). Elle fonctionne hors ligne grâce au service worker. Tout ce que l'enfant crée (dessins, photos, enregistrements…) reste sur l'appareil.
+L'application est une page web statique en français. Elle s'installe comme une application (PWA) ou sur Android avec l'APK (TWA générée avec PWABuilder, dans `apk/`). Le script `tools/apk-launcher.sh` refait cet APK pour qu'il puisse servir d'écran d'accueil du téléphone (launcher), signé avec la même clé. Elle fonctionne hors ligne grâce au service worker. Tout ce que l'enfant crée (dessins, photos, enregistrements…) reste sur l'appareil.
 
 ## Accueil
 
@@ -19,6 +19,7 @@ L'application est une page web statique en français. Elle s'installe comme une 
 | Tuile | Ce qu'on peut faire |
 | --- | --- |
 | 🎨 **Dessin** | Plusieurs dessins enregistrés automatiquement, avec vignettes. Crayon, gomme, pot de peinture, tampons (⭐ ❤️ ☀️ 🌸 🐶 🚗 🌈 🎈), choix de la couleur, de la forme et de la taille du pinceau, bouton pour annuler. |
+| 🖍️ **Coloriage** | 20 dessins à colorier (princesse, château, sirène, fée, licorne, voitures, pompiers, police, tracteur, fusée, animaux, papillon, poisson, maison) : on choisit une couleur et on touche une zone pour la remplir. Bouton pour annuler, coloriages gardés automatiquement. Avec l'appareil photo (ou une photo de la Galerie), la photo devient un coloriage en noir et blanc. |
 | 📝 **Bloc notes** | Écriture libre sauvegardée automatiquement, lecture à voix haute, bouton **AA** pour passer de l'écriture cursive aux capitales. |
 | 🧮 **Nombre** | Calculatrice avec lecture du résultat à voix haute, et un mode jeu : **compter** des objets ou **calculer** avec des objets, avec des étoiles à gagner. |
 | 🖼️ **Galerie** | Prendre des photos avec la caméra ou en ajouter depuis le téléphone, les voir en grand, les supprimer. |

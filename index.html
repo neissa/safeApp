@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="color-scheme" content="light">
-  <meta name="app-version" content="d2767e1844e5">
-  <meta name="app-built" content="2026-11-18 21:07">
+  <meta name="app-version" content="a8d7d6f18803">
+  <meta name="app-built" content="2026-11-21 22:55">
 
 
 
@@ -33,7 +33,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=13fe0c1b96">
+  <link rel="stylesheet" href="css/style.css?v=6ca1746087">
 </head>
 <body>
 <div id="app">
@@ -52,6 +52,7 @@
     </header>
     <nav class="tiles">
       <button class="tile t-draw" data-open="draw" data-say="Dessin" aria-label="Dessin"><span class="tile-ico">🎨</span><span class="tile-label">Dessin</span></button>
+      <button class="tile t-coloriage" data-open="coloriage" data-say="Coloriage" aria-label="Coloriage"><span class="tile-ico">🖍️</span><span class="tile-label">Coloriage</span></button>
       <button class="tile t-notes" data-open="notes" data-say="Bloc notes" aria-label="Bloc notes"><span class="tile-ico">📝</span><span class="tile-label">Bloc notes</span></button>
       <button class="tile t-calc" data-open="calc" data-say="Nombre" aria-label="Nombre"><span class="tile-ico">🧮</span><span class="tile-label">Nombre</span></button>
       <button class="tile t-gallery" data-open="gallery" data-say="Galerie photos" aria-label="Galerie photos"><span class="tile-ico">🖼️</span><span class="tile-label">Galerie</span></button>
@@ -141,6 +142,53 @@
       </div>
     </div>
     <div class="fit fit-paper"><canvas id="draw-canvas" class="paper"></canvas></div>
+  </section>
+
+  <!-- COLORIAGE -->
+  <section id="screen-coloriage" class="screen">
+    <header class="bar bar-colo">
+      <button class="chip" data-back aria-label="Accueil">🏠</button>
+      <h2>🖍️ Coloriage</h2>
+      <div class="colo-actions">
+        <button class="chip" id="colo-back-list" aria-label="Mes coloriages">🗂️</button>
+        <button class="chip" id="colo-undo" aria-label="Annuler la dernière couleur" disabled>↶</button>
+        <button class="chip" id="colo-reset" aria-label="Recommencer">🗑️</button>
+      </div>
+    </header>
+
+    <!-- Choix du dessin -->
+    <div id="colo-choose" class="colo-choose">
+      <div id="colo-grid" class="colo-grid"></div>
+    </div>
+
+    <!-- Photos de la galerie à transformer -->
+    <div id="colo-pick" class="colo-choose" hidden>
+      <div class="row">
+        <button class="chip" id="colo-pick-close" aria-label="Retour">↩️</button>
+      </div>
+      <div id="colo-pick-grid" class="colo-pick-grid"></div>
+      <p id="colo-pick-empty" class="hint" hidden>🌅 Pas encore de photos</p>
+    </div>
+
+    <!-- Le coloriage : le dessin prend toute la place, la palette est dessous (ou à droite en paysage) -->
+    <div id="colo-work" class="colo-work" hidden>
+      <div class="fit"><canvas id="colo-canvas" class="colo-canvas" aria-label="Dessin à colorier"></canvas></div>
+      <div id="colo-palette" class="colo-palette"></div>
+    </div>
+
+    <!-- Appareil photo plein écran dans l'écran -->
+    <div id="colo-cam" class="cam colo-cam" hidden>
+      <video id="colo-video" autoplay playsinline muted></video>
+      <div class="cam-bar">
+        <button class="chip" id="colo-cam-close" aria-label="Fermer la caméra">✖️</button>
+        <button class="shutter" id="colo-shot" aria-label="Prendre la photo"></button>
+        <span class="spacer"></span>
+      </div>
+    </div>
+    <input id="colo-file" type="file" accept="image/*" capture="environment" hidden>
+
+    <!-- Petit sablier pendant la transformation de la photo -->
+    <div id="colo-busy" class="colo-busy" hidden>⏳</div>
   </section>
 
   <!-- BLOC NOTES -->
@@ -781,6 +829,9 @@
 <script src="js/ui.js?v=3d63d19598"></script>
 <script src="js/pad.js?v=721c09a79d"></script>
 <script src="js/draw.js?v=803e6ff922"></script>
+<script src="js/coloriage-images.js?v=1ebc81fcaa"></script>
+<script src="js/coloriage-photo.js?v=25b928176f"></script>
+<script src="js/coloriage.js?v=98fa1a54b4"></script>
 <script src="js/notes.js?v=0b82255267"></script>
 <script src="js/calc.js?v=1e4cb0c132"></script>
 <script src="js/gallery.js?v=ef63a40877"></script>
