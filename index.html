@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="color-scheme" content="light">
-  <meta name="app-version" content="75d1a5eeff63">
-  <meta name="app-built" content="2026-11-22 09:59">
+  <meta name="app-version" content="4f43616dfb49">
+  <meta name="app-built" content="2026-11-22 10:24">
 
 
 
@@ -33,7 +33,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=6ca1746087">
+  <link rel="stylesheet" href="css/style.css?v=ea1c99d540">
 </head>
 <body>
 <div id="app">
@@ -173,7 +173,10 @@
     <!-- Le coloriage : le dessin prend toute la place, la palette est dessous (ou à droite en paysage) -->
     <div id="colo-work" class="colo-work" hidden>
       <div class="fit"><canvas id="colo-canvas" class="colo-canvas" aria-label="Dessin à colorier"></canvas></div>
-      <div id="colo-palette" class="colo-palette"></div>
+      <div class="colo-side">
+        <div id="colo-tools" class="colo-tools"></div>
+        <div id="colo-palette" class="colo-palette"></div>
+      </div>
     </div>
 
     <!-- Appareil photo plein écran dans l'écran -->
@@ -830,8 +833,9 @@
 <script src="js/pad.js?v=721c09a79d"></script>
 <script src="js/draw.js?v=803e6ff922"></script>
 <script src="js/coloriage-images.js?v=82a795372c"></script>
-<script src="js/coloriage-photo.js?v=25b928176f"></script>
-<script src="js/coloriage.js?v=843570b6b3"></script>
+<script src="js/vendor/photo-to-coloring-page.js?v=61cf667572"></script>
+<script src="js/coloriage-photo.js?v=1dcadc0388"></script>
+<script src="js/coloriage.js?v=77379bacdf"></script>
 <script src="js/notes.js?v=0b82255267"></script>
 <script src="js/calc.js?v=1e4cb0c132"></script>
 <script src="js/gallery.js?v=ef63a40877"></script>

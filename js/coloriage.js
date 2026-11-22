@@ -33,6 +33,17 @@
   let root = null;
   let els = {};
   let selected = 0; // couleur choisie (index dans COLORS)
+
+  // Outils : pot de peinture (remplit une zone) ou pinceau (peinture libre)
+  const BRUSHES = [
+    { px: 14, dot: 12, name: "petit pinceau" },
+    { px: 30, dot: 20, name: "pinceau moyen" },
+    { px: 60, dot: 30, name: "gros pinceau" },
+  ]; // px : diamètre sur un dessin de 1024 px ; dot : taille de la pastille du bouton
+  let tool = KA.ls.get("colo-tool", "fill") === "brush" ? "brush" : "fill";
+  let brushIdx = Math.min(BRUSHES.length - 1, Math.max(0, Number(KA.ls.get("colo-brush", 1)) || 0));
+  let stroke = null; // trait de pinceau en cours : { id, x, y }
+  let renderQueued = false;
   let stream = null; // flux de la caméra
   let urls = []; // URLs d'objets à libérer au prochain affichage
   let cur = null; // dessin ouvert : { id, ico, name, createdAt }
@@ -203,6 +214,70 @@
     render();
     scheduleSave();
     if (typeof KA.tone === "function") KA.tone(784, 0.2, "triangle", 0.2); // petit son de réussite
+  }
+
+  // ---------- Pinceau ----------
+  // Peinture libre sur le canvas des couleurs. Les traits noirs du dessin ne sont jamais recouverts :
+  // l'affichage pose les traits par-dessus en « multiply » (noir × couleur = noir).
+  function toCanvas(clientX, clientY) {
+    const r = els.canvas.getBoundingClientRect();
+    return { x: (clientX - r.left) * (W / r.width), y: (clientY - r.top) * (H / r.height) };
+  }
+
+  function renderSoon() {
+    if (renderQueued) return;
+    renderQueued = true;
+    requestAnimationFrame(() => {
+      renderQueued = false;
+      render();
+    });
+  }
+
+  function brushWidth() {
+    return (BRUSHES[brushIdx].px * Math.max(W, H)) / MAX_SIDE;
+  }
+
+  function brushStart(e) {
+    if (!cur || !colorsCtx) return;
+    pushHistory(colorsCtx.getImageData(0, 0, W, H).data);
+    const p = toCanvas(e.clientX, e.clientY);
+    stroke = { id: e.pointerId, x: p.x, y: p.y };
+    try {
+      els.canvas.setPointerCapture(e.pointerId);
+    } catch (err) {
+      /* capture impossible : le trait s'arrête en sortant du dessin */
+    }
+    colorsCtx.fillStyle = COLORS[selected].hex;
+    colorsCtx.beginPath();
+    colorsCtx.arc(p.x, p.y, brushWidth() / 2, 0, Math.PI * 2);
+    colorsCtx.fill();
+    renderSoon();
+  }
+
+  function brushMove(e) {
+    if (!stroke || e.pointerId !== stroke.id) return;
+    const evs = typeof e.getCoalescedEvents === "function" ? e.getCoalescedEvents() : [];
+    colorsCtx.strokeStyle = COLORS[selected].hex;
+    colorsCtx.lineWidth = brushWidth();
+    colorsCtx.lineCap = "round";
+    colorsCtx.lineJoin = "round";
+    colorsCtx.beginPath();
+    colorsCtx.moveTo(stroke.x, stroke.y);
+    for (const ev of evs.length ? evs : [e]) {
+      const p = toCanvas(ev.clientX, ev.clientY);
+      colorsCtx.lineTo(p.x, p.y);
+      stroke.x = p.x;
+      stroke.y = p.y;
+    }
+    colorsCtx.stroke();
+    renderSoon();
+  }
+
+  function brushEnd(e) {
+    if (!stroke || e.pointerId !== stroke.id) return;
+    stroke = null;
+    render();
+    scheduleSave();
   }
 
   // ---------- Annuler ----------
@@ -558,6 +633,60 @@
     markColor();
   }
 
+  // ---------- Outils : 🪣 remplir, 🖌️ pinceau, tailles du pinceau ----------
+  function markTools() {
+    els.tools.querySelectorAll("[data-tool]").forEach((b) => {
+      const on = b.dataset.tool === tool;
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+    els.tools.querySelectorAll("[data-size]").forEach((b) => {
+      const on = Number(b.dataset.size) === brushIdx;
+      b.hidden = tool !== "brush";
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+
+  function buildTools() {
+    els.tools.innerHTML = "";
+    [
+      { id: "fill", ico: "🪣", label: "Remplir" },
+      { id: "brush", ico: "🖌️", label: "Pinceau" },
+    ].forEach((t) => {
+      const b = document.createElement("button");
+      b.className = "chip colo-tool";
+      b.dataset.tool = t.id;
+      b.textContent = t.ico;
+      b.setAttribute("aria-label", t.label);
+      b.addEventListener("click", () => {
+        tool = t.id;
+        KA.ls.set("colo-tool", tool);
+        markTools();
+        KA.speak(t.label);
+      });
+      els.tools.appendChild(b);
+    });
+    BRUSHES.forEach((s, i) => {
+      const b = document.createElement("button");
+      b.className = "chip colo-size";
+      b.dataset.size = String(i);
+      b.setAttribute("aria-label", s.name);
+      const dot = document.createElement("span");
+      dot.className = "colo-size-dot";
+      dot.style.width = dot.style.height = s.dot + "px";
+      b.appendChild(dot);
+      b.addEventListener("click", () => {
+        brushIdx = i;
+        KA.ls.set("colo-brush", i);
+        markTools();
+        KA.speak(s.name);
+      });
+      els.tools.appendChild(b);
+    });
+    markTools();
+  }
+
   // ---------- Panneau ----------
   KA.panels.coloriage = {
     init(r) {
@@ -571,6 +700,7 @@
         work: root.querySelector("#colo-work"),
         canvas: root.querySelector("#colo-canvas"),
         palette: root.querySelector("#colo-palette"),
+        tools: root.querySelector("#colo-tools"),
         undo: root.querySelector("#colo-undo"),
         reset: root.querySelector("#colo-reset"),
         list: root.querySelector("#colo-back-list"),
@@ -582,11 +712,16 @@
         busy: root.querySelector("#colo-busy"),
       };
       buildPalette();
+      buildTools();
 
       els.canvas.addEventListener("pointerdown", (e) => {
         e.preventDefault();
-        fillAt(e.clientX, e.clientY);
+        if (tool === "brush") brushStart(e);
+        else fillAt(e.clientX, e.clientY);
       });
+      els.canvas.addEventListener("pointermove", brushMove);
+      els.canvas.addEventListener("pointerup", brushEnd);
+      els.canvas.addEventListener("pointercancel", brushEnd);
       els.list.addEventListener("click", async () => {
         await flushSave();
         cur = null;

@@ -3113,6 +3113,47 @@ html[data-voice="off"] .speak-btn {
   cursor: pointer;
 }
 
+/* Outils et couleurs : sous le dessin (portrait) ou à droite (paysage) */
+.colo-side {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px; /* la couleur choisie est grossie : elle ne doit pas toucher les outils */
+}
+
+/* Outils : 🪣 remplir, 🖌️ pinceau, puis les tailles du pinceau */
+.colo-tools {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.colo-tool,
+.colo-size {
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.colo-tool.on,
+.colo-size.on {
+  box-shadow: 0 0 0 3px #ffffff, 0 0 0 6px #333333;
+}
+
+.colo-size-dot {
+  display: block;
+  border-radius: 50%;
+  background: currentColor;
+}
+
 /* Palette : pastilles rondes qui passent à la ligne */
 .colo-palette {
   flex: 0 0 auto;

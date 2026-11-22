@@ -19,7 +19,7 @@ L'application est une page web statique en français. Elle s'installe comme une 
 | Tuile | Ce qu'on peut faire |
 | --- | --- |
 | 🎨 **Dessin** | Plusieurs dessins enregistrés automatiquement, avec vignettes. Crayon, gomme, pot de peinture, tampons (⭐ ❤️ ☀️ 🌸 🐶 🚗 🌈 🎈), choix de la couleur, de la forme et de la taille du pinceau, bouton pour annuler. |
-| 🖍️ **Coloriage** | 20 dessins à colorier (princesse, château, sirène, fée, licorne, voitures, pompiers, police, tracteur, fusée, animaux, papillon, poisson, maison) : on choisit une couleur et on touche une zone pour la remplir. Bouton pour annuler, coloriages gardés automatiquement. Avec l'appareil photo (ou une photo de la Galerie), la photo devient un coloriage en noir et blanc. |
+| 🖍️ **Coloriage** | 20 dessins à colorier (princesse, château, sirène, fée, licorne, voitures, pompiers, police, tracteur, fusée, animaux, papillon, poisson, maison) : on choisit une couleur et on touche une zone pour la remplir 🪣, ou on peint librement au pinceau 🖌️ (trois tailles) sans jamais recouvrir les traits noirs. Bouton pour annuler, coloriages gardés automatiquement. Avec l'appareil photo (ou une photo de la Galerie), la photo devient un coloriage en noir et blanc. |
 | 📝 **Bloc notes** | Écriture libre sauvegardée automatiquement, lecture à voix haute, bouton **AA** pour passer de l'écriture cursive aux capitales. |
 | 🧮 **Nombre** | Calculatrice avec lecture du résultat à voix haute, et un mode jeu : **compter** des objets ou **calculer** avec des objets, avec des étoiles à gagner. |
 | 🖼️ **Galerie** | Prendre des photos avec la caméra ou en ajouter depuis le téléphone, les voir en grand, les supprimer. |
@@ -81,6 +81,7 @@ puis d'ouvrir `index.html` dans le navigateur. Pour les règles de développemen
 - **Marelle** (licence OFL 1.1) : la police d'écriture cursive, créée par le ministère de l'Éducation nationale (DNE) et publiée sur la [forge des communs numériques éducatifs](https://marelle.forge.apps.education.fr/) (présentation sur [Eduscol](https://eduscol.education.gouv.fr/6690/marelle-une-police-cursive-libre)). Voir `css/fonts/Marelle-LICENCE.txt`.
 - **Cris d'animaux** (Wikimedia Commons, licences CC BY-SA, CC BY, GFDL ou domaine public) : le chat, le chien, la vache, le canard, le cochon, le mouton, le cheval et le coq. Voir `sounds/animaux/LICENCES.txt`.
 - **Coloriages** : les 20 dessins de `coloriages/` ont été créés avec ChatGPT (OpenAI), puis nettoyés (noir et blanc, contours fermés pour le remplissage).
+- **photo-to-coloring-page** (licence MIT, Jack Ships) : trace les contours d'une photo pour en faire un coloriage. Copie dans `js/vendor/photo-to-coloring-page.js`, licence en tête du fichier.
 - **Bruit blanc** : aucun fichier, les bruits d'ambiance (pluie, orage, vagues, vent, feu) sont fabriqués par le navigateur.
 - **Bun** : outil de développement pour le script de mise à jour du cache (`tools/update-cache.js`). Il n'est pas nécessaire pour utiliser l'application.
 
