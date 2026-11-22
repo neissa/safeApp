@@ -495,8 +495,9 @@
 
     for (const c of KA.coloriages) {
       const work = await KA.db.get("coloriage-" + c.id).catch(() => null);
-      const svgUrl = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(c.svg);
-      const src = work && work.thumb ? objectUrl(work.thumb) : svgUrl;
+      // Image PNG (c.src) ou, à défaut, dessin SVG intégré (c.svg)
+      const artUrl = c.src || "data:image/svg+xml;charset=utf-8," + encodeURIComponent(c.svg);
+      const src = work && work.thumb ? objectUrl(work.thumb) : artUrl;
       grid.appendChild(
         makeCard({
           src,
@@ -504,7 +505,7 @@
           name: c.name,
           label: c.name,
           say: c.name,
-          onOpen: () => openArt({ id: c.id, ico: c.ico, name: c.name, src: svgUrl, photo: false }),
+          onOpen: () => openArt({ id: c.id, ico: c.ico, name: c.name, src: artUrl, photo: false }),
         })
       );
     }
