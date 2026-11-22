@@ -10,7 +10,11 @@
 #   3. ajoute à l'activité de lancement les catégories HOME et DEFAULT (une seule fois) ;
 #   4. augmente le numéro de version (versionCode) ;
 #   5. reconstruit, aligne et signe avec la MÊME clé (l'appli se met à jour sans être désinstallée) ;
-#   6. vérifie le certificat et le manifeste, puis remplace apk/Mon coin.apk.
+#   6. vérifie le certificat et le manifeste, puis écrit une COPIE : apk/Mon coin launcher.apk
+#      (apk/Mon coin.apk reste tel quel).
+#
+# Les deux APK ont le même nom de paquet et la même clé : installer la copie launcher met à jour
+# l'appli déjà installée (sans perdre les données) et lui ajoute le rôle d'écran d'accueil.
 #
 # Les mots de passe sont lus dans signing-key-info.txt de l'archive, ou dans les variables
 # KS_PASS et KEY_PASS, ou demandés au clavier. Ils ne sont jamais écrits sur le disque.
@@ -20,7 +24,8 @@ set -euo pipefail
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 ZIP="${1:-$HOME/Downloads/Mon coin - Google Play package.zip}"
-OUT_APK="$REPO/apk/Mon coin.apk"
+BASE_APK="$REPO/apk/Mon coin.apk" # APK actuel, jamais modifié
+OUT_APK="${OUT_APK:-$REPO/apk/Mon coin launcher.apk}" # copie launcher
 
 JAVA_HOME="${JAVA_HOME:-/c/Program Files/Android/Android Studio/jbr}"
 export JAVA_HOME PATH="$JAVA_HOME/bin:$PATH"
@@ -99,7 +104,11 @@ fi
 # ---------- 3. Numéro de version ----------
 code_of() { "$AAPT2" dump badging "$1" 2>/dev/null | sed -n "s/.*versionCode='\([0-9]*\)'.*/\1/p" | head -1; }
 SRC_CODE="$(code_of "$SRC_APK")"
-CUR_CODE="$( [ -f "$OUT_APK" ] && code_of "$OUT_APK" || echo 0 )"
+# Le numéro doit dépasser celui de l'APK actuel et celui d'une copie launcher déjà faite
+CUR_CODE=0
+for f in "$BASE_APK" "$OUT_APK"; do
+  if [ -f "$f" ]; then c="$(code_of "$f")"; [ -n "$c" ] && [ "$c" -gt "$CUR_CODE" ] && CUR_CODE="$c"; fi
+done
 BASE=$(( SRC_CODE > CUR_CODE ? SRC_CODE : CUR_CODE ))
 NEW_CODE="${VERSION_CODE:-$(( BASE + 1 ))}"
 # apktool.yml : « versionCode: 1 » ou « versionCode: '1' »
@@ -126,6 +135,6 @@ echo "Nouveau certificat   : $NEW_CERT"
   || fail "HOME absent du manifeste final"
 [ "$(code_of "$WORK/signed.apk")" = "$NEW_CODE" ] || fail "versionCode final inattendu"
 
-# ---------- 6. Remplacement ----------
+# ---------- 6. Copie launcher (l'APK actuel n'est pas touché) ----------
 cp "$WORK/signed.apk" "$OUT_APK"
 echo "OK : $OUT_APK ($(wc -c < "$OUT_APK") octets, versionCode $NEW_CODE, launcher)"

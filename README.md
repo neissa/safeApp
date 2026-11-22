@@ -2,7 +2,7 @@
 
 Une application pour les petits : un écran d'accueil avec de grosses tuiles colorées, des activités simples à utiliser sans savoir lire, et un menu parent protégé par un code.
 
-L'application est une page web statique en français. Elle s'installe comme une application (PWA) ou sur Android avec l'APK (TWA générée avec PWABuilder, dans `apk/`). Le script `tools/apk-launcher.sh` refait cet APK pour qu'il puisse servir d'écran d'accueil du téléphone (launcher), signé avec la même clé. Elle fonctionne hors ligne grâce au service worker. Tout ce que l'enfant crée (dessins, photos, enregistrements…) reste sur l'appareil.
+L'application est une page web statique en français. Elle s'installe comme une application (PWA) ou sur Android avec l'APK (TWA générée avec PWABuilder, dans `apk/`). Le script `tools/apk-launcher.sh` en fait une copie, `apk/Mon coin launcher.apk`, qui peut servir d'écran d'accueil du téléphone (launcher). Elle est signée avec la même clé, donc l'installer met à jour l'appli sans perdre les données. Elle fonctionne hors ligne grâce au service worker. Tout ce que l'enfant crée (dessins, photos, enregistrements…) reste sur l'appareil.
 
 ## Accueil
 
@@ -57,7 +57,7 @@ Ouvert avec le bouton 🔧, protégé par un **code à 4 chiffres** (créé au p
 - **Thème** : clair, sombre ou comme l'appareil.
 - **Spotify** : se connecter ou se déconnecter, choisir la playlist.
 - **Sauvegarde** : place utilisée, sauvegarder toutes les données dans un fichier et les restaurer.
-- **Application** : version et date de construction, vérifier et installer une mise à jour.
+- **Application** : version et date de construction, vérifier et installer une mise à jour, télécharger l'APK Android normal ou l'APK écran d'accueil (launcher).
 - **Sécurité** : changer le code.
 
 ## Données et vie privée
