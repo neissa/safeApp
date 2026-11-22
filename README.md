@@ -80,6 +80,7 @@ puis d'ouvrir `index.html` dans le navigateur. Pour les règles de développemen
 - **Raptorize** (licence MIT) : le cri du dinosaure. Voir `sounds/RAPTORIZE-LICENSE.txt`.
 - **Marelle** (licence OFL 1.1) : la police d'écriture cursive, créée par le ministère de l'Éducation nationale (DNE) et publiée sur la [forge des communs numériques éducatifs](https://marelle.forge.apps.education.fr/) (présentation sur [Eduscol](https://eduscol.education.gouv.fr/6690/marelle-une-police-cursive-libre)). Voir `css/fonts/Marelle-LICENCE.txt`.
 - **Cris d'animaux** (Wikimedia Commons, licences CC BY-SA, CC BY, GFDL ou domaine public) : le chat, le chien, la vache, le canard, le cochon, le mouton, le cheval et le coq. Voir `sounds/animaux/LICENCES.txt`.
+- **Coloriages** : les 20 dessins de `coloriages/` ont été créés avec ChatGPT (OpenAI), puis nettoyés (noir et blanc, contours fermés pour le remplissage).
 - **Bruit blanc** : aucun fichier, les bruits d'ambiance (pluie, orage, vagues, vent, feu) sont fabriqués par le navigateur.
 - **Bun** : outil de développement pour le script de mise à jour du cache (`tools/update-cache.js`). Il n'est pas nécessaire pour utiliser l'application.
 
