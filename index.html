@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="color-scheme" content="light">
-  <meta name="app-version" content="e4dc4b77b387">
-  <meta name="app-built" content="2026-11-23 17:27">
+  <meta name="app-version" content="e76a81efade4">
+  <meta name="app-built" content="2026-11-23 19:34">
 
 
 
@@ -33,7 +33,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="css/style.css?v=666f6cf7da">
+  <link rel="stylesheet" href="css/style.css?v=bc974c477e">
 </head>
 <body>
 <div id="app">
@@ -340,6 +340,11 @@
       <canvas id="rec-live" class="live-wave" width="320" height="80" aria-label="Niveau du son"></canvas>
       <button id="rec-btn" class="rec-btn" aria-label="Enregistrer" data-silent><span></span></button>
       <p id="rec-state" class="hint">Appuie pour parler 🎤</p>
+    </div>
+    <div class="rec-speed" id="rec-speed" role="group" aria-label="Vitesse de lecture">
+      <button class="chip" data-rate="0.5" aria-label="Lecture à moitié vitesse">🐢 x0.5</button>
+      <button class="chip" data-rate="1" aria-label="Vitesse normale">x1</button>
+      <button class="chip" data-rate="2" aria-label="Lecture double vitesse">🐇 x2</button>
     </div>
     <ul id="rec-list" class="list"></ul>
     <p id="rec-empty" class="hint">🎧 Pas encore d'enregistrements</p>
@@ -842,7 +847,7 @@
 <script src="js/calc.js?v=1e4cb0c132"></script>
 <script src="js/gallery.js?v=ef63a40877"></script>
 <script src="js/music.js?v=7e8b9510e0"></script>
-<script src="js/recorder.js?v=01d0ef8e3d"></script>
+<script src="js/recorder.js?v=aa34344208"></script>
 <script src="js/clock.js?v=1fa3567f8c"></script>
 <script src="js/spotify.js?v=d6ebba8e7c"></script>
 <script src="js/parent.js?v=03a2f193cb"></script>

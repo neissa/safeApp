@@ -35,6 +35,9 @@
   let activeCanvas = null;
   let activePeaks = FLAT;
   let progressRaf = null;
+  let playingId = null; // enregistrement en cours de lecture (ou en pause)
+  let speed = Number(KA.ls.get("rec-speed", 1)) || 1; // 0.5, 1 ou 2
+  const rowButtons = new Map(); // id -> bouton ▶️ / ⏸️ de la ligne
   const peaksCache = new Map(); // id -> formes d'onde (ou null si illisible)
   const rowCanvases = new Map(); // id -> canvas de la ligne affichée
   const rowPeaks = new Map(); // id -> formes d'onde déjà calculées (pour redessiner après un changement de taille)
@@ -310,10 +313,66 @@
     if (playingUrl) URL.revokeObjectURL(playingUrl);
     playing = null;
     playingUrl = null;
+    playingId = null;
     if (activeCtx) {
       activeCtx.close().catch(() => {});
       activeCtx = null;
     }
+    refreshButtons();
+  }
+
+  // Durée réelle, ou celle mesurée à l'enregistrement (le WebM n'indique pas toujours la sienne)
+  function durationOf(r, audio) {
+    return isFinite(audio.duration) && audio.duration > 0 ? audio.duration : r.duration / 1000;
+  }
+
+  // Icône ▶️ / ⏸️ de chaque ligne, et mise en avant de la ligne en cours
+  function refreshButtons() {
+    rowButtons.forEach((b, id) => {
+      const on = id === playingId && playing && !playing.paused && !playing.ended;
+      b.textContent = on ? "⏸️" : "▶️";
+      b.setAttribute("aria-label", on ? "Pause" : "Écouter");
+      const row = b.closest(".row-item");
+      if (row) row.classList.toggle("playing", id === playingId);
+    });
+  }
+
+  // ▶️ / ⏸️ : pause ou reprise si c'est déjà cet enregistrement, sinon lecture
+  function togglePlay(r) {
+    if (playingId === r.id && playing && !playing.ended) {
+      if (playing.paused) playing.play().catch(() => {});
+      else playing.pause();
+      refreshButtons();
+      return;
+    }
+    play(r);
+  }
+
+  // Toucher ou glisser sur la forme d'onde : aller à cet endroit (et lancer la lecture si besoin)
+  function seekAt(r, canvas, e) {
+    const rect = canvas.getBoundingClientRect();
+    const ratio = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+    if (playingId === r.id && playing && !playing.ended) {
+      playing.currentTime = ratio * durationOf(r, playing);
+      return;
+    }
+    play(r, ratio);
+  }
+
+  // Vitesse de lecture (0.5, 1 ou 2), gardée pour la prochaine écoute
+  function markSpeed() {
+    root.querySelectorAll("[data-rate]").forEach((b) => {
+      const on = Number(b.dataset.rate) === speed;
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+
+  function setSpeed(v) {
+    speed = v;
+    KA.ls.set("rec-speed", v);
+    if (playing) playing.playbackRate = v;
+    markSpeed();
   }
 
   function showError() {
@@ -339,16 +398,20 @@
     );
   }
 
-  function play(r) {
+  // ratio (0 à 1) : où commencer, quand on a touché la forme d'onde
+  function play(r, ratio = 0) {
     stopPlaying();
     playingUrl = URL.createObjectURL(r.blob);
     const audio = new Audio(playingUrl);
+    audio.playbackRate = speed;
     playing = audio;
+    playingId = r.id;
     activeCanvas = rowCanvases.get(r.id) || null;
     activePeaks = FLAT;
     getPeaks(r).then((peaks) => {
       if (peaks && playing === audio) activePeaks = peaks;
     });
+    if (ratio > 0) audio.currentTime = ratio * durationOf(r, audio); // avant le chargement : débute à cet endroit
 
     const fallback = () => {
       if (playing !== audio) return; // un autre enregistrement a été choisi entre-temps
@@ -356,13 +419,16 @@
     };
     audio.addEventListener("error", fallback);
     audio.addEventListener("ended", () => followProgress(() => 0, () => true));
+    audio.addEventListener("play", refreshButtons);
+    audio.addEventListener("pause", refreshButtons);
+    audio.addEventListener("ended", refreshButtons);
 
     // play() passe « paused » à false tout de suite : la lecture suivie doit démarrer après l'appel
     const started = audio.play();
-    const duration = () => (isFinite(audio.duration) && audio.duration > 0 ? audio.duration : r.duration / 1000);
+    // La barre suit la lecture, même en pause (elle s'arrête seulement à la fin)
     followProgress(
-      () => (duration() ? audio.currentTime / duration() : 0),
-      () => audio.paused || audio.ended
+      () => (durationOf(r, audio) ? audio.currentTime / durationOf(r, audio) : 0),
+      () => audio.ended
     );
 
     started.catch((e) => {
@@ -382,6 +448,7 @@
     const items = await KA.db.list("recording");
     list.innerHTML = "";
     rowCanvases.clear();
+    rowButtons.clear();
     empty.hidden = items.length > 0;
     const ordered = items.slice().reverse(); // le plus récent en haut
     ordered.forEach((r, k) => {
@@ -393,7 +460,8 @@
       playBtn.className = "chip";
       playBtn.textContent = "▶️";
       playBtn.setAttribute("aria-label", "Écouter");
-      playBtn.addEventListener("click", () => play(r));
+      playBtn.addEventListener("click", () => togglePlay(r));
+      rowButtons.set(r.id, playBtn);
 
       const info = document.createElement("div");
       info.className = "rec-info";
@@ -414,6 +482,15 @@
         if (rowCanvases.get(r.id) === canvas && activeCanvas !== canvas) drawBars(canvas, peaks, 0);
       });
 
+      // Toucher ou glisser sur la forme d'onde pour aller à cet endroit
+      canvas.addEventListener("pointerdown", (e) => {
+        canvas.setPointerCapture(e.pointerId);
+        seekAt(r, canvas, e);
+      });
+      canvas.addEventListener("pointermove", (e) => {
+        if (playingId === r.id && canvas.hasPointerCapture(e.pointerId)) seekAt(r, canvas, e);
+      });
+
       info.append(name, canvas);
 
       const delBtn = document.createElement("button");
@@ -426,6 +503,7 @@
       list.appendChild(li);
     });
     resizeAll(); // les nouvelles lignes prennent la largeur affichée
+    refreshButtons(); // la ligne en cours de lecture garde son ⏸️
   }
 
   KA.panels.recorder = {
@@ -439,6 +517,10 @@
       liveCanvas = root.querySelector("#rec-live");
       drawBars(liveCanvas, FLAT_LIVE, 0);
       btn.addEventListener("click", toggle);
+      root.querySelectorAll("[data-rate]").forEach((b) => {
+        b.addEventListener("click", () => setSpeed(Number(b.dataset.rate)));
+      });
+      markSpeed();
       // Quand la fenêtre change de taille (ou que l'écran s'affiche), on recale les canvas
       if (window.ResizeObserver) new ResizeObserver(resizeAll).observe(root);
     },

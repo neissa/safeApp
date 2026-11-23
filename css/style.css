@@ -2789,6 +2789,20 @@ html[data-voice="off"] .speak-btn {
   display: block;
   width: 100%;
   height: 36px;
+  cursor: pointer; /* toucher la forme d'onde pour aller à cet endroit */
+  touch-action: none; /* glisser le doigt pour avancer ou reculer */
+}
+
+/* Vitesse de lecture : le bouton choisi est entouré */
+.rec-speed {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 6px 0;
+}
+
+.rec-speed .chip.on {
+  box-shadow: 0 0 0 3px #ffffff, 0 0 0 6px #333333;
 }
 
 .digits {
