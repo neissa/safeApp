@@ -3204,6 +3204,46 @@ html[data-voice="off"] .speak-btn {
   }
 }
 
+/* Hauteur réduite : la palette n'a plus la place, elle s'ouvre depuis l'outil 🎨 au-dessus du dessin */
+.colo-colors {
+  display: none;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  font-size: 28px;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-height: 560px) {
+  .colo-colors {
+    display: flex;
+  }
+
+  .colo-work {
+    position: relative;
+  }
+
+  .colo-palette {
+    display: none;
+  }
+
+  .colo-work.pal-open .colo-palette {
+    display: grid;
+    grid-template-columns: repeat(4, 50px);
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 20;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 24px;
+    background: var(--paper);
+    box-shadow: 0 5px 0 var(--shadow);
+  }
+}
+
 /* Appareil photo : pleine largeur de l'écran */
 #screen-coloriage .colo-cam {
   width: 100%;

@@ -613,6 +613,7 @@
       b.classList.toggle("on", i === selected);
       b.setAttribute("aria-pressed", i === selected ? "true" : "false");
     });
+    if (els.colorBtn) els.colorBtn.style.background = COLORS[selected].hex; // 🎨 montre la couleur choisie
   }
 
   function buildPalette() {
@@ -626,10 +627,26 @@
       b.addEventListener("click", () => {
         selected = i;
         markColor();
+        els.work.classList.remove("pal-open"); // hauteur réduite : la palette se referme après le choix
         KA.speak(c.name);
       });
       els.palette.appendChild(b);
     });
+    markColor();
+  }
+
+  // Outil 🎨 (visible seulement quand la hauteur est réduite) : ouvre ou ferme la palette au-dessus du dessin
+  function addColorTool() {
+    const b = document.createElement("button");
+    b.className = "chip colo-colors";
+    b.textContent = "🎨";
+    b.setAttribute("aria-label", "Choisir une couleur");
+    b.addEventListener("click", () => {
+      els.work.classList.toggle("pal-open");
+      KA.speak("Couleurs");
+    });
+    els.tools.appendChild(b);
+    els.colorBtn = b;
     markColor();
   }
 
@@ -713,9 +730,11 @@
       };
       buildPalette();
       buildTools();
+      addColorTool();
 
       els.canvas.addEventListener("pointerdown", (e) => {
         e.preventDefault();
+        els.work.classList.remove("pal-open");
         if (tool === "brush") brushStart(e);
         else fillAt(e.clientX, e.clientY);
       });
