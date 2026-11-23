@@ -7,7 +7,8 @@
 # Ce que fait le script :
 #   1. extrait l'APK et la clé de signature de l'archive PWABuilder dans un dossier temporaire ;
 #   2. ouvre l'APK avec apktool (téléchargé une fois dans ~/.cache/apktool) ;
-#   3. ajoute à l'activité de lancement les catégories HOME et DEFAULT (une seule fois) ;
+#   3. ajoute une activité « écran d'accueil » (tools/apk-launcher/HomeActivity.java, compilée avec
+#      javac et d8) qui reste ouverte et relance l'appli à chaque appui sur Accueil ;
 #   4. augmente le numéro de version (versionCode) ;
 #   5. reconstruit, aligne et signe avec la MÊME clé (l'appli se met à jour sans être désinstallée) ;
 #   6. vérifie le certificat et le manifeste, puis écrit une COPIE : apk/Mon coin launcher.apk
@@ -78,28 +79,47 @@ echo "Ouverture de l'APK…"
 java -jar "$APKTOOL_JAR" d -f -q -o "$WORK/dec" "$SRC_APK"
 MANIFEST="$WORK/dec/AndroidManifest.xml"
 
-# ---------- 2. Catégorie HOME (idempotent) ----------
-if grep -q 'android.intent.category.HOME' "$MANIFEST"; then
-  echo "Le manifeste déclare déjà HOME."
+# ---------- 2. Activité « écran d'accueil » (idempotent) ----------
+# L'activité de lancement de la TWA lance Chrome puis se ferme : elle ne peut pas être l'écran d'accueil.
+# On ajoute HomeActivity (tools/apk-launcher/HomeActivity.java), qui reste ouverte sous l'appli et la
+# relance à chaque appui sur Accueil (singleTask : l'appli repart sur ses tuiles).
+grep -q '<application' "$MANIFEST" || fail "balise <application> introuvable dans le manifeste"
+if grep -q 'HomeActivity' "$MANIFEST"; then
+  echo "Le manifeste déclare déjà HomeActivity."
 else
-  # Après l'intent-filter qui contient LAUNCHER, on ajoute un second intent-filter MAIN + HOME + DEFAULT.
   awk '
-    /android.intent.category.LAUNCHER/ { seen = 1 }
-    { print }
-    seen && /<\/intent-filter>/ {
-      match($0, /^[ \t]*/); ind = substr($0, 1, RLENGTH)
-      print ind "<intent-filter>"
-      print ind "    <action android:name=\"android.intent.action.MAIN\"/>"
-      print ind "    <category android:name=\"android.intent.category.HOME\"/>"
-      print ind "    <category android:name=\"android.intent.category.DEFAULT\"/>"
-      print ind "</intent-filter>"
-      seen = 0; done = 1
+    /<\/application>/ && !done {
+      print "        <activity android:name=\"io.github.neissa.twa.HomeActivity\" android:exported=\"true\""
+      print "            android:launchMode=\"singleTask\" android:excludeFromRecents=\"true\""
+      print "            android:taskAffinity=\"io.github.neissa.twa.home\""
+      print "            android:stateNotNeeded=\"true\" android:theme=\"@android:style/Theme.Material.Light.NoActionBar\">"
+      print "            <intent-filter>"
+      print "                <action android:name=\"android.intent.action.MAIN\"/>"
+      print "                <category android:name=\"android.intent.category.HOME\"/>"
+      print "                <category android:name=\"android.intent.category.DEFAULT\"/>"
+      print "            </intent-filter>"
+      print "        </activity>"
+      done = 1
     }
+    { print }
     END { if (!done) exit 3 }
-  ' "$MANIFEST" > "$MANIFEST.new" || fail "activité LAUNCHER introuvable dans le manifeste"
+  ' "$MANIFEST" > "$MANIFEST.new" || fail "fin de <application> introuvable dans le manifeste"
   mv "$MANIFEST.new" "$MANIFEST"
-  echo "Catégorie HOME ajoutée."
+  echo "HomeActivity déclarée."
 fi
+
+# Compilation de HomeActivity en dex (javac + d8), ajouté à l'APK après la reconstruction
+ANDROID_JAR="$(ls -d "$ANDROID_SDK"/platforms/android-* | sort -V | tail -1)/android.jar"
+[ -f "$ANDROID_JAR" ] || fail "android.jar introuvable dans $ANDROID_SDK/platforms"
+D8="$BT/d8"; [ -f "$D8.bat" ] && D8="$D8.bat"
+mkdir -p "$WORK/home/classes" "$WORK/home/dex"
+javac -nowarn -encoding UTF-8 --release 11 -cp "$ANDROID_JAR" -d "$WORK/home/classes" "$REPO/tools/apk-launcher/HomeActivity.java" 2>/dev/null \
+  || javac -nowarn -encoding UTF-8 -source 11 -target 11 -cp "$ANDROID_JAR" -d "$WORK/home/classes" "$REPO/tools/apk-launcher/HomeActivity.java"
+"$D8" --release --min-api 21 --lib "$ANDROID_JAR" --output "$WORK/home/dex" "$WORK/home/classes/io/github/neissa/twa/HomeActivity.class"
+# Numéro du nouveau fichier dex : après ceux de l'APK (smali, smali_classes2, …)
+DEX_N=$(( $(ls -d "$WORK/dec"/smali* | wc -l) + 1 ))
+mv "$WORK/home/dex/classes.dex" "$WORK/home/dex/classes$DEX_N.dex"
+echo "HomeActivity compilée (classes$DEX_N.dex)."
 
 # ---------- 3. Numéro de version ----------
 code_of() { "$AAPT2" dump badging "$1" 2>/dev/null | sed -n "s/.*versionCode='\([0-9]*\)'.*/\1/p" | head -1; }
@@ -119,6 +139,7 @@ echo "versionCode : $SRC_CODE (PWABuilder) / $CUR_CODE (dépôt) -> $NEW_CODE"
 # ---------- 4. Reconstruction, alignement, signature ----------
 echo "Reconstruction…"
 java -jar "$APKTOOL_JAR" b -q -o "$WORK/unsigned.apk" "$WORK/dec"
+( cd "$WORK/home/dex" && jar ufM "$WORK/unsigned.apk" "classes$DEX_N.dex" )
 "$ZIPALIGN" -p -f 4 "$WORK/unsigned.apk" "$WORK/aligned.apk"
 "$APKSIGNER" sign --ks "$KEYSTORE" --ks-key-alias "$KEY_ALIAS" \
   --ks-pass env:KS_PASS --key-pass env:KEY_PASS \
@@ -133,6 +154,7 @@ echo "Nouveau certificat   : $NEW_CERT"
 [ -n "$NEW_CERT" ] && [ "$OLD_CERT" = "$NEW_CERT" ] || fail "certificats différents : l'APK ne pourrait pas remplacer l'appli installée"
 "$AAPT2" dump xmltree --file AndroidManifest.xml "$WORK/signed.apk" | grep -q 'android.intent.category.HOME' \
   || fail "HOME absent du manifeste final"
+unzip -l "$WORK/signed.apk" | grep -q "classes$DEX_N.dex" || fail "HomeActivity absente de l'APK final"
 [ "$(code_of "$WORK/signed.apk")" = "$NEW_CODE" ] || fail "versionCode final inattendu"
 
 # ---------- 6. Copie launcher (l'APK actuel n'est pas touché) ----------
