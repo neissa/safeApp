@@ -3116,13 +3116,19 @@ html[data-voice="off"] .speak-btn {
   flex: 1 1 0;
 }
 
+/* Cadre du dessin : quand on zoome, le dessin agrandi reste dans ce cadre */
+.colo-zoom {
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 0 5px 0 var(--shadow);
+}
+
 .colo-canvas {
   display: block;
   width: min(100cqw, calc(100cqh * var(--r, 1)));
   height: calc(min(100cqw, calc(100cqh * var(--r, 1))) / var(--r, 1));
   background: #ffffff;
-  border-radius: 20px;
-  box-shadow: 0 5px 0 var(--shadow);
+  transform-origin: 0 0; /* zoom (pincer à deux doigts) posé par js/coloriage.js */
   touch-action: none;
   cursor: pointer;
 }

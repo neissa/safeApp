@@ -233,8 +233,115 @@
     });
   }
 
+  // Divisé par le zoom : le pinceau garde la même taille à l'écran, on peut colorier les petits coins
   function brushWidth() {
-    return (BRUSHES[brushIdx].px * Math.max(W, H)) / MAX_SIDE;
+    return (BRUSHES[brushIdx].px * Math.max(W, H)) / MAX_SIDE / view.zoom;
+  }
+
+  // ---------- Zoom : pincer à deux doigts (ou molette) pour agrandir, deux doigts pour déplacer ----------
+  const MAX_ZOOM = 5;
+  const view = { zoom: 1, x: 0, y: 0 }; // décalage en px CSS, origine en haut à gauche du dessin
+  const pointers = new Map(); // doigts posés sur le dessin : id -> { x, y }
+  let pinch = null; // pincement en cours
+  let tap = null; // remplissage en attente (fait au lever du doigt) : { id, x, y }
+
+  // Applique le zoom ; le dessin agrandi couvre toujours son cadre (pas de bord vide)
+  function setView(zoom, x, y) {
+    const z = Math.min(MAX_ZOOM, Math.max(1, zoom));
+    const w = els.canvas.offsetWidth;
+    const h = els.canvas.offsetHeight;
+    view.zoom = z;
+    view.x = Math.min(0, Math.max(w * (1 - z), x));
+    view.y = Math.min(0, Math.max(h * (1 - z), y));
+    els.canvas.style.transform = z === 1 ? "" : `translate(${view.x}px, ${view.y}px) scale(${z})`;
+  }
+
+  // Zoome autour d'un point de l'écran (il reste sous les doigts ou la souris)
+  function zoomAround(base, cx, cy, zoom, sx, sy) {
+    const z = Math.min(MAX_ZOOM, Math.max(1, zoom));
+    setView(z, sx - base.left - cx * z, sy - base.top - cy * z);
+  }
+
+  function pinchPoints() {
+    const [a, b] = [...pointers.values()];
+    return { d: Math.hypot(a.x - b.x, a.y - b.y) || 1, x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+  }
+
+  function startPinch() {
+    const r = els.canvas.getBoundingClientRect();
+    const p = pinchPoints();
+    pinch = {
+      d0: p.d,
+      z0: view.zoom,
+      base: { left: r.left - view.x, top: r.top - view.y }, // coin du dessin sans zoom
+      cx: (p.x - r.left) / view.zoom, // point du dessin sous les doigts
+      cy: (p.y - r.top) / view.zoom,
+    };
+  }
+
+  function movePinch() {
+    const p = pinchPoints();
+    zoomAround(pinch.base, pinch.cx, pinch.cy, (pinch.z0 * p.d) / pinch.d0, p.x, p.y);
+  }
+
+  // Un deuxième doigt arrive : ce n'était pas un coloriage, on l'annule
+  function cancelPaint() {
+    tap = null;
+    if (stroke) {
+      stroke = null;
+      undo(); // le trait commencé par le premier doigt disparaît
+    }
+  }
+
+  function onPointerDown(e) {
+    e.preventDefault();
+    els.work.classList.remove("pal-open");
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    try {
+      els.canvas.setPointerCapture(e.pointerId);
+    } catch (err) {
+      /* capture impossible : sans gravité */
+    }
+    if (pointers.size === 2) {
+      cancelPaint();
+      startPinch();
+      return;
+    }
+    if (pointers.size > 2 || pinch) return;
+    if (tool === "brush") brushStart(e);
+    else tap = { id: e.pointerId, x: e.clientX, y: e.clientY };
+  }
+
+  function onPointerMove(e) {
+    if (!pointers.has(e.pointerId)) return;
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pinch) {
+      if (pointers.size >= 2) movePinch();
+      return;
+    }
+    if (tap && tap.id === e.pointerId && Math.hypot(e.clientX - tap.x, e.clientY - tap.y) > 15) tap = null;
+    brushMove(e);
+  }
+
+  function onPointerUp(e) {
+    pointers.delete(e.pointerId);
+    if (pinch) {
+      if (pointers.size === 0) pinch = null; // le doigt restant ne colorie pas
+      return;
+    }
+    if (tap && tap.id === e.pointerId && e.type === "pointerup") fillAt(tap.x, tap.y);
+    tap = null;
+    brushEnd(e);
+  }
+
+  function onWheel(e) {
+    e.preventDefault();
+    const r = els.canvas.getBoundingClientRect();
+    const base = { left: r.left - view.x, top: r.top - view.y };
+    const cx = (e.clientX - r.left) / view.zoom;
+    const cy = (e.clientY - r.top) / view.zoom;
+    const zoom = view.zoom * (e.deltaY < 0 ? 1.25 : 1 / 1.25);
+    zoomAround(base, cx, cy, zoom, e.clientX, e.clientY);
   }
 
   function brushStart(e) {
@@ -380,6 +487,7 @@
     els.canvas.width = W;
     els.canvas.height = H;
     els.canvas.style.setProperty("--r", String(W / H));
+    setView(1, 0, 0); // un nouveau dessin s'ouvre en entier
     history = [];
     updateUndo();
     cur = {
@@ -732,15 +840,11 @@
       buildTools();
       addColorTool();
 
-      els.canvas.addEventListener("pointerdown", (e) => {
-        e.preventDefault();
-        els.work.classList.remove("pal-open");
-        if (tool === "brush") brushStart(e);
-        else fillAt(e.clientX, e.clientY);
-      });
-      els.canvas.addEventListener("pointermove", brushMove);
-      els.canvas.addEventListener("pointerup", brushEnd);
-      els.canvas.addEventListener("pointercancel", brushEnd);
+      els.canvas.addEventListener("pointerdown", onPointerDown);
+      els.canvas.addEventListener("pointermove", onPointerMove);
+      els.canvas.addEventListener("pointerup", onPointerUp);
+      els.canvas.addEventListener("pointercancel", onPointerUp);
+      els.canvas.addEventListener("wheel", onWheel, { passive: false });
       els.list.addEventListener("click", async () => {
         await flushSave();
         cur = null;
